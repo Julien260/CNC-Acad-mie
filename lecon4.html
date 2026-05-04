@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leçon 4 : Compensation de Rayon - CNC Académie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #f97316; --orange-dark: #ea6c0a;
+            --navy: #0f172a; --navy-mid: #1e293b;
+            --mono: 'Space Mono', monospace;
+            --display: 'Barlow Condensed', sans-serif;
+            --body: 'Barlow', sans-serif;
+        }
+        * { font-family: var(--body); }
+        h1,h2,h3,h4 { font-family: var(--display); }
+        body { background: #f1f5f9; color: #0f172a; }
+
+        /* NAV */
+        .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
+        #mobile-menu { display: none; }
+        #mobile-menu.open { display: block; }
+        .dropdown-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); width: 18rem; background: white; border-radius: 0.75rem; box-shadow: 0 20px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0; z-index: 100; overflow: hidden; }
+        .dropdown-trigger:hover .dropdown-menu, .dropdown-trigger:focus-within .dropdown-menu { display: block; }
+        .menu-lesson { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; text-decoration: none; }
+        .menu-lesson:hover { background: #fff7ed; }
+        .menu-lesson:last-child { border-bottom: none; }
+        .menu-lesson-num { font-family: var(--mono); font-size: 0.6rem; color: var(--orange); letter-spacing: 0.1em; text-transform: uppercase; display: block; }
+        .menu-lesson-title { font-size: 0.85rem; color: #1e293b; font-weight: 500; }
+        .menu-lesson.active { background: #fff7ed; }
+        .menu-lesson.active .menu-lesson-num, .menu-lesson.active .menu-lesson-title { color: var(--orange); font-weight: 700; }
+        .menu-lesson.done .menu-lesson-num { color: #22c55e; }
+        .menu-lesson.pro:hover { background: #eef2ff; }
+        .menu-lesson.pro .menu-lesson-num { color: #6366f1; }
+        .badge-pro { font-size: 0.6rem; background: #6366f1; color: white; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.4rem; }
+        .btn-primary { background: var(--orange); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 2rem; border-radius: 6px; transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none; }
+        .btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); }
+        .btn-secondary { border: 2px solid #e2e8f0; color: #475569; font-family: var(--display); font-weight: 700; text-transform: uppercase; padding: 0.75rem 1.5rem; border-radius: 6px; transition: all 0.2s; display: inline-block; text-decoration: none; font-size: 0.9rem; }
+        .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+
+        /* PROGRESS */
+        .progress-bar { background: var(--navy-mid); border-bottom: 1px solid #1e293b; overflow-x: auto; }
+        .progress-step { display: flex; align-items: center; gap: 0.4rem; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; color: #475569; padding: 0.75rem 0; white-space: nowrap; }
+        .progress-step.active { color: var(--orange); }
+        .progress-step.done { color: #22c55e; }
+        .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #334155; flex-shrink: 0; }
+        .progress-step.active .progress-dot { background: var(--orange); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+        .progress-step.done .progress-dot { background: #22c55e; }
+        .progress-line { height: 1px; background: #334155; flex: 1; }
+        .progress-line.done { background: #22c55e; }
+
+        /* PAGE HEADER */
+        .page-header { background: var(--navy); position: relative; overflow: hidden; padding: 3rem 1.5rem; }
+        .page-header::before { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(249,115,22,0.06) 39px, rgba(249,115,22,0.06) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(249,115,22,0.06) 39px, rgba(249,115,22,0.06) 40px); pointer-events: none; }
+        .page-header-inner { position: relative; z-index: 1; }
+        .level-badge { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.35); color: var(--orange); padding: 0.3rem 0.8rem; border-radius: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 1rem; }
+        .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1; text-transform: uppercase; color: white; }
+        .page-sub { color: #94a3b8; font-size: 0.95rem; margin-top: 0.75rem; max-width: 560px; line-height: 1.6; }
+
+        /* COMP CARDS G41/G42 */
+        .comp-card { border-left: 6px solid; border-radius: 14px; padding: 1.75rem; background: white; transition: transform 0.2s, box-shadow 0.2s; }
+        .comp-card:hover { transform: translateX(6px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+
+        /* CODE BLOCK */
+        .code-block { background: var(--navy); border-radius: 10px; padding: 1.25rem 1.5rem; font-family: var(--mono); font-size: 0.78rem; line-height: 1.9; color: #64748b; border-left: 3px solid var(--orange); }
+        .code-block .kw { color: var(--orange); }
+        .code-block .val { color: #7dd3fc; }
+        .code-block .cm { color: #475569; font-style: italic; }
+        .code-block .hi { color: #fb923c; font-weight: 700; }
+        .code-block .hi-b { color: #60a5fa; font-weight: 700; }
+        .code-block .danger { color: #f87171; font-weight: 700; }
+
+        /* STRATÉGIE CARDS */
+        .strat-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.5rem; }
+
+        /* CORRECTEURS TABLE */
+        .corr-table { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .corr-table table { width: 100%; border-collapse: collapse; }
+        .corr-table thead tr { background: var(--navy); }
+        .corr-table thead th { padding: 0.7rem 1rem; font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.08em; color: #94a3b8; text-align: left; font-weight: 400; }
+        .corr-table tbody tr { border-bottom: 1px solid #f1f5f9; }
+        .corr-table tbody tr:last-child { border-bottom: none; }
+        .corr-table td { padding: 0.9rem 1rem; font-size: 0.875rem; }
+
+        /* SVG DIAGRAM */
+        .diagram-wrap { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.07); border: 1px solid #e2e8f0; }
+
+        /* IMAGE FRAME */
+        .img-frame { background: var(--navy-mid); border-radius: 12px; overflow: hidden; }
+        .img-frame img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+
+        /* LESSON NAV */
+        .lesson-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.5s ease both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+    </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+    <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+        <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+        <div class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+            <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+            <div class="relative dropdown-trigger">
+                <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-orange-400 transition">
+                    COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                    <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
+                    <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
+                    <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
+                    <a href="lecon4.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 04</span><span class="menu-lesson-title">Compensation (G41/G42)</span></a>
+                    <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
+                    <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
+                    <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
+                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                </div>
+            </div>
+            <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+            <a href="feedback.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+        </div>
+        <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+            <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+        <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
+        <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
+        <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
+        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
+        <div>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
+            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
+            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
+            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
+            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
+            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
+            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
+            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══ PROGRESS ═══ -->
+<div class="progress-bar">
+    <div class="container mx-auto max-w-5xl px-6">
+        <div class="flex items-center gap-2 py-1">
+            <div class="progress-step done"><span class="progress-dot"></span>L.1 Axes</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.2 G54</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.3 F/S</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step active"><span class="progress-dot"></span>L.4 Comp.</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.5 Perçage</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.6 M98</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.7 Sécu.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="page-header">
+    <div class="container mx-auto max-w-5xl page-header-inner fade-up">
+        <div class="level-badge">Niveau Intermédiaire · Leçon 04 / 10</div>
+        <h2 class="page-title">L'Intelligence<br>du <span style="color:var(--orange)">Rayon</span></h2>
+        <p class="page-sub italic">"Programmez le profil de la pièce, laissez la machine calculer l'écart." — C'est la puissance de G41/G42.</p>
+    </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="container mx-auto max-w-5xl py-12 px-6">
+
+    <!-- ── POURQUOI COMPENSER ── -->
+    <section class="mb-12 fade-up">
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+                <h3 class="text-2xl font-black uppercase mb-4 text-slate-800">Pourquoi compenser le rayon ?</h3>
+                <p class="text-gray-600 leading-relaxed mb-4 text-sm">
+                    Par défaut, la machine déplace le <strong>centre</strong> de la broche sur les coordonnées programmées. Si vous demandez <code style="font-family:var(--mono); background:#f1f5f9; padding:0 4px; border-radius:3px">X50.</code>, le centre de la fraise ira à X=50. Mais la coupe se fait à <strong>X=45</strong> si votre fraise fait 10mm de diamètre.
+                </p>
+                <div class="bg-orange-50 border-l-4 border-orange-500 rounded-r-xl p-4 text-sm text-orange-800 font-medium">
+                    G41/G42 décale automatiquement la trajectoire du rayon de l'outil — vous programmez sur le profil exact de la pièce, la commande fait le reste.
+                </div>
+            </div>
+
+            <!-- Schéma SVG : sans/avec compensation -->
+            <div class="diagram-wrap">
+                <p style="font-family:var(--mono); font-size:0.6rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.75rem">Schéma — effet de la compensation</p>
+                <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg" width="100%">
+                    <!-- Profil pièce -->
+                    <rect x="60" y="60" width="200" height="80" rx="4" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5,3"/>
+                    <text x="155" y="105" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="monospace">PROFIL PIÈCE</text>
+
+                    <!-- Sans G41 : trajectoire centre (rouge) -->
+                    <line x1="40" y1="60" x2="260" y2="60" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2"/>
+                    <!-- Fraise sans comp -->
+                    <circle cx="40" cy="60" r="10" fill="none" stroke="#ef4444" stroke-width="1.5" opacity="0.7"/>
+                    <circle cx="40" cy="60" r="1.5" fill="#ef4444"/>
+                    <text x="42" y="44" font-size="8" fill="#ef4444" font-family="monospace">centre fraise</text>
+                    <text x="42" y="54" font-size="7" fill="#ef4444" font-family="monospace">sans G41 →</text>
+
+                    <!-- Avec G41 : trajectoire décalée (verte) -->
+                    <line x1="40" y1="50" x2="260" y2="50" stroke="#22c55e" stroke-width="2"/>
+                    <!-- Flèche décalage -->
+                    <line x1="80" y1="50" x2="80" y2="60" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2,2"/>
+                    <text x="83" y="56" font-size="7" fill="#475569" font-family="monospace">R=5mm</text>
+
+                    <!-- Fraise avec comp -->
+                    <circle cx="260" cy="50" r="10" fill="none" stroke="#22c55e" stroke-width="2"/>
+                    <circle cx="260" cy="50" r="1.5" fill="#22c55e"/>
+                    <text x="200" y="36" font-size="8" fill="#22c55e" font-family="monospace">avec G41 ✓</text>
+
+                    <!-- Légende -->
+                    <rect x="60" y="155" width="10" height="2" fill="#ef4444"/>
+                    <text x="74" y="160" font-size="8" fill="#64748b" font-family="monospace">Sans comp. → pièce trop petite</text>
+                    <rect x="60" y="168" width="10" height="2" fill="#22c55e"/>
+                    <text x="74" y="173" font-size="8" fill="#64748b" font-family="monospace">Avec G41 → profil exact</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── G41 vs G42 CARDS ── -->
+    <section class="mb-12 fade-up delay-1">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="h-px flex-1 bg-slate-200"></div>
+            <h3 class="text-xl font-black uppercase text-slate-700" style="font-family:var(--display)">G41 ou G42 : lequel choisir ?</h3>
+            <div class="h-px flex-1 bg-slate-200"></div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <!-- G41 -->
+            <div class="comp-card" style="border-left-color:#2563eb">
+                <div class="flex items-baseline gap-3 mb-3">
+                    <span class="text-5xl font-black text-blue-600 italic" style="font-family:var(--display)">G41</span>
+                    <span class="text-xs font-bold uppercase text-blue-500 bg-blue-50 px-2 py-0.5 rounded">Gauche du profil</span>
+                </div>
+                <p class="text-sm text-gray-600 leading-relaxed mb-4">Le plus utilisé en <strong>fraisage avalant</strong>. Imaginez que vous êtes assis sur l'outil et que vous regardez dans la direction d'avance : la pièce est à votre droite, vous êtes à sa gauche → G41.</p>
+                <ul class="space-y-1.5 text-xs text-gray-600">
+                    <li class="flex items-center gap-2"><span class="text-blue-500">✔</span> Fraisage extérieur d'un contour</li>
+                    <li class="flex items-center gap-2"><span class="text-blue-500">✔</span> Avalant (climb milling) — finition supérieure</li>
+                    <li class="flex items-center gap-2"><span class="text-blue-500">✔</span> Cas le plus fréquent en atelier</li>
+                </ul>
+            </div>
+            <!-- G42 -->
+            <div class="comp-card" style="border-left-color:var(--orange)">
+                <div class="flex items-baseline gap-3 mb-3">
+                    <span class="text-5xl font-black text-orange-600 italic" style="font-family:var(--display)">G42</span>
+                    <span class="text-xs font-bold uppercase text-orange-500 bg-orange-50 px-2 py-0.5 rounded">Droite du profil</span>
+                </div>
+                <p class="text-sm text-gray-600 leading-relaxed mb-4">Utilisé en <strong>fraisage en opposition</strong> ou pour des profils intérieurs spécifiques. L'outil se décale à droite du trait de programmation.</p>
+                <ul class="space-y-1.5 text-xs text-gray-600">
+                    <li class="flex items-center gap-2"><span class="text-orange-500">!</span> Opposition — pour les machines à jeu de vis</li>
+                    <li class="flex items-center gap-2"><span class="text-orange-500">!</span> Ébauche sur croûte de fonderie</li>
+                    <li class="flex items-center gap-2"><span class="text-orange-500">!</span> Certains profils intérieurs spécifiques</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Schéma SVG avalant vs opposition -->
+        <div class="diagram-wrap">
+            <p style="font-family:var(--mono); font-size:0.6rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem">Avalant (G41) vs Opposition (G42) — sens de rotation et d'avance</p>
+            <svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg" width="100%">
+                <!-- AVALANT -->
+                <text x="90" y="18" text-anchor="middle" font-size="10" font-weight="bold" fill="#16a34a" font-family="monospace">AVALANT (G41)</text>
+                <!-- Pièce -->
+                <rect x="20" y="60" width="140" height="50" rx="4" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5"/>
+                <text x="90" y="90" text-anchor="middle" font-size="8" fill="#16a34a" font-family="monospace">PIÈCE</text>
+                <!-- Outil -->
+                <circle cx="90" cy="45" r="14" fill="none" stroke="#22c55e" stroke-width="2"/>
+                <circle cx="90" cy="45" r="2" fill="#22c55e"/>
+                <!-- Rotation -->
+                <path d="M 103 38 A 14 14 0 0 0 103 52" stroke="#22c55e" stroke-width="1.5" fill="none" marker-end="url(#arrowG)"/>
+                <!-- Avance -->
+                <line x1="30" y1="45" x2="70" y2="45" stroke="#22c55e" stroke-width="2" marker-end="url(#arrowG2)"/>
+                <text x="48" y="38" font-size="8" fill="#16a34a" font-family="monospace">avance →</text>
+                <text x="55" y="145" text-anchor="middle" font-size="8" fill="#16a34a" font-family="monospace">Copeau : épais → fin ✓</text>
+
+                <!-- OPPOSITION -->
+                <text x="300" y="18" text-anchor="middle" font-size="10" font-weight="bold" fill="#dc2626" font-family="monospace">OPPOSITION (G42)</text>
+                <rect x="230" y="60" width="140" height="50" rx="4" fill="#fff1f2" stroke="#ef4444" stroke-width="1.5"/>
+                <text x="300" y="90" text-anchor="middle" font-size="8" fill="#dc2626" font-family="monospace">PIÈCE</text>
+                <circle cx="300" cy="45" r="14" fill="none" stroke="#ef4444" stroke-width="2"/>
+                <circle cx="300" cy="45" r="2" fill="#ef4444"/>
+                <path d="M 313 52 A 14 14 0 0 0 313 38" stroke="#ef4444" stroke-width="1.5" fill="none" marker-end="url(#arrowR)"/>
+                <line x1="240" y1="45" x2="280" y2="45" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowR2)"/>
+                <text x="258" y="38" font-size="8" fill="#dc2626" font-family="monospace">avance →</text>
+                <text x="265" y="145" text-anchor="middle" font-size="8" fill="#dc2626" font-family="monospace">Copeau : fin → épais (friction)</text>
+
+                <defs>
+                    <marker id="arrowG" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#22c55e"/></marker>
+                    <marker id="arrowG2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#22c55e"/></marker>
+                    <marker id="arrowR" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#ef4444"/></marker>
+                    <marker id="arrowR2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#ef4444"/></marker>
+                </defs>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ── TABLEAU CORRECTEURS ── -->
+    <section class="mb-12 fade-up delay-1">
+        <div class="grid md:grid-cols-2 gap-6 items-start">
+            <div>
+                <h3 class="text-xl font-black uppercase mb-4 text-slate-700" style="font-family:var(--display)">📋 Les mémoires de la machine</h3>
+                <div class="corr-table mb-4">
+                    <table>
+                        <thead><tr><th>Type</th><th>Code</th><th>Rôle</th><th>Activé par</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><span style="font-family:var(--mono); font-weight:700; color:#2563eb">Longueur (L)</span></td>
+                                <td><code style="font-family:var(--mono); background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:0.8rem">H01</code></td>
+                                <td class="text-sm text-gray-600">Compense la longueur outil (Z)</td>
+                                <td><code style="font-family:var(--mono); font-size:0.75rem; color:var(--orange)">G43</code></td>
+                            </tr>
+                            <tr>
+                                <td><span style="font-family:var(--mono); font-weight:700; color:var(--orange)">Rayon (R)</span></td>
+                                <td><code style="font-family:var(--mono); background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:0.8rem">D01</code></td>
+                                <td class="text-sm text-gray-600">Compense le rayon (X/Y)</td>
+                                <td><code style="font-family:var(--mono); font-size:0.75rem; color:var(--orange)">G41/G42</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bg-slate-800 rounded-xl p-4 text-sm">
+                    <span class="text-orange-400 font-bold block mb-2" style="font-family:var(--display); text-transform:uppercase">💡 L'avantage du D</span>
+                    <p class="text-slate-300 text-xs leading-relaxed">Votre fraise de 10mm s'use et ne fait plus que 9.98mm ? Changez juste la valeur dans <code style="font-family:var(--mono); color:var(--orange)">D01</code> — la pièce redevient parfaite <strong>sans toucher au programme</strong>.</p>
+                </div>
+            </div>
+            <!-- Image table correcteurs -->
+            <div class="img-frame h-52">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Fanuc_tool_offset_screen.png/640px-Fanuc_tool_offset_screen.png"
+                     alt="Table des correcteurs Fanuc"
+                     class="w-full h-full object-cover"
+                     onerror="this.parentElement.style.background='#1e293b'; this.parentElement.innerHTML='<div style=\'display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:0.5rem;padding:1rem\'><svg width=\'40\' height=\'40\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'#475569\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2\'/></svg><span style=\'font-family:monospace;font-size:0.7rem;color:#475569;text-align:center\'>Table des correcteurs Fanuc D/H</span></div>'">
+            </div>
+        </div>
+    </section>
+
+    <!-- ── STRATÉGIE AVALANT / OPPOSITION ── -->
+    <section class="mb-12 fade-up delay-2">
+        <div class="bg-slate-900 rounded-2xl p-8">
+            <h3 class="text-orange-500 text-2xl font-black uppercase mb-6" style="font-family:var(--display)">Avalant vs Opposition : Le duel</h3>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="strat-card">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="bg-green-500 text-white px-3 py-0.5 rounded text-xs font-bold uppercase">Recommandé</span>
+                        <h4 class="text-white font-black uppercase" style="font-family:var(--display)">Avalant (G41)</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-3">L'outil tourne dans le même sens que l'avance — comme une roue qui "mord" la route.</p>
+                    <ul class="space-y-2 text-xs text-slate-300">
+                        <li class="flex gap-2"><span class="text-green-400">✔</span> Copeau épais → fin : meilleure finition de surface</li>
+                        <li class="flex gap-2"><span class="text-green-400">✔</span> Plaque la pièce contre le montage (stable)</li>
+                        <li class="flex gap-2"><span class="text-green-400">✔</span> Chaleur évacuée dans le copeau</li>
+                        <li class="flex gap-2"><span class="text-green-400">✔</span> Durée de vie outil supérieure</li>
+                    </ul>
+                </div>
+                <div class="strat-card border-l-2 border-slate-600 pl-8">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="bg-red-500 text-white px-3 py-0.5 rounded text-xs font-bold uppercase">Spécifique</span>
+                        <h4 class="text-white font-black uppercase" style="font-family:var(--display)">Opposition (G42)</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-3">L'outil tourne en sens inverse de l'avance — la dent frotte avant de couper.</p>
+                    <ul class="space-y-2 text-xs text-slate-300">
+                        <li class="flex gap-2"><span class="text-orange-400">!</span> Copeau fin → épais : écrouissage possible</li>
+                        <li class="flex gap-2"><span class="text-orange-400">!</span> Tend à soulever la pièce → vibrations</li>
+                        <li class="flex gap-2"><span class="text-orange-400">!</span> Utile sur machines à jeu de vis (anciennes)</li>
+                        <li class="flex gap-2"><span class="text-orange-400">!</span> Croûte de fonderie ou matériaux abrasifs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── CODE EXEMPLE ── -->
+    <section class="mb-4 fade-up">
+        <h3 class="text-xl font-black uppercase text-slate-700 mb-4" style="font-family:var(--display)">Programme complet — Contourage avec G41</h3>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="code-block">
+                <span class="cm">( CONTOURAGE EXTÉRIEUR — G41 )</span><br>
+                <span class="kw">T01 M06</span>                <span class="cm">; fraise D10</span><br>
+                <span class="kw">G00 G90 G54</span> X<span class="val">-20.</span> Y<span class="val">-20.</span><br>
+                <span class="kw">S4000 M03 M08</span><br>
+                <span class="kw">G43</span> H<span class="val">01</span> Z<span class="val">2.</span>       <span class="cm">; comp. longueur</span><br>
+                <span class="kw">G01</span> Z<span class="val">-5.</span> F<span class="val">500.</span><br>
+                <span class="hi">G41 D01</span> X<span class="val">0.</span> Y<span class="val">0.</span>    <span class="cm">; activation + rayon</span><br>
+                <span class="kw">G01</span> Y<span class="val">100.</span> F<span class="val">1500.</span><br>
+                <span class="kw">G01</span> X<span class="val">100.</span><br>
+                <span class="kw">G01</span> Y<span class="val">0.</span><br>
+                <span class="kw">G01</span> X<span class="val">-10.</span><br>
+                <span class="danger">G40</span> X<span class="val">-20.</span> Y<span class="val">-20.</span> <span class="cm">; annulation OBLIGATOIRE</span><br>
+                <span class="kw">G00</span> Z<span class="val">100.</span> <span class="kw">M09 M05</span><br>
+                <span class="kw">M30</span>
+            </div>
+            <div class="space-y-3">
+                <div class="bg-red-50 border-l-4 border-red-500 rounded-r-xl p-4">
+                    <h5 class="font-black text-red-700 text-sm uppercase mb-2" style="font-family:var(--display)">⚠️ Règle de sécurité absolue</h5>
+                    <p class="text-xs text-red-600 leading-relaxed">L'activation <strong>(G41/G42)</strong> et l'annulation <strong>(G40)</strong> doivent TOUJOURS se faire lors d'un <strong>mouvement linéaire (G00 ou G01)</strong> d'une distance supérieure au rayon de l'outil. Jamais en milieu de contour.</p>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-xl p-4">
+                    <h5 class="font-bold text-slate-700 text-sm mb-2" style="font-family:var(--display); text-transform:uppercase">Le "D" c'est quoi ?</h5>
+                    <p class="text-xs text-gray-600 leading-relaxed"><code style="font-family:var(--mono); background:#f1f5f9; padding:0 4px; border-radius:3px">D01</code> dit à la machine : "Lis la valeur du rayon n°1 dans la table des correcteurs." Changez de fraise → modifiez D01, pas le programme.</p>
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 rounded-r-xl p-4">
+                    <h5 class="font-bold text-blue-700 text-sm mb-2" style="font-family:var(--display); text-transform:uppercase">Astuce tolérance</h5>
+                    <p class="text-xs text-blue-700 leading-relaxed">Pour ajuster une cote sans retoucher le programme, modifiez D01 : si la pièce est <strong>trop grande</strong> de 0.02mm, augmentez D01 de 0.01mm (le rayon s'agrandit = la pièce diminue).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── NAV LEÇONS ── -->
+    <div class="lesson-nav">
+        <a href="lecon3.html" class="btn-secondary">← Leçon 3 : F/S</a>
+        <div class="text-center"><p style="font-family:var(--mono)" class="text-xs text-slate-400 uppercase tracking-widest">Leçon 4 / 10</p></div>
+        <a href="lecon5.html" class="btn-primary">Leçon 5 : Cycles de Perçage →</a>
+    </div>
+
+</main>
+
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-8">
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Engineering Excellence</p>
+</footer>
+
+<script>
+    const burgerBtn = document.getElementById('burger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const burgerIcon = document.getElementById('burger-icon');
+    const closeIcon = document.getElementById('close-icon');
+    burgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+        burgerIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+    });
+</script>
+</body>
+</html>

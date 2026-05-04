@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leçon 1 : Les Axes et les Mouvements - CNC Académie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #f97316;
+            --orange-dark: #ea6c0a;
+            --navy: #0f172a;
+            --navy-mid: #1e293b;
+            --mono: 'Space Mono', monospace;
+            --display: 'Barlow Condensed', sans-serif;
+            --body: 'Barlow', sans-serif;
+        }
+        * { font-family: var(--body); }
+        h1,h2,h3,h4 { font-family: var(--display); }
+        body { background: #f1f5f9; color: #0f172a; }
+
+        /* ── NAV ── */
+        .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
+        #mobile-menu { display: none; }
+        #mobile-menu.open { display: block; }
+        .dropdown-menu {
+            display: none; position: absolute; right: 0; top: calc(100% + 4px);
+            width: 18rem; background: white; border-radius: 0.75rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0;
+            z-index: 100; overflow: hidden;
+        }
+        .dropdown-trigger:hover .dropdown-menu,
+        .dropdown-trigger:focus-within .dropdown-menu { display: block; }
+        .menu-lesson { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; text-decoration: none; }
+        .menu-lesson:hover { background: #fff7ed; }
+        .menu-lesson:last-child { border-bottom: none; }
+        .menu-lesson-num { font-family: var(--mono); font-size: 0.6rem; color: var(--orange); letter-spacing: 0.1em; text-transform: uppercase; display: block; }
+        .menu-lesson-title { font-size: 0.85rem; color: #1e293b; font-weight: 500; }
+        .menu-lesson.active { background: #fff7ed; }
+        .menu-lesson.active .menu-lesson-num { color: var(--orange); }
+        .menu-lesson.active .menu-lesson-title { color: var(--orange); font-weight: 700; }
+        .menu-lesson.pro:hover { background: #eef2ff; }
+        .menu-lesson.pro .menu-lesson-num { color: #6366f1; }
+        .badge-pro { font-size: 0.6rem; background: #6366f1; color: white; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.4rem; }
+        .btn-primary { background: var(--orange); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 2rem; border-radius: 6px; transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none; }
+        .btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); }
+
+        /* ── PAGE HEADER ── */
+        .page-header { background: var(--navy); position: relative; overflow: hidden; padding: 3rem 1.5rem; }
+        .page-header::before {
+            content: ''; position: absolute; inset: 0;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(249,115,22,0.06) 39px, rgba(249,115,22,0.06) 40px),
+                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(249,115,22,0.06) 39px, rgba(249,115,22,0.06) 40px);
+            pointer-events: none;
+        }
+        .page-header-inner { position: relative; z-index: 1; }
+        .level-badge { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.35); color: var(--orange); padding: 0.3rem 0.8rem; border-radius: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 1rem; }
+        .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1; text-transform: uppercase; color: white; }
+        .page-sub { color: #94a3b8; font-size: 0.95rem; margin-top: 0.75rem; max-width: 560px; line-height: 1.6; }
+
+        /* ── PROGRESS BAR ── */
+        .progress-bar { background: var(--navy-mid); border-bottom: 1px solid #1e293b; }
+        .progress-step { display: flex; align-items: center; gap: 0.4rem; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; color: #475569; padding: 0.75rem 0; white-space: nowrap; }
+        .progress-step.active { color: var(--orange); }
+        .progress-step.done { color: #22c55e; }
+        .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #334155; flex-shrink: 0; }
+        .progress-step.active .progress-dot { background: var(--orange); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+        .progress-step.done .progress-dot { background: #22c55e; }
+        .progress-line { height: 1px; background: #334155; flex: 1; }
+
+        /* ── CONTENT SECTIONS ── */
+        .content-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+
+        /* Axis cards */
+        .axis-card { border-radius: 12px; padding: 1.25rem 1.5rem; transition: transform 0.2s, box-shadow 0.2s; }
+        .axis-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+
+        /* Section letter badge */
+        .section-badge { width: 2.5rem; height: 2.5rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 900; font-size: 1.1rem; flex-shrink: 0; }
+
+        /* Image placeholders */
+        .img-frame { background: var(--navy-mid); border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .img-frame img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+
+        /* Code block */
+        .code-block { font-family: var(--mono); font-size: 0.78rem; background: var(--navy); border-left: 3px solid var(--orange); padding: 1rem 1.25rem; border-radius: 6px; color: #64748b; line-height: 1.9; }
+        .code-block .kw { color: var(--orange); }
+        .code-block .val { color: #7dd3fc; }
+        .code-block .cm { color: #475569; font-style: italic; }
+
+        /* Retenir box */
+        .retenir-box { background: var(--navy); border-radius: 16px; padding: 2rem; position: relative; overflow: hidden; }
+        .retenir-box::before { content: '§'; font-family: var(--display); font-size: 8rem; font-weight: 900; position: absolute; right: -0.5rem; top: -1.5rem; color: rgba(255,255,255,0.03); pointer-events: none; line-height: 1; }
+        .retenir-item { border: 1px solid #1e293b; border-radius: 10px; padding: 1rem 1.25rem; }
+        .retenir-item .label { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; color: var(--orange); text-transform: uppercase; display: block; margin-bottom: 0.4rem; }
+
+        /* Nav leçon prev/next */
+        .lesson-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; }
+        .btn-secondary { border: 2px solid #e2e8f0; color: #475569; font-family: var(--display); font-weight: 700; text-transform: uppercase; padding: 0.75rem 1.5rem; border-radius: 6px; transition: all 0.2s; display: inline-block; text-decoration: none; font-size: 0.9rem; }
+        .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+
+        /* Animations */
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.5s ease both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+    </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+    <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+        <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+        <div class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+            <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+            <div class="relative dropdown-trigger">
+                <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-orange-400 transition">
+                    COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                    <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
+                    <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
+                    <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
+                    <a href="lecon4.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 04</span><span class="menu-lesson-title">Compensation (G41/G42)</span></a>
+                    <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
+                    <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
+                    <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
+                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                </div>
+            </div>
+            <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+            <a href="feedback.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+        </div>
+        <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+            <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+        <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
+        <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
+        <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
+        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
+        <div>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
+            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
+            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
+            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
+            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
+            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
+            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
+            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══ PROGRESS BAR ═══ -->
+<div class="progress-bar overflow-x-auto">
+    <div class="container mx-auto max-w-5xl px-6">
+        <div class="flex items-center gap-2 py-1">
+            <div class="progress-step active"><span class="progress-dot"></span>L.1 Axes</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.2 G54</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.3 F/S</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.4 Comp.</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.5 Perçage</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.6 M98</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.7 Sécu.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="page-header">
+    <div class="container mx-auto max-w-5xl page-header-inner fade-up">
+        <div class="level-badge">Niveau Débutant · Leçon 01 / 10</div>
+        <h2 class="page-title">S'orienter<br>dans <span style="color:var(--orange)">l'espace</span></h2>
+        <p class="page-sub">Avant de coder, il faut savoir où l'on va. Apprenez la logique des axes CNC — la même sur toutes les machines du monde.</p>
+    </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="container mx-auto max-w-5xl py-12 px-6">
+
+    <!-- ── SECTION 1 : Règle de la main droite ── -->
+    <section class="mb-12 fade-up">
+        <div class="content-card">
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="section-badge bg-orange-100 text-orange-600">✋</div>
+                        <h3 class="text-2xl font-black uppercase text-slate-800">La règle de la main droite</h3>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed mb-5">
+                        Toutes les machines CNC du monde — Fanuc, Siemens, Haas — suivent la <strong>même logique</strong>. Pour ne jamais confondre les directions, utilisez votre main droite :
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 bg-slate-50 rounded-lg px-4 py-3">
+                            <span class="text-red-500 font-black text-lg" style="font-family:var(--mono)">X</span>
+                            <div><strong>Pouce</strong> — Droite <span class="text-green-600 font-bold">(X+)</span> ou Gauche <span class="text-red-500 font-bold">(X-)</span></div>
+                        </div>
+                        <div class="flex items-center gap-3 bg-slate-50 rounded-lg px-4 py-3">
+                            <span class="text-green-500 font-black text-lg" style="font-family:var(--mono)">Y</span>
+                            <div><strong>Index</strong> — Avant <span class="text-green-600 font-bold">(Y+)</span> ou Arrière <span class="text-red-500 font-bold">(Y-)</span></div>
+                        </div>
+                        <div class="flex items-center gap-3 bg-slate-50 rounded-lg px-4 py-3">
+                            <span class="text-blue-500 font-black text-lg" style="font-family:var(--mono)">Z</span>
+                            <div><strong>Majeur</strong> — Haut <span class="text-green-600 font-bold">(Z+)</span> ou Bas <span class="text-red-500 font-bold">(Z-)</span></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Image règle main droite -->
+                <div class="img-frame h-75 md:h-75">
+                    <img src="https://www.methodephysique.fr/main-droite.png"
+                         alt="Règle de la main droite - axes XYZ"
+                         class="object-contain bg-white p-4 w-full h-full"
+                         onerror="this.parentElement.innerHTML='<div class=\'flex flex-col items-center justify-center h-full text-slate-400 gap-2\'><svg class=\'w-12 h-12\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01\'></path></svg><span class=\'text-xs\'>Schéma axes X·Y·Z</span></div>'">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── SECTION 2 : Fraisage ── -->
+    <section class="mb-12 fade-up delay-1">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="section-badge bg-blue-600 text-white">F</div>
+            <h3 class="text-2xl font-black uppercase text-blue-700">Le Fraisage — Le volume en 3D</h3>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <div class="axis-card bg-blue-50 border-l-4 border-blue-500">
+                    <h4 class="font-bold text-blue-800 uppercase mb-1" style="font-family:var(--display)">Axe Z — La profondeur</h4>
+                    <p class="text-sm text-gray-600">C'est l'axe de la broche. Quand Z descend vers la pièce, les valeurs sont <strong>négatives (Z-)</strong>. Quand il remonte vers le haut, elles sont <strong>positives (Z+)</strong>.</p>
+                </div>
+                <div class="axis-card bg-blue-50 border-l-4 border-blue-500">
+                    <h4 class="font-bold text-blue-800 uppercase mb-1" style="font-family:var(--display)">Axes X &amp; Y — Le plateau</h4>
+                    <p class="text-sm text-gray-600">X est le mouvement latéral (longueur de la table). Y est le mouvement de profondeur (largeur de la table). Ensemble, ils définissent la position dans le plan horizontal.</p>
+                </div>
+                <div class="code-block">
+                    <span class="cm">; Exemple fraisage simple</span><br>
+                    <span class="kw">G00</span> X0. Y0. Z5.   <span class="cm">; Approche rapide</span><br>
+                    <span class="kw">G01</span> Z<span class="val">-5.</span> F<span class="val">100.</span>    <span class="cm">; Plongée Z-</span><br>
+                    <span class="kw">G01</span> X<span class="val">100.</span> Y<span class="val">50.</span> F<span class="val">200.</span> <span class="cm">; Déplacement XY</span><br>
+                    <span class="kw">G00</span> Z<span class="val">5.</span>           <span class="cm">; Dégagement Z+</span>
+                </div>
+            </div>
+
+            <!-- Image fraiseuse avec axes -->
+            <div class="img-frame h-64 md:h-auto min-h-48">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/CNC_Milling_Machine.jpg/640px-CNC_Milling_Machine.jpg"
+                     alt="Fraiseuse CNC 3 axes"
+                     class="w-full h-full object-cover"
+                     onerror="this.parentElement.innerHTML='<div class=\'flex flex-col items-center justify-center h-full text-slate-400 gap-2 p-4\'><svg class=\'w-12 h-12\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z\'></path></svg><span class=\'text-xs text-center\'>Fraiseuse CNC 3 axes X·Y·Z</span></div>'">
+            </div>
+        </div>
+    </section>
+
+    <!-- ── SECTION 3 : Tournage ── -->
+    <section class="mb-12 fade-up delay-2">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="section-badge bg-orange-500 text-white">T</div>
+            <h3 class="text-2xl font-black uppercase text-orange-600">Le Tournage — La révolution</h3>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Image tour CNC -->
+            <div class="img-frame h-64 md:h-auto min-h-48 order-2 md:order-1">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/CNC_Lathe.jpg/640px-CNC_Lathe.jpg"
+                     alt="Tour CNC 2 axes"
+                     class="w-full h-full object-cover"
+                     onerror="this.parentElement.innerHTML='<div class=\'flex flex-col items-center justify-center h-full text-slate-400 gap-2 p-4\'><svg class=\'w-12 h-12\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4\'></path></svg><span class=\'text-xs text-center\'>Tour CNC 2 axes X·Z</span></div>'">
+            </div>
+
+            <div class="space-y-4 order-1 md:order-2">
+                <p class="text-gray-600 text-sm bg-white rounded-lg p-4 border border-slate-200">En tournage, seulement <strong>deux axes</strong> suffisent car la pièce tourne sur elle-même autour de l'axe Z.</p>
+                <div class="axis-card bg-orange-50 border-l-4 border-orange-500">
+                    <h4 class="font-bold text-orange-800 uppercase mb-1" style="font-family:var(--display)">Axe Z — La longueur</h4>
+                    <p class="text-sm text-gray-600">C'est l'axe de rotation de la pièce. Si l'outil se déplace vers le mandrin (vers la gauche), c'est <strong>Z-</strong>.</p>
+                </div>
+                <div class="axis-card bg-orange-50 border-l-4 border-orange-500">
+                    <h4 class="font-bold text-orange-800 uppercase mb-1" style="font-family:var(--display)">Axe X — Le diamètre</h4>
+                    <p class="text-sm text-gray-600">Cet axe règle le <strong>diamètre</strong> de la pièce. Les valeurs X sont programmées en <strong>diamètre</strong> (et non en rayon) sur la plupart des commandes Fanuc.</p>
+                </div>
+                <div class="code-block">
+                    <span class="cm">; Exemple tournage chariotage</span><br>
+                    <span class="kw">G96</span> S<span class="val">180</span> M03  <span class="cm">; Vc constante</span><br>
+                    <span class="kw">G00</span> X<span class="val">42.</span> Z<span class="val">2.</span><br>
+                    <span class="kw">G01</span> X<span class="val">40.</span> Z<span class="val">-25.</span> F<span class="val">0.2</span><br>
+                    <span class="kw">G00</span> X<span class="val">100.</span> Z<span class="val">100.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── À RETENIR ── -->
+    <section class="mb-4 fade-up">
+        <div class="retenir-box">
+            <p style="font-family:var(--mono)" class="text-xs text-orange-400 uppercase tracking-widest mb-4">// Ce qu'il faut retenir</p>
+            <h3 class="text-white text-2xl font-black uppercase mb-6" style="font-family:var(--display)">Les 3 règles fondamentales</h3>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="retenir-item">
+                    <span class="label">Coordonnées</span>
+                    <p class="text-slate-300 text-sm">Toutes les positions s'écrivent avec un point décimal. Ex : <code style="font-family:var(--mono);color:var(--orange)">X50.</code> et non <code style="font-family:var(--mono);color:#64748b">X50</code>.</p>
+                </div>
+                <div class="retenir-item">
+                    <span class="label">Mouvement</span>
+                    <p class="text-slate-300 text-sm">Un chiffre <span class="text-green-400 font-bold">positif</span> s'éloigne du zéro pièce. Un chiffre <span class="text-red-400 font-bold">négatif</span> s'en approche ou rentre dans la matière.</p>
+                </div>
+                <div class="retenir-item">
+                    <span class="label">Zéro Pièce</span>
+                    <p class="text-slate-300 text-sm">L'origine de tous les axes s'appelle le <strong class="text-orange-400">Zéro Pièce</strong> (Work Zero / Origin). On l'appelle G54 — c'est la leçon 2.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── NAVIGATION LEÇONS ── -->
+    <div class="lesson-nav">
+        <a href="index.html" class="btn-secondary">← Introduction</a>
+        <div class="text-center">
+            <p style="font-family:var(--mono)" class="text-xs text-slate-400 uppercase tracking-widest">Leçon 1 / 10</p>
+        </div>
+        <a href="lecon2.html" class="btn-primary">Leçon 2 : Le Point Zéro →</a>
+    </div>
+
+</main>
+
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-8">
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Apprendre sans limite</p>
+</footer>
+
+<script>
+    const burgerBtn = document.getElementById('burger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const burgerIcon = document.getElementById('burger-icon');
+    const closeIcon = document.getElementById('close-icon');
+    burgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+        burgerIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+    });
+</script>
+</body>
+</html>

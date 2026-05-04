@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leçon 6 : Sous-Programmes M98/M99 - CNC Académie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #f97316; --orange-dark: #ea6c0a;
+            --navy: #0f172a; --navy-mid: #1e293b;
+            --mono: 'Space Mono', monospace;
+            --display: 'Barlow Condensed', sans-serif;
+            --body: 'Barlow', sans-serif;
+        }
+        * { font-family: var(--body); }
+        h1,h2,h3,h4 { font-family: var(--display); }
+        body { background: #f1f5f9; color: #0f172a; }
+
+        /* NAV */
+        .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
+        #mobile-menu { display: none; }
+        #mobile-menu.open { display: block; }
+        .dropdown-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); width: 18rem; background: white; border-radius: 0.75rem; box-shadow: 0 20px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0; z-index: 100; overflow: hidden; }
+        .dropdown-trigger:hover .dropdown-menu, .dropdown-trigger:focus-within .dropdown-menu { display: block; }
+        .menu-lesson { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; text-decoration: none; }
+        .menu-lesson:hover { background: #fff7ed; }
+        .menu-lesson:last-child { border-bottom: none; }
+        .menu-lesson-num { font-family: var(--mono); font-size: 0.6rem; color: var(--orange); letter-spacing: 0.1em; text-transform: uppercase; display: block; }
+        .menu-lesson-title { font-size: 0.85rem; color: #1e293b; font-weight: 500; }
+        .menu-lesson.active { background: #fff7ed; }
+        .menu-lesson.active .menu-lesson-num, .menu-lesson.active .menu-lesson-title { color: var(--orange); font-weight: 700; }
+        .menu-lesson.done .menu-lesson-num { color: #22c55e; }
+        .menu-lesson.pro:hover { background: #eef2ff; }
+        .menu-lesson.pro .menu-lesson-num { color: #6366f1; }
+        .badge-pro { font-size: 0.6rem; background: #6366f1; color: white; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.4rem; }
+        .btn-primary { background: var(--orange); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 2rem; border-radius: 6px; transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none; }
+        .btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); }
+        .btn-secondary { border: 2px solid #e2e8f0; color: #475569; font-family: var(--display); font-weight: 700; text-transform: uppercase; padding: 0.75rem 1.5rem; border-radius: 6px; transition: all 0.2s; display: inline-block; text-decoration: none; font-size: 0.9rem; }
+        .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+
+        /* PROGRESS */
+        .progress-bar { background: var(--navy-mid); border-bottom: 1px solid #1e293b; overflow-x: auto; }
+        .progress-step { display: flex; align-items: center; gap: 0.4rem; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; color: #475569; padding: 0.75rem 0; white-space: nowrap; }
+        .progress-step.active { color: var(--orange); }
+        .progress-step.done { color: #22c55e; }
+        .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #334155; flex-shrink: 0; }
+        .progress-step.active .progress-dot { background: var(--orange); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+        .progress-step.done .progress-dot { background: #22c55e; }
+        .progress-line { height: 1px; background: #334155; flex: 1; }
+        .progress-line.done { background: #22c55e; }
+
+        /* PAGE HEADER */
+        .page-header { background: var(--navy); position: relative; overflow: hidden; padding: 3rem 1.5rem; }
+        .page-header::before { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(249,115,22,0.06) 39px, rgba(249,115,22,0.06) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(249,115,22,0.06) 39px, rgba(249,115,22,0.06) 40px); pointer-events: none; }
+        .page-header-inner { position: relative; z-index: 1; }
+        .level-badge { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.35); color: var(--orange); padding: 0.3rem 0.8rem; border-radius: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 1rem; }
+        .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1; text-transform: uppercase; color: white; }
+        .page-sub { color: #94a3b8; font-size: 0.95rem; margin-top: 0.75rem; max-width: 560px; line-height: 1.6; }
+
+        /* CONCEPT CARDS */
+        .concept-card { border-left: 5px solid var(--orange); background: white; padding: 1.25rem 1.5rem; border-radius: 0 12px 12px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: border-color 0.2s, box-shadow 0.2s; }
+        .concept-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.09); }
+
+        /* CODE BLOCKS */
+        .code-main { background: var(--navy); border-radius: 10px; padding: 1.25rem 1.5rem; font-family: var(--mono); font-size: 0.75rem; line-height: 1.9; color: #64748b; border-top: 4px solid #3b82f6; }
+        .code-sub  { background: var(--navy); border-radius: 10px; padding: 1.25rem 1.5rem; font-family: var(--mono); font-size: 0.75rem; line-height: 1.9; color: #64748b; border-top: 4px solid #10b981; }
+        .kw  { color: var(--orange); }
+        .val { color: #7dd3fc; }
+        .cm  { color: #475569; font-style: italic; }
+        .m98 { color: #fb923c; font-weight: 700; }
+        .m99 { color: #4ade80; font-weight: 700; }
+        .osub { color: #4ade80; font-weight: 700; }
+        .omain { color: #60a5fa; font-weight: 700; }
+        .g91  { color: #a78bfa; font-weight: 700; }
+
+        /* DIAGRAM */
+        .diagram-wrap { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.07); border: 1px solid #e2e8f0; }
+
+        /* USE CASES */
+        .use-card { background: white; border-radius: 12px; padding: 1.25rem; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: border-color 0.2s; }
+        .use-card:hover { border-color: var(--orange); }
+        .use-icon { width: 2.2rem; height: 2.2rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; margin-bottom: 0.75rem; }
+
+        /* PRO TIP */
+        .pro-tip { background: #fff7ed; border-left: 5px solid var(--orange); border-radius: 0 12px 12px 0; padding: 1.5rem; }
+
+        /* LESSON NAV */
+        .lesson-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.5s ease both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+    </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+    <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+        <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+        <div class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+            <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+            <div class="relative dropdown-trigger">
+                <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-orange-400 transition">
+                    COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                    <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
+                    <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
+                    <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
+                    <a href="lecon4.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 04</span><span class="menu-lesson-title">Compensation (G41/G42)</span></a>
+                    <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
+                    <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
+                    <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
+                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                </div>
+            </div>
+            <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+            <a href="feedback.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+        </div>
+        <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+            <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+        <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
+        <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
+        <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
+        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
+        <div>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
+            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
+            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
+            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
+            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
+            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
+            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
+            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══ PROGRESS ═══ -->
+<div class="progress-bar">
+    <div class="container mx-auto max-w-5xl px-6">
+        <div class="flex items-center gap-2 py-1">
+            <div class="progress-step done"><span class="progress-dot"></span>L.1 Axes</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.2 G54</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.3 F/S</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.4 Comp.</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.5 Perçage</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step active"><span class="progress-dot"></span>L.6 M98</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.7 Sécu.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="page-header">
+    <div class="container mx-auto max-w-5xl page-header-inner fade-up">
+        <div class="level-badge">Programmation Structurée · Leçon 06 / 10</div>
+        <h2 class="page-title">M98 / M99<br><span style="color:var(--orange)">Le Pouvoir de la Répétition</span></h2>
+        <p class="page-sub">Gagnez en clarté, réduisez les lignes de code et évitez les erreurs de frappe — en appelant un sous-programme plutôt qu'en copiant-collant du code.</p>
+    </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="container mx-auto max-w-5xl py-12 px-6">
+
+    <!-- ── CONCEPTS ── -->
+    <section class="mb-12 fade-up">
+        <h3 class="text-xl font-black uppercase text-slate-700 mb-5" style="font-family:var(--display)">Mots-clés de la leçon</h3>
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="concept-card">
+                <h4 class="font-bold text-orange-600 uppercase text-xs mb-2" style="font-family:var(--mono)">M98 P.. — Appel</h4>
+                <p class="text-sm text-gray-600 leading-relaxed">Ordre de "quitter" le programme principal pour aller exécuter le sous-programme numéro P. Le programme principal attend, suspendu.</p>
+            </div>
+            <div class="concept-card">
+                <h4 class="font-bold text-orange-600 uppercase text-xs mb-2" style="font-family:var(--mono)">M99 — Retour</h4>
+                <p class="text-sm text-gray-600 leading-relaxed">Point final du sous-programme. Dit à la machine : "C'est fini, retourne à la ligne suivante dans le programme principal."</p>
+            </div>
+            <div class="concept-card">
+                <h4 class="font-bold text-orange-600 uppercase text-xs mb-2" style="font-family:var(--mono)">L.. — Répétitions</h4>
+                <p class="text-sm text-gray-600 leading-relaxed">Paramètre optionnel pour répéter le sous-programme N fois. <code style="font-family:var(--mono); background:#f1f5f9; padding:0 3px; border-radius:2px">M98 P2000 L5</code> = 5 répétitions de O2000.</p>
+            </div>
+            <div class="concept-card" style="border-left-color:#7c3aed">
+                <h4 class="font-bold text-purple-600 uppercase text-xs mb-2" style="font-family:var(--mono)">G91 — Incrémental</h4>
+                <p class="text-sm text-gray-600 leading-relaxed">Très souvent utilisé dans les sous-programmes pour que l'outil se déplace "par rapport à sa position actuelle" — indispensable pour les passes successives.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── SCHÉMA FLUX SVG ── -->
+    <section class="mb-12 fade-up delay-1">
+        <div class="diagram-wrap mb-6">
+            <p style="font-family:var(--mono); font-size:0.6rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem">Schéma — Flux d'exécution M98 / M99</p>
+            <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" width="100%">
+                <!-- Programme Principal -->
+                <rect x="10" y="20" width="160" height="160" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+                <text x="90" y="15" text-anchor="middle" font-size="9" font-weight="bold" fill="#2563eb" font-family="monospace">PROG. PRINCIPAL O1000</text>
+
+                <!-- Lignes prog principal -->
+                <text x="20" y="45" font-size="8" fill="#64748b" font-family="monospace">T01 M06</text>
+                <text x="20" y="60" font-size="8" fill="#64748b" font-family="monospace">G00 G54 X0. Y0.</text>
+                <text x="20" y="75" font-size="8" fill="#64748b" font-family="monospace">G43 H1 Z10. M03</text>
+                <!-- M98 call 1 -->
+                <rect x="15" y="82" width="150" height="16" rx="3" fill="#fff7ed" stroke="#f97316" stroke-width="1"/>
+                <text x="90" y="93" text-anchor="middle" font-size="9" font-weight="bold" fill="#f97316" font-family="monospace">M98 P2000</text>
+                <text x="20" y="112" font-size="8" fill="#64748b" font-family="monospace">X0. Y20.</text>
+                <!-- M98 call 2 -->
+                <rect x="15" y="118" width="150" height="16" rx="3" fill="#fff7ed" stroke="#f97316" stroke-width="1"/>
+                <text x="90" y="129" text-anchor="middle" font-size="9" font-weight="bold" fill="#f97316" font-family="monospace">M98 P2000</text>
+                <text x="20" y="148" font-size="8" fill="#64748b" font-family="monospace">X0. Y40.</text>
+                <!-- M98 call 3 -->
+                <rect x="15" y="154" width="150" height="16" rx="3" fill="#fff7ed" stroke="#f97316" stroke-width="1"/>
+                <text x="90" y="165" text-anchor="middle" font-size="9" font-weight="bold" fill="#f97316" font-family="monospace">M98 P2000</text>
+                <text x="20" y="183" font-size="8" fill="#64748b" font-family="monospace">M30</text>
+
+                <!-- Sous-Programme -->
+                <rect x="320" y="40" width="170" height="120" rx="8" fill="#f0fdf4" stroke="#10b981" stroke-width="1.5"/>
+                <text x="405" y="35" text-anchor="middle" font-size="9" font-weight="bold" fill="#059669" font-family="monospace">SOUS-PROG. O2000</text>
+                <text x="330" y="62" font-size="8" fill="#64748b" font-family="monospace">G01 Z-5. F200.</text>
+                <text x="330" y="77" font-size="8" fill="#64748b" font-family="monospace">G01 X50.</text>
+                <text x="330" y="92" font-size="8" fill="#64748b" font-family="monospace">G00 Z2.</text>
+                <text x="330" y="107" font-size="8" fill="#64748b" font-family="monospace">G00 X0.</text>
+                <!-- M99 -->
+                <rect x="325" y="114" width="160" height="16" rx="3" fill="#f0fdf4" stroke="#10b981" stroke-width="1"/>
+                <text x="405" y="125" text-anchor="middle" font-size="9" font-weight="bold" fill="#059669" font-family="monospace">M99</text>
+                <text x="330" y="152" font-size="8" fill="#94a3b8" font-family="monospace">(retour auto)</text>
+
+                <!-- Flèche aller M98 → sous-prog -->
+                <path d="M 170 90 Q 245 70 320 90" stroke="#f97316" stroke-width="1.8" fill="none" stroke-dasharray="5,3" marker-end="url(#arrowO)"/>
+                <text x="245" y="68" text-anchor="middle" font-size="8" fill="#f97316" font-family="monospace">appel</text>
+
+                <!-- Flèche retour M99 → prog principal -->
+                <path d="M 320 130 Q 245 160 170 130" stroke="#10b981" stroke-width="1.8" fill="none" stroke-dasharray="5,3" marker-end="url(#arrowG)"/>
+                <text x="245" y="160" text-anchor="middle" font-size="8" fill="#059669" font-family="monospace">retour M99</text>
+
+                <!-- Flèche appel 2 -->
+                <path d="M 170 126 Q 245 108 320 110" stroke="#f97316" stroke-width="1.4" fill="none" stroke-dasharray="3,3" opacity="0.5" marker-end="url(#arrowO2)"/>
+                <!-- Flèche appel 3 -->
+                <path d="M 170 162 Q 245 150 320 130" stroke="#f97316" stroke-width="1.2" fill="none" stroke-dasharray="3,3" opacity="0.3" marker-end="url(#arrowO3)"/>
+
+                <defs>
+                    <marker id="arrowO" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#f97316"/></marker>
+                    <marker id="arrowO2" markerWidth="5" markerHeight="5" refX="3" refY="3" orient="auto"><path d="M0,0 L0,5 L5,2.5 z" fill="#f97316" opacity="0.5"/></marker>
+                    <marker id="arrowO3" markerWidth="5" markerHeight="5" refX="3" refY="3" orient="auto"><path d="M0,0 L0,5 L5,2.5 z" fill="#f97316" opacity="0.3"/></marker>
+                    <marker id="arrowG" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#10b981"/></marker>
+                </defs>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ── EXEMPLE CODE CÔTE À CÔTE ── -->
+    <section class="mb-12 fade-up delay-1">
+        <h3 class="text-xl font-black uppercase text-slate-700 mb-5" style="font-family:var(--display)">Exemple — Usiner 3 rainures identiques</h3>
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Prog principal -->
+            <div>
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <span class="font-bold text-blue-600 uppercase text-xs" style="font-family:var(--mono)">Programme Principal O1000</span>
+                </div>
+                <div class="code-main">
+                    <span class="omain">O1000</span><br>
+                    <span class="kw">T01 M06</span>           <span class="cm">; fraise D10</span><br>
+                    <span class="kw">G00 G90 G54</span> X<span class="val">0.</span> Y<span class="val">0.</span><br>
+                    <span class="kw">S3000 M03 M08</span><br>
+                    <span class="kw">G43</span> H<span class="val">01</span> Z<span class="val">10.</span><br><br>
+                    <span class="cm">( rainure 1 )</span><br>
+                    <span class="m98">M98 P2000</span><br><br>
+                    <span class="kw">G00</span> X<span class="val">0.</span> Y<span class="val">20.</span>    <span class="cm">; position 2</span><br>
+                    <span class="m98">M98 P2000</span><br><br>
+                    <span class="kw">G00</span> X<span class="val">0.</span> Y<span class="val">40.</span>    <span class="cm">; position 3</span><br>
+                    <span class="m98">M98 P2000</span><br><br>
+                    <span class="kw">G00</span> Z<span class="val">100.</span> <span class="kw">M09 M05</span><br>
+                    <span class="kw">M30</span>
+                </div>
+            </div>
+            <!-- Sous-programme -->
+            <div>
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span class="font-bold text-green-600 uppercase text-xs" style="font-family:var(--mono)">Sous-Programme O2000</span>
+                </div>
+                <div class="code-sub">
+                    <span class="osub">O2000</span>             <span class="cm">; déclaration</span><br><br>
+                    <span class="kw">G01</span> Z<span class="val">-5.</span> F<span class="val">200.</span>  <span class="cm">; plongée</span><br>
+                    <span class="kw">G01</span> X<span class="val">50.</span> F<span class="val">800.</span>   <span class="cm">; usinage rainure</span><br>
+                    <span class="kw">G00</span> Z<span class="val">2.</span>          <span class="cm">; dégagement</span><br>
+                    <span class="kw">G00</span> X<span class="val">0.</span>          <span class="cm">; retour départ</span><br><br>
+                    <span class="m99">M99</span>               <span class="cm">; retour prog. principal</span>
+                </div>
+                <div class="mt-4 bg-green-50 border border-green-200 rounded-xl p-3 text-xs text-green-800">
+                    <strong>O2000</strong> contient la séquence d'une rainure. En l'appelant 3 fois, on usine 3 rainures sans dupliquer le code. Si la profondeur change, on modifie juste O2000.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── CAS D'USAGE ── -->
+    <section class="mb-12 fade-up delay-2">
+        <div class="flex items-center gap-4 mb-5">
+            <div class="h-px flex-1 bg-slate-200"></div>
+            <h3 class="text-xl font-black uppercase text-slate-700" style="font-family:var(--display)">Quand utiliser les sous-programmes ?</h3>
+            <div class="h-px flex-1 bg-slate-200"></div>
+        </div>
+        <div class="grid md:grid-cols-4 gap-4">
+            <div class="use-card">
+                <div class="use-icon bg-blue-100">🔁</div>
+                <h4 class="font-bold text-slate-800 text-sm mb-1" style="font-family:var(--display); text-transform:uppercase">Motif répété</h4>
+                <p class="text-xs text-gray-500">Rainures, poches ou trous identiques à plusieurs positions sur la pièce.</p>
+            </div>
+            <div class="use-card">
+                <div class="use-icon bg-orange-100">📉</div>
+                <h4 class="font-bold text-slate-800 text-sm mb-1" style="font-family:var(--display); text-transform:uppercase">Passes profondes</h4>
+                <p class="text-xs text-gray-500">Descendre en Z par incréments avec L répétitions + G91 Z-1.</p>
+            </div>
+            <div class="use-card">
+                <div class="use-icon bg-green-100">📦</div>
+                <h4 class="font-bold text-slate-800 text-sm mb-1" style="font-family:var(--display); text-transform:uppercase">Bibliothèque</h4>
+                <p class="text-xs text-gray-500">Sous-programme de changement d'outil ou de palpage, réutilisé dans tous vos programmes.</p>
+            </div>
+            <div class="use-card">
+                <div class="use-icon bg-purple-100">🎯</div>
+                <h4 class="font-bold text-slate-800 text-sm mb-1" style="font-family:var(--display); text-transform:uppercase">Multi-pièces</h4>
+                <p class="text-xs text-gray-500">Même contour usiné sur G54, G55, G56 en changeant juste l'origine entre chaque appel.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── PRO TIP G91 + L ── -->
+    <section class="mb-4 fade-up">
+        <div class="pro-tip">
+            <div class="flex items-start gap-4">
+                <div class="text-2xl flex-shrink-0">💡</div>
+                <div>
+                    <h4 class="font-black text-orange-700 uppercase text-sm mb-3" style="font-family:var(--display)">L'astuce pro : G91 + L pour des passes en Z</h4>
+                    <p class="text-sm text-slate-700 leading-relaxed mb-4">
+                        Pour usiner une poche profonde sans surcharger la fraise, appelez votre sous-programme avec un nombre de répétitions <strong>L</strong> et utilisez <strong>G91</strong> (incrémental) à l'intérieur :
+                    </p>
+                    <div class="bg-white rounded-lg p-4" style="font-family:var(--mono); font-size:0.75rem; line-height:1.9; border-left: 3px solid var(--orange)">
+                        <span style="color:#475569; font-style:italic">( Programme principal )</span><br>
+                        <span style="color:#f97316">M98 P3000 <strong>L10</strong></span>  <span style="color:#475569; font-style:italic">; 10 passes de 1mm = prof. -10mm</span><br><br>
+                        <span style="color:#475569; font-style:italic">( Sous-programme O3000 )</span><br>
+                        <span style="color:#7c3aed">G91</span> Z<span style="color:#7dd3fc">-1.</span>   <span style="color:#475569; font-style:italic">; descend de 1mm relatif</span><br>
+                        <span style="color:#f97316">G01</span> X<span style="color:#7dd3fc">80.</span> F<span style="color:#7dd3fc">600.</span><br>
+                        <span style="color:#f97316">G01</span> X<span style="color:#7dd3fc">0.</span><br>
+                        <span style="color:#90">G90</span>         <span style="color:#475569; font-style:italic">; retour absolu avant M99</span><br>
+                        <span style="color:#4ade80">M99</span>
+                    </div>
+                    <p class="text-xs text-orange-700 mt-3">⚠️ Toujours revenir en <strong>G90</strong> avant M99 pour éviter que le programme principal hérite du mode incrémental !</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── NAV LEÇONS ── -->
+    <div class="lesson-nav">
+        <a href="lecon5.html" class="btn-secondary">← Leçon 5 : Perçage</a>
+        <div class="text-center"><p style="font-family:var(--mono)" class="text-xs text-slate-400 uppercase tracking-widest">Leçon 6 / 10</p></div>
+        <a href="lecon7.html" class="btn-primary">Leçon 7 : Sécurité →</a>
+    </div>
+
+</main>
+
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-8">
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Engineering Excellence</p>
+</footer>
+
+<script>
+    const burgerBtn = document.getElementById('burger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const burgerIcon = document.getElementById('burger-icon');
+    const closeIcon = document.getElementById('close-icon');
+    burgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+        burgerIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+    });
+</script>
+</body>
+</html>

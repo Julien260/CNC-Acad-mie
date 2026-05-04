@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leçon 7 : Sécurité & Maintenance - CNC Académie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #f97316; --orange-dark: #ea6c0a;
+            --navy: #0f172a; --navy-mid: #1e293b;
+            --mono: 'Space Mono', monospace;
+            --display: 'Barlow Condensed', sans-serif;
+            --body: 'Barlow', sans-serif;
+        }
+        * { font-family: var(--body); }
+        h1,h2,h3,h4 { font-family: var(--display); }
+        body { background: #f1f5f9; color: #0f172a; }
+
+        /* NAV */
+        .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
+        #mobile-menu { display: none; }
+        #mobile-menu.open { display: block; }
+        .dropdown-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); width: 18rem; background: white; border-radius: 0.75rem; box-shadow: 0 20px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0; z-index: 100; overflow: hidden; }
+        .dropdown-trigger:hover .dropdown-menu, .dropdown-trigger:focus-within .dropdown-menu { display: block; }
+        .menu-lesson { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; text-decoration: none; }
+        .menu-lesson:hover { background: #fff7ed; }
+        .menu-lesson:last-child { border-bottom: none; }
+        .menu-lesson-num { font-family: var(--mono); font-size: 0.6rem; color: var(--orange); letter-spacing: 0.1em; text-transform: uppercase; display: block; }
+        .menu-lesson-title { font-size: 0.85rem; color: #1e293b; font-weight: 500; }
+        .menu-lesson.active { background: #fff7ed; }
+        .menu-lesson.active .menu-lesson-num, .menu-lesson.active .menu-lesson-title { color: var(--orange); font-weight: 700; }
+        .menu-lesson.done .menu-lesson-num { color: #22c55e; }
+        .menu-lesson.pro:hover { background: #eef2ff; }
+        .menu-lesson.pro .menu-lesson-num { color: #6366f1; }
+        .badge-pro { font-size: 0.6rem; background: #6366f1; color: white; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.4rem; }
+        .btn-primary { background: var(--orange); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 2rem; border-radius: 6px; transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none; }
+        .btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); }
+        .btn-secondary { border: 2px solid #e2e8f0; color: #475569; font-family: var(--display); font-weight: 700; text-transform: uppercase; padding: 0.75rem 1.5rem; border-radius: 6px; transition: all 0.2s; display: inline-block; text-decoration: none; font-size: 0.9rem; }
+        .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+
+        /* PROGRESS */
+        .progress-bar { background: var(--navy-mid); border-bottom: 1px solid #1e293b; overflow-x: auto; }
+        .progress-step { display: flex; align-items: center; gap: 0.4rem; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; color: #475569; padding: 0.75rem 0; white-space: nowrap; }
+        .progress-step.active { color: var(--orange); }
+        .progress-step.done { color: #22c55e; }
+        .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #334155; flex-shrink: 0; }
+        .progress-step.active .progress-dot { background: var(--orange); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+        .progress-step.done .progress-dot { background: #22c55e; }
+        .progress-line { height: 1px; background: #334155; flex: 1; }
+        .progress-line.done { background: #22c55e; }
+
+        /* PAGE HEADER — rouge pour sécurité */
+        .page-header { background: #991b1b; position: relative; overflow: hidden; padding: 3.5rem 1.5rem; }
+        .page-header::before { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.04) 39px, rgba(255,255,255,0.04) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.04) 39px, rgba(255,255,255,0.04) 40px); pointer-events: none; }
+        .page-header::after { content: '⚠'; font-size: 18rem; font-weight: 900; position: absolute; right: -2rem; top: -2rem; color: rgba(255,255,255,0.04); pointer-events: none; line-height: 1; }
+        .page-header-inner { position: relative; z-index: 1; }
+        .level-badge { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.3rem 0.8rem; border-radius: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 1rem; }
+        .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1; text-transform: uppercase; color: white; }
+        .page-sub { color: #fca5a5; font-size: 0.95rem; margin-top: 0.75rem; max-width: 560px; line-height: 1.6; }
+
+        /* DANGER / MAINT CARDS */
+        .danger-card { background: white; border-radius: 14px; border-top: 5px solid #dc2626; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; }
+        .danger-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(220,38,38,0.12); }
+        .maint-card { background: white; border-radius: 14px; border-top: 5px solid #2563eb; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; }
+        .maint-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(37,99,235,0.12); }
+
+        /* CHECKLIST */
+        .checklist-section { background: var(--navy); border-radius: 16px; padding: 2rem; }
+        .check-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .check-item:last-child { border-bottom: none; }
+        .check-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+        .check-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--orange); flex-shrink: 0; margin-top: 2px; cursor: pointer; }
+        .check-item label { font-size: 0.85rem; color: #94a3b8; cursor: pointer; transition: color 0.2s; line-height: 1.4; }
+        .check-item input:checked + label { color: #22c55e; text-decoration: line-through; text-decoration-color: #16a34a; }
+
+        /* ALARM TABLE */
+        .alarm-table { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+        .alarm-table table { width: 100%; border-collapse: collapse; }
+        .alarm-table thead tr { background: var(--navy); }
+        .alarm-table thead th { padding: 0.75rem 1rem; font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.08em; color: #94a3b8; text-align: left; font-weight: 400; }
+        .alarm-table tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.12s; }
+        .alarm-table tbody tr:last-child { border-bottom: none; }
+        .alarm-table tbody tr:hover { background: #fff5f5; }
+        .alarm-table td { padding: 0.9rem 1rem; font-size: 0.875rem; }
+
+        /* RÈGLES D'OR */
+        .golden-rule { display: flex; gap: 1rem; background: white; border-radius: 12px; padding: 1.25rem; border-left: 4px solid #dc2626; box-shadow: 0 2px 8px rgba(0,0,0,0.05); align-items: flex-start; }
+        .rule-num { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: #dc2626; line-height: 1; flex-shrink: 0; width: 2rem; text-align: center; }
+
+        /* COMPLETION BOX */
+        .completion-box { background: linear-gradient(135deg, var(--orange) 0%, #c2410c 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; position: relative; overflow: hidden; }
+        .completion-box::before { content: '✓'; font-family: var(--display); font-size: 12rem; font-weight: 900; position: absolute; right: -1rem; top: -2rem; color: rgba(255,255,255,0.08); line-height: 1; pointer-events: none; }
+
+        /* IMAGE FRAME */
+        .img-frame { background: var(--navy-mid); border-radius: 12px; overflow: hidden; }
+        .img-frame img { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; }
+
+        /* LESSON NAV */
+        .lesson-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.5s ease both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        @keyframes ping { 0%,100% { transform:scale(1); opacity:1; } 50% { transform:scale(1.4); opacity:.6; } }
+        .animate-ping { animation: ping 1.4s ease-in-out infinite; }
+    </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+    <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+        <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+        <div class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+            <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+            <div class="relative dropdown-trigger">
+                <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-orange-400 transition">
+                    COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                    <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
+                    <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
+                    <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
+                    <a href="lecon4.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 04</span><span class="menu-lesson-title">Compensation (G41/G42)</span></a>
+                    <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
+                    <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
+                    <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
+                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                </div>
+            </div>
+            <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+            <a href="feedback.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+        </div>
+        <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+            <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+        <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
+        <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
+        <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
+        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
+        <div>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
+            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
+            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
+            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
+            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
+            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
+            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
+            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══ PROGRESS — toutes done sauf L7 active ═══ -->
+<div class="progress-bar">
+    <div class="container mx-auto max-w-5xl px-6">
+        <div class="flex items-center gap-2 py-1">
+            <div class="progress-step done"><span class="progress-dot"></span>L.1 Axes</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.2 G54</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.3 F/S</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.4 Comp.</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.5 Perçage</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.6 M98</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step active"><span class="progress-dot"></span>L.7 Sécu.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="page-header">
+    <div class="container mx-auto max-w-5xl page-header-inner fade-up">
+        <div class="level-badge">Dernière Étape · Leçon 07 / 10</div>
+        <h2 class="page-title">Sécurité &<br><span style="color:#fca5a5">Maintenance</span></h2>
+        <p class="page-sub">Le savoir-faire ne vaut rien sans la maîtrise du risque. Apprenez à protéger l'humain, l'outil et la broche.</p>
+    </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="container mx-auto max-w-5xl py-12 px-6">
+
+    <!-- ── LEXIQUE ── -->
+    <section class="mb-12 fade-up">
+        <h3 class="text-xl font-black uppercase text-slate-700 mb-5" style="font-family:var(--display)">Le Lexique "Atelier"</h3>
+        <div class="grid md:grid-cols-2 gap-5">
+            <div class="danger-card">
+                <h4 class="text-red-600 font-bold text-xs uppercase mb-2 tracking-widest" style="font-family:var(--mono)">⛔ L'Arrêt d'Urgence (E-Stop)</h4>
+                <p class="text-gray-600 text-sm leading-relaxed">Le bouton "champignon" rouge. Il coupe la puissance des moteurs. <strong>Attention :</strong> sur certaines machines, il ne freine pas instantanément la broche — attendez l'arrêt complet avant d'ouvrir la porte.</p>
+            </div>
+            <div class="danger-card">
+                <h4 class="text-red-600 font-bold text-xs uppercase mb-2 tracking-widest" style="font-family:var(--mono)">💥 Le Crash (ou "Carotte")</h4>
+                <p class="text-gray-600 text-sm leading-relaxed">Collision violente entre l'outil/broche et la pièce/étau. Souvent causé par un mauvais G54, une erreur de correcteur H, ou un départ programme sans dry run.</p>
+            </div>
+            <div class="maint-card">
+                <h4 class="text-blue-600 font-bold text-xs uppercase mb-2 tracking-widest" style="font-family:var(--mono)">🔬 Le Réfractomètre</h4>
+                <p class="text-gray-600 text-sm leading-relaxed">Outil optique mesurant le % d'huile dans le lubrifiant. Idéalement entre <strong>6% et 10%</strong> pour l'aluminium. En dessous = corrosion. Au-dessus = mousse et bactéries.</p>
+            </div>
+            <div class="maint-card">
+                <h4 class="text-blue-600 font-bold text-xs uppercase mb-2 tracking-widest" style="font-family:var(--mono)">🔩 L'Écrouissage</h4>
+                <p class="text-gray-600 text-sm leading-relaxed">Durcissement de la surface causé par un outil usé qui frotte au lieu de couper. Peut détruire l'outil suivant et rendre la pièce irrécupérable.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── RÈGLES D'OR ── -->
+    <section class="mb-12 fade-up delay-1">
+        <h3 class="text-xl font-black uppercase text-slate-700 mb-5" style="font-family:var(--display)">🏆 Les 5 règles d'or de l'usineur</h3>
+        <div class="space-y-3">
+            <div class="golden-rule">
+                <span class="rule-num">01</span>
+                <div>
+                    <p class="font-bold text-slate-800 text-sm">Toujours faire un dry run (départ à vide) sur un nouveau programme</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Lancez le programme avec la broche arrêtée et le potentiomètre F à 0% — observez la trajectoire avant de couper dans la matière.</p>
+                </div>
+            </div>
+            <div class="golden-rule">
+                <span class="rule-num">02</span>
+                <div>
+                    <p class="font-bold text-slate-800 text-sm">Ne jamais modifier un correcteur (H ou D) sans noter l'ancienne valeur</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Une erreur de signe sur H peut provoquer un crash immédiat au premier démarrage.</p>
+                </div>
+            </div>
+            <div class="golden-rule">
+                <span class="rule-num">03</span>
+                <div>
+                    <p class="font-bold text-slate-800 text-sm">Vérifier le serrage pièce et outil avant chaque lancement</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Un outil mal serré dans le porte-outil peut s'éjecter à 20 000 tr/min. Un bridage insuffisant fait voler la pièce.</p>
+                </div>
+            </div>
+            <div class="golden-rule">
+                <span class="rule-num">04</span>
+                <div>
+                    <p class="font-bold text-slate-800 text-sm">G40 et G80 avant tout changement d'outil</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Annulez toujours les compensations et cycles actifs — c'est la règle numéro 1 de la programmation sûre.</p>
+                </div>
+            </div>
+            <div class="golden-rule">
+                <span class="rule-num">05</span>
+                <div>
+                    <p class="font-bold text-slate-800 text-sm">Porter les EPI (lunettes, bouchons d'oreille) même pour un "simple" contrôle</p>
+                    <p class="text-xs text-gray-500 mt-0.5">85% des accidents surviennent lors d'opérations "rapides" que l'on pensait maîtriser.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── CHECKLIST INTERACTIVE ── -->
+    <section class="mb-12 fade-up delay-1">
+        <div class="checklist-section">
+            <h3 class="text-orange-400 text-xl font-black uppercase mb-6" style="font-family:var(--display)">✅ Check-list de l'Usineur (interactive)</h3>
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Matin -->
+                <div>
+                    <p style="font-family:var(--mono); font-size:0.65rem; color:#60a5fa; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.75rem">— Chaque matin —</p>
+                    <div class="check-item">
+                        <input type="checkbox" id="c1"><label for="c1">Niveau d'huile des glissières (Vactra 2)</label>
+                    </div>
+                    <div class="check-item">
+                        <input type="checkbox" id="c2"><label for="c2">Pression d'air (min 6 bars)</label>
+                    </div>
+                    <div class="check-item">
+                        <input type="checkbox" id="c3"><label for="c3">Warm-up broche 10 min avant production</label>
+                    </div>
+                    <div class="check-item">
+                        <input type="checkbox" id="c4"><label for="c4">Vérifier concentré lubrifiant (réfractomètre)</label>
+                    </div>
+                    <div class="check-item">
+                        <input type="checkbox" id="c5"><label for="c5">Contrôle visuel bande de copeaux / évacuation</label>
+                    </div>
+                </div>
+                <!-- Fin de poste -->
+                <div>
+                    <p style="font-family:var(--mono); font-size:0.65rem; color:#fb923c; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.75rem">— Fin de poste —</p>
+                    <div class="check-item">
+                        <input type="checkbox" id="c6"><label for="c6">Nettoyage complet (soufflette + jet)</label>
+                    </div>
+                    <div class="check-item">
+                        <input type="checkbox" id="c7"><label for="c7">Graissage cônes d'outils et tirette</label>
+                    </div>
+                    <div class="check-item">
+                        <input type="checkbox" id="c8"><label for="c8">Vidage du bac à copeaux</label>
+                    </div>
+                    <div class="check-item">
+                        <input type="checkbox" id="c9"><label for="c9">Retour outils à la position sûre (G28)</label>
+                    </div>
+                    <div class="check-item">
+                        <input type="checkbox" id="c10"><label for="c10">Archivage programme sur réseau/clé USB</label>
+                    </div>
+                </div>
+            </div>
+            <!-- Compteur -->
+            <div class="mt-6 flex items-center gap-3">
+                <div id="progress-fill" style="height:6px; background:var(--orange); border-radius:3px; transition:width 0.4s; width:0%"></div>
+                <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; flex:1; position:relative; overflow:hidden;">
+                    <div id="progress-track" style="position:absolute; inset:0;"></div>
+                </div>
+                <span id="check-count" style="font-family:var(--mono); font-size:0.7rem; color:#64748b; white-space:nowrap">0 / 10</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── ALARMES FANUC ── -->
+    <section class="mb-12 fade-up delay-2">
+        <div class="grid md:grid-cols-2 gap-6 items-start">
+            <div>
+                <h3 class="text-xl font-black uppercase text-slate-700 mb-4" style="font-family:var(--display)">Décoder les Alarmes Fanuc</h3>
+                <div class="alarm-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Signification</th>
+                                <th>Solution</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span style="font-family:var(--mono); font-weight:700; color:#dc2626; font-size:0.8rem">ALM 500</span></td>
+                                <td class="font-semibold text-sm">Over-travel</td>
+                                <td class="text-xs text-gray-500">Reculer l'axe en JOG dans le sens inverse, puis reset.</td>
+                            </tr>
+                            <tr>
+                                <td><span style="font-family:var(--mono); font-weight:700; color:#dc2626; font-size:0.8rem">ALM 101</span></td>
+                                <td class="font-semibold text-sm">Mémoire pleine</td>
+                                <td class="text-xs text-gray-500">Effacer les vieux programmes dans la liste DNC.</td>
+                            </tr>
+                            <tr>
+                                <td><span style="font-family:var(--mono); font-weight:700; color:#dc2626; font-size:0.8rem">ALM 414</span></td>
+                                <td class="font-semibold text-sm">Servo Error</td>
+                                <td class="text-xs text-gray-500">Surcharge moteur. Vérifiez obstacle ou manque d'huile glissières.</td>
+                            </tr>
+                            <tr>
+                                <td><span style="font-family:var(--mono); font-weight:700; color:#dc2626; font-size:0.8rem">ALM 090</span></td>
+                                <td class="font-semibold text-sm">Reference Return</td>
+                                <td class="text-xs text-gray-500">Faire le retour référence machine (POM) avant usinage.</td>
+                            </tr>
+                            <tr>
+                                <td><span style="font-family:var(--mono); font-weight:700; color:#dc2626; font-size:0.8rem">ALM P/S</span></td>
+                                <td class="font-semibold text-sm">Erreur programme</td>
+                                <td class="text-xs text-gray-500">Erreur syntaxe G-code. Vérifier le numéro de ligne indiqué.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Image arrêt urgence -->
+            <div>
+                <div class="img-frame h-44 mb-4">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Emergency_stop_button.jpg/640px-Emergency_stop_button.jpg"
+                         alt="Bouton arrêt d'urgence E-Stop"
+                         class="w-full h-full object-cover"
+                         onerror="this.parentElement.style.background='#7f1d1d'; this.parentElement.innerHTML='<div style=\'display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#fca5a5;font-size:3rem\'>⛔<span style=\'font-size:0.75rem;margin-top:0.5rem;font-family:monospace\'>Arrêt d\'urgence</span></div>'">
+                </div>
+                <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-xs text-red-700">
+                    <strong>Procédure après un crash :</strong> Ne pas redémarrer immédiatement. Couper la machine, inspecter la broche, les outils et la pièce. Contrôler les correcteurs avant tout re-départ.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── COMPLETION ── -->
+    <section class="mb-4 fade-up">
+        <div class="completion-box">
+            <p style="font-family:var(--mono); font-size:0.65rem; color:rgba(255,255,255,0.6); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.75rem">// Formation de base complétée</p>
+            <h3 class="text-white text-4xl font-black uppercase mb-3" style="font-family:var(--display)">Formation Terminée !</h3>
+            <p class="text-orange-100 text-lg mb-8 opacity-90">Vous possédez maintenant les bases solides du métier de régleur CNC Fanuc.</p>
+
+            <!-- Badges acquis -->
+            <div class="flex flex-wrap justify-center gap-3 mb-8">
+                <span style="background:rgba(255,255,255,0.15); color:white; font-family:var(--mono); font-size:0.65rem; letter-spacing:0.08em; padding:0.4rem 0.9rem; border-radius:4px; border:1px solid rgba(255,255,255,0.25)">✓ Axes & Mouvements</span>
+                <span style="background:rgba(255,255,255,0.15); color:white; font-family:var(--mono); font-size:0.65rem; letter-spacing:0.08em; padding:0.4rem 0.9rem; border-radius:4px; border:1px solid rgba(255,255,255,0.25)">✓ G54 Zéro Pièce</span>
+                <span style="background:rgba(255,255,255,0.15); color:white; font-family:var(--mono); font-size:0.65rem; letter-spacing:0.08em; padding:0.4rem 0.9rem; border-radius:4px; border:1px solid rgba(255,255,255,0.25)">✓ Avances & Vitesses</span>
+                <span style="background:rgba(255,255,255,0.15); color:white; font-family:var(--mono); font-size:0.65rem; letter-spacing:0.08em; padding:0.4rem 0.9rem; border-radius:4px; border:1px solid rgba(255,255,255,0.25)">✓ G41/G42 Comp.</span>
+                <span style="background:rgba(255,255,255,0.15); color:white; font-family:var(--mono); font-size:0.65rem; letter-spacing:0.08em; padding:0.4rem 0.9rem; border-radius:4px; border:1px solid rgba(255,255,255,0.25)">✓ Cycles Perçage</span>
+                <span style="background:rgba(255,255,255,0.15); color:white; font-family:var(--mono); font-size:0.65rem; letter-spacing:0.08em; padding:0.4rem 0.9rem; border-radius:4px; border:1px solid rgba(255,255,255,0.25)">✓ M98 Sous-prog.</span>
+                <span style="background:rgba(255,255,255,0.15); color:white; font-family:var(--mono); font-size:0.65rem; letter-spacing:0.08em; padding:0.4rem 0.9rem; border-radius:4px; border:1px solid rgba(255,255,255,0.25)">✓ Sécurité</span>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="index.html" style="background:rgba(255,255,255,0.15); color:white; border:2px solid rgba(255,255,255,0.4)" class="inline-block font-bold uppercase py-3 px-7 rounded-lg text-sm transition hover:bg-white hover:text-orange-600" style="font-family:var(--display)">← Menu principal</a>
+                <a href="lecon8.html" style="background:white; color:#1e293b; font-family:var(--display)" class="inline-block font-black uppercase py-3 px-7 rounded-lg text-sm transition hover:bg-indigo-600 hover:text-white">Niveau PRO : Leçon 8 →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── NAV LEÇONS ── -->
+    <div class="lesson-nav">
+        <a href="lecon6.html" class="btn-secondary">← Leçon 6 : M98</a>
+        <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 bg-orange-500 rounded-full animate-ping"></span>
+            <span style="font-family:var(--mono); font-size:0.65rem; color:#f97316; text-transform:uppercase; letter-spacing:0.1em">Certifié CNC Académie</span>
+        </div>
+        <a href="lecon8.html" class="btn-primary" style="background:#6366f1">Leçon 8 PRO →</a>
+    </div>
+
+</main>
+
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-8">
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Précision et Rigueur</p>
+</footer>
+
+<script>
+    // Burger
+    const burgerBtn = document.getElementById('burger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const burgerIcon = document.getElementById('burger-icon');
+    const closeIcon = document.getElementById('close-icon');
+    burgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+        burgerIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+    });
+
+    // Checklist interactive
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const countEl = document.getElementById('check-count');
+    const fillEl = document.getElementById('progress-fill');
+    const trackEl = document.getElementById('progress-track');
+
+    function updateProgress() {
+        const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
+        const total = checkboxes.length;
+        const pct = Math.round((checked / total) * 100);
+        countEl.textContent = `${checked} / ${total}`;
+        trackEl.style.cssText = `position:absolute; inset:0; background:var(--orange); border-radius:3px; width:${pct}%; transition:width 0.4s;`;
+        if (checked === total) {
+            countEl.style.color = '#22c55e';
+            countEl.textContent = `✓ ${total} / ${total} — Parfait !`;
+        }
+    }
+    checkboxes.forEach(cb => cb.addEventListener('change', updateProgress));
+    updateProgress();
+</script>
+</body>
+</html>

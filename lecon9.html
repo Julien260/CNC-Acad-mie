@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leçon 9 PRO : Cycle de Filetage G76 - CNC Académie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #f97316; --orange-dark: #ea6c0a;
+            --indigo: #6366f1; --indigo-dark: #4f46e5;
+            --navy: #0f172a; --navy-mid: #1e293b;
+            --mono: 'Space Mono', monospace;
+            --display: 'Barlow Condensed', sans-serif;
+            --body: 'Barlow', sans-serif;
+        }
+        * { font-family: var(--body); }
+        h1,h2,h3,h4 { font-family: var(--display); }
+        body { background: #f1f5f9; color: #0f172a; }
+
+        /* NAV */
+        .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
+        #mobile-menu { display: none; }
+        #mobile-menu.open { display: block; }
+        .dropdown-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); width: 18rem; background: white; border-radius: 0.75rem; box-shadow: 0 20px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0; z-index: 100; overflow: hidden; }
+        .dropdown-trigger:hover .dropdown-menu, .dropdown-trigger:focus-within .dropdown-menu { display: block; }
+        .menu-lesson { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; text-decoration: none; }
+        .menu-lesson:hover { background: #fff7ed; }
+        .menu-lesson:last-child { border-bottom: none; }
+        .menu-lesson-num { font-family: var(--mono); font-size: 0.6rem; color: var(--orange); letter-spacing: 0.1em; text-transform: uppercase; display: block; }
+        .menu-lesson-title { font-size: 0.85rem; color: #1e293b; font-weight: 500; }
+        .menu-lesson.active { background: #eef2ff; }
+        .menu-lesson.active .menu-lesson-num,.menu-lesson.active .menu-lesson-title { color: var(--indigo); font-weight: 700; }
+        .menu-lesson.done .menu-lesson-num { color: #22c55e; }
+        .menu-lesson.pro:hover { background: #eef2ff; }
+        .menu-lesson.pro .menu-lesson-num { color: var(--indigo); }
+        .badge-pro { font-size: 0.6rem; background: var(--indigo); color: white; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.4rem; }
+        .btn-primary { background: var(--orange); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 2rem; border-radius: 6px; transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none; }
+        .btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); }
+        .btn-pro { background: var(--indigo); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 2rem; border-radius: 6px; transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none; }
+        .btn-pro:hover { background: var(--indigo-dark); transform: translateY(-1px); }
+        .btn-secondary { border: 2px solid #e2e8f0; color: #475569; font-family: var(--display); font-weight: 700; text-transform: uppercase; padding: 0.75rem 1.5rem; border-radius: 6px; transition: all 0.2s; display: inline-block; text-decoration: none; font-size: 0.9rem; }
+        .btn-secondary:hover { border-color: var(--indigo); color: var(--indigo); }
+
+        /* PROGRESS */
+        .progress-bar { background: #1e1b4b; border-bottom: 1px solid #312e81; overflow-x: auto; }
+        .progress-step { display: flex; align-items: center; gap: 0.4rem; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; color: #475569; padding: 0.75rem 0; white-space: nowrap; }
+        .progress-step.active { color: var(--indigo); }
+        .progress-step.done { color: #22c55e; }
+        .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #334155; flex-shrink: 0; }
+        .progress-step.active .progress-dot { background: var(--indigo); box-shadow: 0 0 0 3px rgba(99,102,241,0.25); }
+        .progress-step.done .progress-dot { background: #22c55e; }
+        .progress-line { height: 1px; background: #334155; flex: 1; }
+        .progress-line.done { background: #22c55e; }
+
+        /* PAGE HEADER */
+        .page-header { background: #1e1b4b; position: relative; overflow: hidden; padding: 3.5rem 1.5rem; }
+        .page-header::before { content: 'G76'; font-family: var(--display); font-size: 14rem; font-weight: 900; position: absolute; right: -2rem; top: -2rem; color: rgba(99,102,241,0.07); pointer-events: none; line-height: 1; }
+        .page-header::after { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(99,102,241,0.06) 39px, rgba(99,102,241,0.06) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(99,102,241,0.06) 39px, rgba(99,102,241,0.06) 40px); pointer-events: none; }
+        .page-header-inner { position: relative; z-index: 1; }
+        .level-badge { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.4); color: #a5b4fc; padding: 0.3rem 0.8rem; border-radius: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 1rem; }
+        .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1; text-transform: uppercase; color: white; }
+        .page-sub { color: #a5b4fc; font-size: 0.95rem; margin-top: 0.75rem; max-width: 560px; line-height: 1.6; }
+
+        /* MODULE */
+        .module-num { font-family: var(--mono); font-size: 2.5rem; font-weight: 700; color: rgba(99,102,241,0.18); line-height: 1; }
+        .content-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+
+        /* CODE BLOCK */
+        .code-block { background: var(--navy); border-radius: 10px; padding: 1.25rem 1.5rem; font-family: var(--mono); font-size: 0.78rem; line-height: 1.9; color: #64748b; border-left: 3px solid var(--indigo); }
+        .kw { color: var(--orange); }
+        .val { color: #7dd3fc; }
+        .cm { color: #475569; font-style: italic; }
+        .g76 { color: #818cf8; font-weight: 700; }
+        .g97c { color: #34d399; font-weight: 700; }
+        .P1 { color: #fb923c; font-weight: 700; }
+        .P2 { color: #f472b6; font-weight: 700; }
+        .danger-val { color: #f87171; font-weight: 700; }
+
+        /* ANATOMY DARK */
+        .anatomy-dark { background: var(--navy); border-radius: 16px; padding: 2rem; }
+        .anatomy-token-dark { background: rgba(255,255,255,0.06); border-radius: 8px; padding: 1rem; border: 1px solid rgba(255,255,255,0.08); }
+
+        /* CALC */
+        .calc-box { background: var(--navy); border-radius: 16px; padding: 1.5rem; }
+        .calc-input { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 0.6rem 0.9rem; font-family: var(--mono); font-size: 0.85rem; color: white; outline: none; transition: border-color 0.2s; }
+        .calc-input:focus { border-color: var(--indigo); }
+        .calc-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 0.3rem; }
+        .calc-result { background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); border-radius: 8px; padding: 0.9rem 1rem; font-family: var(--mono); color: #818cf8; font-size: 0.9rem; font-weight: 700; text-align: center; margin-top: 0.75rem; }
+
+        /* DIAGRAM */
+        .diagram-wrap { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.07); border: 1px solid #e2e8f0; }
+
+        /* DANGER */
+        .danger-box { background: #fff1f2; border: 2px solid #dc2626; border-radius: 16px; padding: 2rem; }
+
+        /* LESSON NAV */
+        .lesson-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.5s ease both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+    </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+    <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+        <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+        <div class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+            <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+            <div class="relative dropdown-trigger">
+                <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-orange-400 transition">
+                    COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                    <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
+                    <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
+                    <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
+                    <a href="lecon4.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 04</span><span class="menu-lesson-title">Compensation (G41/G42)</span></a>
+                    <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
+                    <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
+                    <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
+                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                </div>
+            </div>
+            <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+            <a href="feedback.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+        </div>
+        <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+            <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+        <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
+        <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
+        <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
+        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
+        <div>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
+            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
+            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
+            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
+            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
+            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
+            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
+            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══ PROGRESS ═══ -->
+<div class="progress-bar">
+    <div class="container mx-auto max-w-5xl px-6">
+        <div class="flex items-center gap-2 py-1">
+            <div class="progress-step done"><span class="progress-dot"></span>L.1→7 ✓</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.8 G96/G97 ✓</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step active"><span class="progress-dot"></span>L.9 G76</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.10 Param.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="page-header">
+    <div class="container mx-auto max-w-5xl page-header-inner fade-up">
+        <div class="level-badge">Module Expert 02 · Leçon 09 PRO</div>
+        <h2 class="page-title">Le Filetage<br><span style="color:#818cf8">Automatisé G76</span></h2>
+        <p class="page-sub">Maîtriser le cycle multi-passes pour des filetages parfaits et sécurisés — la commande la plus puissante du tournage Fanuc.</p>
+    </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="container mx-auto max-w-5xl py-12 px-6">
+
+    <!-- ── MODULE 01 : Concept ── -->
+    <section class="mb-12 fade-up">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">01.</span>
+            <h3 class="text-2xl font-black uppercase text-slate-800">Qu'est-ce que le G76 ?</h3>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="content-card">
+                <p class="text-gray-600 leading-relaxed text-sm mb-4">Le <strong>G76</strong> est un cycle automatique de filetage multi-passes. Contrairement au G33 (passe unique manuelle), le G76 gère lui-même la division des passes, la pénétration et les passes de finition.</p>
+                <div class="bg-indigo-50 border-l-4 border-indigo-500 rounded-r-xl p-4 text-sm text-indigo-800">
+                    <strong>Principe de synchronisation :</strong> Le CNC synchronise la rotation de la broche avec l'avance de l'axe Z. À chaque tour de pièce, l'outil avance exactement de la valeur du <strong>pas</strong> du filet.
+                </div>
+            </div>
+            <!-- Schéma SVG filetage -->
+            <div class="diagram-wrap">
+                <p style="font-family:var(--mono); font-size:0.6rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem">Schéma — Anatomie d'un filet ISO 60°</p>
+                <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" width="100%">
+                    <!-- Cylindre extérieur -->
+                    <line x1="30" y1="40" x2="270" y2="40" stroke="#cbd5e1" stroke-width="1.5"/>
+                    <line x1="30" y1="140" x2="270" y2="140" stroke="#cbd5e1" stroke-width="1.5"/>
+                    <!-- Filets (profil dents de scie) -->
+                    <polyline points="30,40 50,100 70,40 90,100 110,40 130,100 150,40 170,100 190,40 210,100 230,40 250,100 270,40"
+                              stroke="#6366f1" stroke-width="2" fill="none"/>
+                    <!-- Annotations -->
+                    <!-- Pas -->
+                    <line x1="50" y1="30" x2="90" y2="30" stroke="#f97316" stroke-width="1" marker-start="url(#mS)" marker-end="url(#mE)"/>
+                    <text x="70" y="22" text-anchor="middle" font-size="9" fill="#f97316" font-family="monospace">Pas (F)</text>
+                    <!-- Hauteur filet -->
+                    <line x1="15" y1="40" x2="15" y2="100" stroke="#818cf8" stroke-width="1" marker-start="url(#mS)" marker-end="url(#mE)"/>
+                    <text x="10" y="75" text-anchor="middle" font-size="8" fill="#818cf8" font-family="monospace" transform="rotate(-90,10,75)">H filet (P)</text>
+                    <!-- D extérieur -->
+                    <line x1="280" y1="40" x2="280" y2="140" stroke="#22c55e" stroke-width="1"/>
+                    <text x="292" y="95" font-size="8" fill="#22c55e" font-family="monospace" text-anchor="middle" transform="rotate(-90,292,95)">D ext.</text>
+                    <!-- Fond de filet -->
+                    <line x1="30" y1="100" x2="270" y2="100" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+                    <text x="155" y="115" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="monospace">D fond (X dans G76)</text>
+                    <!-- Angle 60° -->
+                    <text x="78" y="95" font-size="8" fill="#a78bfa" font-family="monospace">60°</text>
+                    <defs>
+                        <marker id="mS" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto"><circle cx="2" cy="2" r="1.5" fill="#f97316"/></marker>
+                        <marker id="mE" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto"><circle cx="2" cy="2" r="1.5" fill="#f97316"/></marker>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── MODULE 02 : Ligne 1 G76 ── -->
+    <section class="mb-12 fade-up delay-1">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">02.</span>
+            <h3 class="text-2xl font-black uppercase text-slate-800">Structure — Ligne 1</h3>
+        </div>
+        <div class="anatomy-dark mb-4">
+            <div style="font-family:var(--mono); font-size:1.1rem; font-weight:700; color:#818cf8; text-align:center; margin-bottom:1.5rem; letter-spacing:0.05em">
+                G76 <span style="color:#fb923c">P</span><span style="color:#fbbf24">02</span><span style="color:#34d399">00</span><span style="color:#a78bfa">60</span>  <span style="color:#f472b6">Q</span><span style="color:#7dd3fc">100</span>  <span style="color:#60a5fa">R</span><span style="color:#7dd3fc">0.05</span>
+            </div>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="anatomy-token-dark">
+                    <span style="font-family:var(--mono); font-size:0.65rem; color:#fb923c; letter-spacing:0.08em; text-transform:uppercase; display:block; margin-bottom:0.5rem">P [aabbcc]</span>
+                    <div class="space-y-1 text-xs text-slate-400">
+                        <div><span style="color:#fbbf24; font-family:var(--mono)">aa=02</span> — passes de finition</div>
+                        <div><span style="color:#34d399; font-family:var(--mono)">bb=00</span> — sortie angulaire (chanfrein)</div>
+                        <div><span style="color:#a78bfa; font-family:var(--mono)">cc=60</span> — angle du filet (60° ISO)</div>
+                    </div>
+                </div>
+                <div class="anatomy-token-dark">
+                    <span style="font-family:var(--mono); font-size:0.65rem; color:#f472b6; letter-spacing:0.08em; text-transform:uppercase; display:block; margin-bottom:0.5rem">Q [100]</span>
+                    <p class="text-xs text-slate-400">Profondeur de passe minimale en microns. <code style="color:#7dd3fc">Q100</code> = 0.1 mm. En dessous de cette valeur, le cycle arrête les passes d'ébauche.</p>
+                </div>
+                <div class="anatomy-token-dark">
+                    <span style="font-family:var(--mono); font-size:0.65rem; color:#60a5fa; letter-spacing:0.08em; text-transform:uppercase; display:block; margin-bottom:0.5rem">R [0.05]</span>
+                    <p class="text-xs text-slate-400">Surépaisseur de finition (mm) réservée pour les dernières passes. Garantit une meilleure qualité de flanc.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── MODULE 03 : Ligne 2 G76 ── -->
+    <section class="mb-12 fade-up delay-1">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">03.</span>
+            <h3 class="text-2xl font-black uppercase text-slate-800">Structure — Ligne 2</h3>
+        </div>
+        <div class="content-card mb-4">
+            <div style="font-family:var(--mono); font-size:1rem; font-weight:700; color:#6366f1; text-align:center; background:#eef2ff; border-radius:8px; padding:1rem; margin-bottom:1.5rem; letter-spacing:0.03em">
+                G76  X18.376  Z-25.0  P1299  Q300  F2.0
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <div style="background:#f8fafc; border-radius:10px; padding:1rem; text-align:center; border:1px solid #e2e8f0">
+                    <span style="font-family:var(--mono); font-weight:700; color:#6366f1; font-size:1rem; display:block; margin-bottom:0.4rem">X</span>
+                    <p style="font-size:0.65rem; text-transform:uppercase; color:#94a3b8; letter-spacing:0.06em">Diamètre<br>fond de filet</p>
+                </div>
+                <div style="background:#f8fafc; border-radius:10px; padding:1rem; text-align:center; border:1px solid #e2e8f0">
+                    <span style="font-family:var(--mono); font-weight:700; color:#6366f1; font-size:1rem; display:block; margin-bottom:0.4rem">Z</span>
+                    <p style="font-size:0.65rem; text-transform:uppercase; color:#94a3b8; letter-spacing:0.06em">Longueur<br>du filetage</p>
+                </div>
+                <div style="background:#eef2ff; border-radius:10px; padding:1rem; text-align:center; border:1px solid #c7d2fe">
+                    <span style="font-family:var(--mono); font-weight:700; color:#4f46e5; font-size:1rem; display:block; margin-bottom:0.4rem">P</span>
+                    <p style="font-size:0.65rem; text-transform:uppercase; color:#6366f1; letter-spacing:0.06em">Hauteur filet<br>(microns)</p>
+                </div>
+                <div style="background:#f8fafc; border-radius:10px; padding:1rem; text-align:center; border:1px solid #e2e8f0">
+                    <span style="font-family:var(--mono); font-weight:700; color:#6366f1; font-size:1rem; display:block; margin-bottom:0.4rem">Q</span>
+                    <p style="font-size:0.65rem; text-transform:uppercase; color:#94a3b8; letter-spacing:0.06em">1ère passe<br>(microns)</p>
+                </div>
+                <div style="background:#fff7ed; border-radius:10px; padding:1rem; text-align:center; border:1px solid #fed7aa">
+                    <span style="font-family:var(--mono); font-weight:700; color:var(--orange); font-size:1rem; display:block; margin-bottom:0.4rem">F</span>
+                    <p style="font-size:0.65rem; text-transform:uppercase; color:#9a3412; letter-spacing:0.06em">Le Pas<br>(mm)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code exemple complet -->
+        <div class="code-block">
+            <span class="cm">( FILETAGE M20 × 2.0 — PROGRAMME COMPLET )</span><br>
+            <span class="kw">T0303</span>              <span class="cm">; plaquette de filetage</span><br>
+            <span class="g97c">G97</span> S<span class="val">800</span> <span class="kw">M03 M08</span>  <span class="cm">; OBLIGATOIRE — N fixe</span><br>
+            <span class="kw">G00</span> X<span class="val">22.</span> Z<span class="val">4.</span><br>
+            <span class="g76">G76</span> <span class="P1">P</span><span class="val">020060</span> <span class="P1">Q</span><span class="val">100</span> <span class="P1">R</span><span class="val">0.05</span>      <span class="cm">; ligne 1 — paramètres cycle</span><br>
+            <span class="g76">G76</span> X<span class="val">17.402</span> Z<span class="val">-30.</span> <span class="P2">P</span><span class="val">1299</span> <span class="P2">Q</span><span class="val">400</span> F<span class="val">2.0</span>  <span class="cm">; ligne 2 — géométrie filet</span><br>
+            <span class="kw">G00</span> X<span class="val">100.</span> Z<span class="val">100.</span><br>
+            <span class="kw">M30</span>
+        </div>
+    </section>
+
+    <!-- ── MODULE 04 : Calculateur ── -->
+    <section class="mb-12 fade-up delay-2">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">04.</span>
+            <h3 class="text-2xl font-black uppercase text-slate-800">Calculateur G76 — Filet ISO 60°</h3>
+        </div>
+        <div class="calc-box">
+            <h4 style="font-family:var(--display); font-weight:800; font-size:1rem; text-transform:uppercase; color:white; margin-bottom:1rem">⚡ Calcul automatique des paramètres</h4>
+            <div class="grid md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <span class="calc-label">Diamètre nominal (mm) — ex: 20 pour M20</span>
+                    <input type="number" id="dnom" class="calc-input" value="20" step="0.5">
+                </div>
+                <div>
+                    <span class="calc-label">Pas du filet (mm) — ex: 2.0 pour M20×2</span>
+                    <input type="number" id="pas" class="calc-input" value="2.0" step="0.25">
+                </div>
+                <div>
+                    <span class="calc-label">Longueur filetage (mm)</span>
+                    <input type="number" id="longueur" class="calc-input" value="30" step="1">
+                </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="calc-result" id="res-h">H filet (P) = — microns</div>
+                <div class="calc-result" id="res-xfond">X fond de filet = — mm</div>
+            </div>
+            <div class="mt-3 bg-slate-900 rounded-lg p-3" id="res-code" style="font-family:var(--mono); font-size:0.72rem; color:#64748b; line-height:1.9; border-left:3px solid var(--indigo)">
+                G76 P020060 Q100 R0.05<br>
+                G76 X? Z? P? Q400 F?
+            </div>
+        </div>
+    </section>
+
+    <!-- ── MODULE 05 : Règle G97 ── -->
+    <section class="mb-4 fade-up">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">05.</span>
+            <h3 class="text-2xl font-black uppercase text-red-700">La Règle Incontournable — G97</h3>
+        </div>
+        <div class="danger-box">
+            <div class="grid md:grid-cols-2 gap-6 items-center">
+                <div>
+                    <h4 class="font-black text-red-800 text-lg uppercase mb-3" style="font-family:var(--display)">⚠️ G76 + G96 = Filetage HS</h4>
+                    <p class="text-red-800 text-sm leading-relaxed mb-3">Un filetage <strong>doit impérativement</strong> être programmé en <strong>G97</strong> (vitesse fixe). Si vous restez en G96, la vitesse de broche varie avec le diamètre, ce qui modifie le temps de réaction des axes et fausse le pas.</p>
+                    <ul class="space-y-1 text-sm text-red-700">
+                        <li class="flex gap-2"><span>❌</span> Pas du filet incorrect → filetage HS</li>
+                        <li class="flex gap-2"><span>❌</span> Désynchronisation broche/avance</li>
+                        <li class="flex gap-2"><span>❌</span> Bris plaquette de filetage</li>
+                    </ul>
+                </div>
+                <div class="space-y-3">
+                    <div class="bg-white rounded-xl p-4 border-l-4 border-red-600 shadow-sm">
+                        <h5 style="font-family:var(--mono); font-size:0.65rem; color:#dc2626; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem">Toujours avant G76</h5>
+                        <div style="font-family:var(--mono); font-size:1.2rem; font-weight:700; color:#dc2626">G97 S800 M03</div>
+                        <p class="text-xs text-gray-500 mt-1">Vitesse fixe 800 tr/min, quel que soit le diamètre.</p>
+                    </div>
+                    <div class="bg-red-800 text-white rounded-xl p-4 text-sm italic">
+                        "Règle absolue : G76 est toujours précédé de G97. Sans exception, sans dérogation."
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── NAV LEÇONS ── -->
+    <div class="lesson-nav">
+        <a href="lecon8.html" class="btn-secondary">← Leçon 8 : G96/G97</a>
+        <div class="text-center">
+            <p style="font-family:var(--mono); font-size:0.65rem; color:var(--indigo); text-transform:uppercase; letter-spacing:0.1em">Leçon 9 PRO / 10</p>
+        </div>
+        <a href="lecon10.html" class="btn-pro">Leçon 10 PRO : Paramétrage →</a>
+    </div>
+
+</main>
+
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-8">
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Le Savoir est votre Force</p>
+</footer>
+
+<script>
+    // Burger
+    const burgerBtn = document.getElementById('burger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const burgerIcon = document.getElementById('burger-icon');
+    const closeIcon = document.getElementById('close-icon');
+    burgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+        burgerIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+    });
+
+    // Calculateur G76 ISO 60°
+    function calcG76() {
+        const dnom  = parseFloat(document.getElementById('dnom').value) || 0;
+        const pas   = parseFloat(document.getElementById('pas').value) || 0;
+        const lon   = parseFloat(document.getElementById('longueur').value) || 0;
+
+        // H filet ISO = pas × 0.6134
+        const H = pas * 0.6134;
+        const Hmicrons = Math.round(H * 1000);
+        // X fond = D_nominal - 2 × H
+        const Xfond = (dnom - 2 * H).toFixed(3);
+        // Q = première passe ≈ 40% de H (en microns)
+        const Q = Math.round(H * 0.4 * 1000 / 100) * 100;
+
+        document.getElementById('res-h').textContent    = `H filet (P) = ${Hmicrons} microns`;
+        document.getElementById('res-xfond').textContent = `X fond de filet = ${Xfond} mm`;
+        document.getElementById('res-code').innerHTML   =
+            `<span style="color:#818cf8">G97</span> S800 M03  <span style="color:#475569;font-style:italic">; N fixe obligatoire</span><br>` +
+            `<span style="color:#818cf8">G76</span> P020060 Q100 R0.05<br>` +
+            `<span style="color:#818cf8">G76</span> X<span style="color:#7dd3fc">${Xfond}</span> Z<span style="color:#7dd3fc">-${lon.toFixed(1)}</span> P<span style="color:#fb923c">${Hmicrons}</span> Q<span style="color:#f472b6">${Q}</span> F<span style="color:#fbbf24">${pas.toFixed(1)}</span>`;
+    }
+
+    ['dnom','pas','longueur'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calcG76);
+    });
+    calcG76();
+</script>
+</body>
+</html>

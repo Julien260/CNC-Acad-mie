@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certification Finale - CNC Académie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #f97316; --orange-dark: #ea6c0a;
+            --navy: #0f172a; --navy-mid: #1e293b;
+            --gold: #f59e0b; --gold-dark: #d97706;
+            --mono: 'Space Mono', monospace;
+            --display: 'Barlow Condensed', sans-serif;
+            --body: 'Barlow', sans-serif;
+        }
+        * { font-family: var(--body); }
+        h1,h2,h3,h4 { font-family: var(--display); }
+        body { background: #f1f5f9; color: #0f172a; }
+
+        /* ── NAV ── */
+        .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
+        #mobile-menu { display: none; }
+        #mobile-menu.open { display: block; }
+        #dropdown-menu { display: none; }
+        #dropdown-menu.open { display: block; }
+
+        /* ── PAGE HEADER ── */
+        .page-header { background: var(--navy); position: relative; overflow: hidden; padding: 3.5rem 1.5rem; text-align: center; }
+        .page-header::before { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(245,158,11,0.05) 39px, rgba(245,158,11,0.05) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(245,158,11,0.05) 39px, rgba(245,158,11,0.05) 40px); pointer-events: none; }
+        .page-header::after { content: '★'; font-family: var(--display); font-size: 18rem; font-weight: 900; position: absolute; right: -2rem; top: -3rem; color: rgba(245,158,11,0.04); pointer-events: none; line-height: 1; }
+        .page-header-inner { position: relative; z-index: 1; }
+        .level-badge { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); color: var(--gold); padding: 0.3rem 0.8rem; border-radius: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 1rem; }
+        .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(2.5rem, 6vw, 4rem); line-height: 1; text-transform: uppercase; color: white; }
+        .page-sub { color: #94a3b8; font-size: 0.95rem; margin-top: 0.75rem; line-height: 1.6; }
+
+        /* ── PROGRESS ── */
+        .exam-progress { background: var(--navy-mid); border-bottom: 1px solid #1e293b; }
+        .progress-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #334155; background: transparent; transition: all 0.3s; flex-shrink: 0; }
+        .progress-dot.answered { background: var(--gold); border-color: var(--gold); }
+        .progress-dot.correct { background: #22c55e; border-color: #22c55e; }
+        .progress-dot.wrong { background: #ef4444; border-color: #ef4444; }
+
+        /* ── QUESTION BLOCKS ── */
+        .q-block { background: white; border-radius: 16px; padding: 2rem; border: 2px solid #e2e8f0; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: border-color 0.3s, background 0.3s; }
+        .q-block.correct { border-color: #22c55e !important; background: #f0fdf4 !important; }
+        .q-block.wrong   { border-color: #ef4444 !important; background: #fef2f2 !important; }
+        .q-block.unanswered { border-color: #f59e0b !important; background: #fffbeb !important; }
+
+        .q-lecon-badge { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; background: var(--navy); color: var(--gold); padding: 0.25rem 0.7rem; border-radius: 3px; display: inline-block; margin-bottom: 1rem; }
+        .q-text { font-family: var(--display); font-weight: 700; font-size: 1.15rem; text-transform: uppercase; color: #1e293b; margin-bottom: 1.25rem; line-height: 1.3; }
+
+        /* ── OPTIONS ── */
+        .option-label { display: flex; align-items: center; gap: 0.85rem; padding: 0.9rem 1.1rem; border-radius: 10px; border: 2px solid #e2e8f0; background: white; cursor: pointer; transition: all 0.15s; margin-bottom: 0.5rem; }
+        .option-label:hover { border-color: var(--gold); background: #fffbeb; }
+        .option-label input[type="radio"] { display: none; }
+        .option-label.selected { border-color: var(--gold); background: #fff7ed; }
+        .option-letter { width: 28px; height: 28px; border-radius: 6px; background: #f1f5f9; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 0.7rem; font-weight: 700; color: #64748b; flex-shrink: 0; transition: all 0.15s; }
+        .option-label.selected .option-letter { background: var(--gold); border-color: var(--gold); color: white; }
+        .option-label.result-correct { border-color: #22c55e !important; background: #f0fdf4 !important; }
+        .option-label.result-correct .option-letter { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .option-label.result-wrong { border-color: #ef4444 !important; background: #fef2f2 !important; }
+        .option-label.result-wrong .option-letter { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .option-label.result-answer { border-color: #22c55e !important; background: #f0fdf4 !important; }
+        .option-text { font-size: 0.9rem; color: #374151; font-weight: 500; }
+        .explanation { display: none; margin-top: 0.75rem; padding: 0.75rem 1rem; background: rgba(0,0,0,0.04); border-radius: 8px; font-size: 0.8rem; color: #475569; line-height: 1.6; border-left: 3px solid #22c55e; }
+        .explanation.show { display: block; }
+
+        /* ── CERTIFICATION RESULT ── */
+        .certif-box { border-radius: 20px; padding: 3rem 2rem; text-align: center; position: relative; overflow: hidden; }
+        .certif-expert { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); border: 3px solid var(--gold); }
+        .certif-confirme { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border: 3px solid #6366f1; }
+        .certif-apprenti { background: white; border: 3px solid #e2e8f0; }
+
+        /* ── SCORE RING ── */
+        .score-ring { display: inline-flex; align-items: center; justify-content: center; width: 120px; height: 120px; border-radius: 50%; border: 6px solid; margin-bottom: 1.5rem; position: relative; }
+        .score-ring-expert { border-color: var(--gold); background: rgba(245,158,11,0.1); }
+        .score-ring-confirme { border-color: #6366f1; background: rgba(99,102,241,0.1); }
+        .score-ring-apprenti { border-color: #94a3b8; background: #f8fafc; }
+
+        /* ── BUTTONS ── */
+        .btn-gold { background: var(--gold); color: black; font-family: var(--display); font-weight: 900; font-size: 1.1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 1rem 3rem; border-radius: 10px; border: none; cursor: pointer; transition: background 0.2s, transform 0.15s; }
+        .btn-gold:hover { background: var(--gold-dark); transform: translateY(-2px); }
+        .btn-gold:active { transform: scale(0.97); }
+        .btn-secondary { background: #1e293b; color: white; font-family: var(--display); font-weight: 700; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 1.75rem; border-radius: 8px; border: none; cursor: pointer; transition: background 0.2s; text-decoration: none; display: inline-block; }
+        .btn-secondary:hover { background: #334155; }
+
+        /* ── TIMER ── */
+        .timer-box { font-family: var(--mono); }
+        .timer-danger { color: #ef4444 !important; }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.5s ease both; }
+        @keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+        .bounce { animation: bounce 0.6s ease; }
+
+        /* Print */
+        @media print {
+            nav, .exam-progress, #submit-section, footer { display: none !important; }
+            .certif-box { border: 3px solid #000 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══ NAV UNIVERSELLE ═══ -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+    <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+        <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+
+        <div class="hidden md:flex items-center gap-5">
+            <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+            <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+            <div class="relative" id="dropdown-wrapper">
+                <button onclick="toggleDropdown()" class="flex items-center text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs focus:outline-none">
+                    COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 overflow-hidden">
+                    <div class="px-3 pt-2 pb-1"><p class="text-[10px] font-bold uppercase tracking-widest text-slate-400" style="font-family:var(--mono)">— Bases —</p></div>
+                    <a href="lecon1.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 01</span><span class="text-sm text-slate-700">Les Axes et Mouvements</span></a>
+                    <a href="lecon2.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 02</span><span class="text-sm text-slate-700">Le Point Zéro (G54)</span></a>
+                    <a href="lecon3.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 03</span><span class="text-sm text-slate-700">Avances et Vitesses (F/S)</span></a>
+                    <a href="lecon4.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 04</span><span class="text-sm text-slate-700">Compensation (G41/G42)</span></a>
+                    <a href="lecon5.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 05</span><span class="text-sm text-slate-700">Cycles de Perçage</span></a>
+                    <a href="lecon6.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 06</span><span class="text-sm text-slate-700">Sous-Programmes (M98)</span></a>
+                    <a href="lecon7.html" class="block px-4 py-2.5 border-b-2 border-slate-200 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 07</span><span class="text-sm text-slate-700">Sécurité &amp; Maintenance</span></a>
+                    <div class="px-3 pt-2 pb-1"><p class="text-[10px] font-bold uppercase tracking-widest text-indigo-400" style="font-family:var(--mono)">— Expert PRO —</p></div>
+                    <a href="lecon8.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-indigo-50 no-underline"><span class="block text-[10px] text-indigo-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 08</span><span class="text-sm text-slate-700">Tournage G96 &amp; G97 <span style="background:#6366f1;color:white;font-size:0.55rem;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700">PRO</span></span></a>
+                    <a href="lecon9.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-indigo-50 no-underline"><span class="block text-[10px] text-indigo-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 09</span><span class="text-sm text-slate-700">Filetage G76 <span style="background:#6366f1;color:white;font-size:0.55rem;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700">PRO</span></span></a>
+                    <a href="lecon10.html" class="block px-4 py-2.5 hover:bg-indigo-50 no-underline"><span class="block text-[10px] text-indigo-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 10</span><span class="text-sm text-slate-700">Prog. Paramétrée <span style="background:#6366f1;color:white;font-size:0.55rem;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700">PRO</span></span></a>
+                </div>
+            </div>
+            <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+            <a href="feedback.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+        </div>
+
+        <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+            <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+
+    <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+        <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
+        <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
+        <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
+        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm">FAQ &amp; Feedback</a>
+        <a href="mentions-legales.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Légal</a>
+        <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1" style="font-family:var(--mono)">— Cours —</p>
+            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
+            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+            <a href="lecon10.html" class="block text-slate-300 py-1.5 text-sm hover:text-indigo-400">Leçon 10 – Paramétré</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══ PROGRESS DOTS ═══ -->
+<div class="exam-progress">
+    <div class="container mx-auto max-w-4xl px-6 py-3 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2" id="progress-dots"></div>
+        <div class="flex items-center gap-3">
+            <div class="timer-box text-slate-400 text-xs" id="timer-display">⏱ 00:00</div>
+            <div style="font-family:var(--mono); font-size:0.65rem; color:#475569" id="answered-count">0 / 10</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="page-header">
+    <div class="page-header-inner fade-up">
+        <div class="level-badge">Certification Finale · 10 Questions</div>
+        <h2 class="page-title">Évaluation<br><span style="color:var(--gold)">Globale</span></h2>
+        <p class="page-sub">Validez votre titre de Technicien Programmeur CNC Fanuc</p>
+        <div class="flex justify-center gap-6 mt-6 flex-wrap">
+            <div class="text-center">
+                <div style="font-family:var(--mono); font-size:1.5rem; font-weight:700; color:var(--gold)">10</div>
+                <div style="font-family:var(--mono); font-size:0.6rem; color:#64748b; text-transform:uppercase">Questions</div>
+            </div>
+            <div class="text-center">
+                <div style="font-family:var(--mono); font-size:1.5rem; font-weight:700; color:var(--gold)">7/10</div>
+                <div style="font-family:var(--mono); font-size:0.6rem; color:#64748b; text-transform:uppercase">Pour réussir</div>
+            </div>
+            <div class="text-center">
+                <div style="font-family:var(--mono); font-size:1.5rem; font-weight:700; color:var(--gold)">L.1→10</div>
+                <div style="font-family:var(--mono); font-size:0.6rem; color:#64748b; text-transform:uppercase">Couverture</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="container mx-auto max-w-4xl py-10 px-6">
+
+    <!-- Questions -->
+    <div id="exam-flow" class="space-y-6"></div>
+
+    <!-- Submit -->
+    <div id="submit-section" class="mt-12 text-center">
+        <div id="warn-unanswered" class="hidden mb-4 bg-amber-50 border border-amber-200 rounded-xl px-6 py-3 text-amber-800 text-sm font-semibold" style="font-family:var(--mono)">
+            ⚠ Répondez à toutes les questions avant de valider.
+        </div>
+        <button onclick="validateCertification()" class="btn-gold text-lg px-16 py-5">
+            Terminer l'examen →
+        </button>
+        <p class="text-slate-400 text-xs mt-3" style="font-family:var(--mono)">Vos réponses seront corrigées immédiatement</p>
+    </div>
+
+    <!-- Résultat -->
+    <div id="certif-result" class="hidden mt-12 fade-up"></div>
+
+</main>
+
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-16">
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Précision et Rigueur</p>
+    <p class="text-xs mt-2" style="font-family:var(--mono); color:#334155;"><a href="mentions-legales.html" style="color:#475569; text-decoration:underline;">Mentions légales</a></p>
+</footer>
+
+<script>
+// ═══════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════
+document.getElementById('burger-btn').addEventListener('click', () => {
+    document.getElementById('mobile-menu').classList.toggle('open');
+    document.getElementById('burger-icon').classList.toggle('hidden');
+    document.getElementById('close-icon').classList.toggle('hidden');
+});
+function toggleDropdown() {
+    document.getElementById('dropdown-menu').classList.toggle('hidden');
+}
+document.addEventListener('click', e => {
+    const w = document.getElementById('dropdown-wrapper');
+    if (w && !w.contains(e.target)) document.getElementById('dropdown-menu').classList.add('hidden');
+});
+
+// ═══════════════════════════════════════
+// QUESTIONS
+// ═══════════════════════════════════════
+const questions = [
+    {
+        l: "L.1", topic: "Axes & Mouvements",
+        q: "Quel axe gère la longueur de la pièce sur un tour CNC ?",
+        opts: ["X — le diamètre", "Z — l'axe de rotation", "C — l'axe rotatif"],
+        c: 1,
+        expl: "En tournage, Z est l'axe longitudinal (longueur), X est l'axe radial (diamètre). C'est l'inverse du fraisage où Z est vertical."
+    },
+    {
+        l: "L.2", topic: "G54 & Zéro Pièce",
+        q: "En G91 (incrémental), la coordonnée est calculée par rapport à :",
+        opts: ["L'origine pièce G54", "La position actuelle de l'outil", "Le zéro machine G28"],
+        c: 1,
+        expl: "G91 = mode incrémental. Chaque déplacement est relatif à la position courante de l'outil. G90 = absolu (par rapport à G54)."
+    },
+    {
+        l: "L.3", topic: "Avances & Vitesses",
+        q: "Quel code G réalise une interpolation circulaire anti-horaire ?",
+        opts: ["G01 — linéaire", "G02 — arc horaire", "G03 — arc anti-horaire"],
+        c: 2,
+        expl: "G02 = arc horaire (CW). G03 = arc anti-horaire (CCW). Les deux nécessitent X, Y/Z et soit R (rayon) soit I, J, K (centre)."
+    },
+    {
+        l: "L.4", topic: "Compensation G41/G42",
+        q: "G42 active la compensation de rayon d'outil à :",
+        opts: ["Droite du profil programmé", "Gauche du profil programmé", "Au centre exact du profil"],
+        c: 0,
+        expl: "G41 = gauche du profil (fraisage avalant, le plus courant). G42 = droite du profil (fraisage en opposition). G40 = annulation."
+    },
+    {
+        l: "L.5", topic: "Cycles de Perçage",
+        q: "Le cycle G81 est utilisé pour :",
+        opts: ["Le perçage simple (descente directe)", "Le taraudage rigide", "L'alésage avec remontée F"],
+        c: 0,
+        expl: "G81 = perçage simple, descente directe jusqu'à Z final, remontée rapide. G83 = perçage profond (débourrage). G84 = taraudage."
+    },
+    {
+        l: "L.6", topic: "Sous-Programmes M98",
+        q: "L'argument P dans un appel M98 P2000 désigne :",
+        opts: ["Le numéro du sous-programme à appeler", "Le nombre de répétitions L", "La profondeur de passe"],
+        c: 0,
+        expl: "M98 P2000 appelle le sous-programme numéro O2000. Pour répéter 5 fois : M98 P2000 L5. M99 retourne au programme principal."
+    },
+    {
+        l: "L.7", topic: "Sécurité & Maintenance",
+        q: "Que fait le mode 'Dry Run' (départ à vide) ?",
+        opts: ["Il usine sans liquide de coupe", "Il exécute le programme à vitesse rapide sans couper", "Il bloque tous les axes en position"],
+        c: 1,
+        expl: "Le Dry Run exécute le programme à vitesse maximale, souvent avec F potentiomètre à 0%. Il permet de vérifier la trajectoire avant le vrai usinage."
+    },
+    {
+        l: "L.8", topic: "G96 & G97 Tournage",
+        q: "Pourquoi utilise-t-on G96 (Vitesse de Coupe Constante) en tournage ?",
+        opts: ["Pour économiser l'énergie", "Pour maintenir une Vc constante quelle que soit le diamètre", "Les deux — économie et qualité de surface"],
+        c: 2,
+        expl: "G96 S180 maintient Vc = 180 m/min. Quand D diminue, N (tr/min) augmente automatiquement. Résultat : état de surface uniforme ET durée de vie outil optimale."
+    },
+    {
+        l: "L.9", topic: "Filetage G76",
+        q: "Quel paramètre F doit-on programmer pour un filetage ISO au pas de 2.0 mm ?",
+        opts: ["F2.0 — le pas en mm", "F0.2 — avance réduite", "F200 — avance en mm/min"],
+        c: 0,
+        expl: "En G76, F représente directement le pas du filet en mm. F2.0 = pas de 2mm (ex : filet M20×2). Ce n'est pas une avance mm/min mais un pas/tour."
+    },
+    {
+        l: "L.10", topic: "Programmation Paramétrée",
+        q: "Une variable macro #500 à #999 est dite :",
+        opts: ["Temporaire — effacée à chaque sous-programme", "Permanente — conservée après extinction", "Système — réservée à Fanuc"],
+        c: 1,
+        expl: "#1 à #33 = locales (temporaires). #100 à #199 = communes (effacées à l'extinction). #500 à #999 = permanentes (conservées même après extinction machine)."
+    }
+];
+
+// ═══════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════
+let timerSeconds = 0;
+let timerInterval = setInterval(() => {
+    timerSeconds++;
+    const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+    const s = String(timerSeconds % 60).padStart(2, '0');
+    const el = document.getElementById('timer-display');
+    el.textContent = `⏱ ${m}:${s}`;
+    if (timerSeconds > 1200) el.classList.add('timer-danger'); // >20min
+}, 1000);
+
+// ═══════════════════════════════════════
+// RENDER QUESTIONS
+// ═══════════════════════════════════════
+const letters = ['A', 'B', 'C'];
+let answered = new Array(questions.length).fill(null);
+
+function renderQuestions() {
+    const flow = document.getElementById('exam-flow');
+    const dotsEl = document.getElementById('progress-dots');
+
+    questions.forEach((item, idx) => {
+        // Progress dot
+        const dot = document.createElement('div');
+        dot.className = 'progress-dot';
+        dot.id = `dot-${idx}`;
+        dot.title = `Q${idx + 1} — ${item.topic}`;
+        dotsEl.appendChild(dot);
+
+        // Question block
+        const block = document.createElement('div');
+        block.className = 'q-block fade-up';
+        block.id = `qblock-${idx}`;
+        block.style.animationDelay = `${idx * 0.04}s`;
+
+        const optsHtml = item.opts.map((opt, i) => `
+            <label class="option-label" id="opt-${idx}-${i}" onclick="selectOption(${idx}, ${i})">
+                <input type="radio" name="q${idx}" value="${i}">
+                <div class="option-letter">${letters[i]}</div>
+                <span class="option-text">${opt}</span>
+            </label>
+        `).join('');
+
+        block.innerHTML = `
+            <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                <span class="q-lecon-badge">${item.l} · ${item.topic}</span>
+                <span style="font-family:var(--mono); font-size:0.6rem; color:#94a3b8">Question ${idx + 1} / ${questions.length}</span>
+            </div>
+            <div class="q-text">${item.q}</div>
+            <div class="space-y-0">${optsHtml}</div>
+            <div class="explanation" id="expl-${idx}">${item.expl}</div>
+        `;
+        flow.appendChild(block);
+    });
+}
+
+function selectOption(qIdx, optIdx) {
+    // Remove selected from siblings
+    questions[qIdx].opts.forEach((_, i) => {
+        document.getElementById(`opt-${qIdx}-${i}`).classList.remove('selected');
+    });
+    document.getElementById(`opt-${qIdx}-${optIdx}`).classList.add('selected');
+    answered[qIdx] = optIdx;
+
+    // Update dot
+    document.getElementById(`dot-${qIdx}`).classList.add('answered');
+    // Update count
+    const count = answered.filter(a => a !== null).length;
+    document.getElementById('answered-count').textContent = `${count} / ${questions.length}`;
+    // Hide warning
+    document.getElementById('warn-unanswered').classList.add('hidden');
+}
+
+// ═══════════════════════════════════════
+// VALIDATE
+// ═══════════════════════════════════════
+function validateCertification() {
+    // Check all answered
+    const unanswered = answered.filter(a => a === null).length;
+    if (unanswered > 0) {
+        document.getElementById('warn-unanswered').classList.remove('hidden');
+        // Scroll to first unanswered
+        const firstIdx = answered.indexOf(null);
+        document.getElementById(`qblock-${firstIdx}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.getElementById(`qblock-${firstIdx}`).classList.add('unanswered');
+        setTimeout(() => document.getElementById(`qblock-${firstIdx}`).classList.remove('unanswered'), 2000);
+        return;
+    }
+
+    // Stop timer
+    clearInterval(timerInterval);
+
+    let score = 0;
+    questions.forEach((item, idx) => {
+        const block = document.getElementById(`qblock-${idx}`);
+        const sel = answered[idx];
+        const isCorrect = sel === item.c;
+
+        if (isCorrect) {
+            score++;
+            block.classList.add('correct');
+            document.getElementById(`dot-${idx}`).classList.remove('answered');
+            document.getElementById(`dot-${idx}`).classList.add('correct');
+        } else {
+            block.classList.add('wrong');
+            document.getElementById(`dot-${idx}`).classList.remove('answered');
+            document.getElementById(`dot-${idx}`).classList.add('wrong');
+        }
+
+        // Style options
+        questions[idx].opts.forEach((_, i) => {
+            const label = document.getElementById(`opt-${idx}-${i}`);
+            label.style.pointerEvents = 'none';
+            label.classList.remove('selected');
+            if (i === item.c) label.classList.add('result-correct');
+            else if (i === sel && !isCorrect) label.classList.add('result-wrong');
+        });
+
+        // Show explanation
+        document.getElementById(`expl-${idx}`).classList.add('show');
+    });
+
+    // Hide submit
+    document.getElementById('submit-section').style.display = 'none';
+
+    // Show result
+    showResult(score);
+}
+
+function showResult(score) {
+    const pct = Math.round((score / questions.length) * 100);
+    const time = document.getElementById('timer-display').textContent.replace('⏱ ', '');
+    const res = document.getElementById('certif-result');
+
+    let grade, msg, boxClass, ringClass, scoreColor, emoji;
+
+    if (score === 10) {
+        grade = 'EXPERT PROGRAMMEUR'; msg = 'Parfait absolu. Vous maîtrisez l\'intégralité de la chaîne de programmation CNC Fanuc.';
+        boxClass = 'certif-expert'; ringClass = 'score-ring-expert'; scoreColor = 'color:var(--gold)'; emoji = '🏆';
+    } else if (score >= 7) {
+        grade = 'TECHNICIEN CONFIRMÉ'; msg = 'Félicitations — vous êtes prêt pour l\'atelier. Revoyez les questions en rouge pour atteindre l\'excellence.';
+        boxClass = 'certif-confirme'; ringClass = 'score-ring-confirme'; scoreColor = 'color:#818cf8'; emoji = '🎓';
+    } else if (score >= 5) {
+        grade = 'APPRENTI AVANCÉ'; msg = 'Bon début ! Quelques leçons méritent d\'être revisitées. Cliquez sur les liens de correction.';
+        boxClass = 'certif-apprenti'; ringClass = 'score-ring-apprenti'; scoreColor = 'color:#f59e0b'; emoji = '📚';
+    } else {
+        grade = 'DÉBUTANT'; msg = 'Les bases ne sont pas encore solides. Reprenez les leçons 1 à 7 avant de retenter l\'examen.';
+        boxClass = 'certif-apprenti'; ringClass = 'score-ring-apprenti'; scoreColor = 'color:#ef4444'; emoji = '🔧';
+    }
+
+    res.innerHTML = `
+        <div class="certif-box ${boxClass}">
+            <div class="text-5xl mb-4 bounce">${emoji}</div>
+            <div class="score-ring ${ringClass}">
+                <div>
+                    <div style="font-family:var(--mono); font-size:1.8rem; font-weight:700; ${scoreColor}">${score}/10</div>
+                    <div style="font-family:var(--mono); font-size:0.6rem; color:#94a3b8; text-transform:uppercase">${pct}%</div>
+                </div>
+            </div>
+            <div style="font-family:var(--display); font-weight:900; font-size:1.8rem; text-transform:uppercase; color:white; margin-bottom:0.5rem">${grade}</div>
+            <p style="color:#94a3b8; font-size:0.9rem; max-width:440px; margin:0 auto 1.5rem; line-height:1.6">${msg}</p>
+            <div style="font-family:var(--mono); font-size:0.65rem; color:#64748b; margin-bottom:2rem">Temps : ${time} · Score : ${score}/10 · ${pct}%</div>
+            <div class="flex flex-wrap justify-center gap-3">
+                <button onclick="window.print()" class="btn-secondary">🖨 Imprimer</button>
+                <a href="lecon1.html" class="btn-secondary">↩ Revoir les leçons</a>
+                <button onclick="location.reload()" class="btn-secondary">↺ Recommencer</button>
+            </div>
+        </div>
+    `;
+    res.classList.remove('hidden');
+    res.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ═══ INIT ═══
+renderQuestions();
+</script>
+</body>
+</html>

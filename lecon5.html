@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leçon 5 : Cycles de Perçage - CNC Académie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #f97316; --orange-dark: #ea6c0a;
+            --navy: #0f172a; --navy-mid: #1e293b;
+            --mono: 'Space Mono', monospace;
+            --display: 'Barlow Condensed', sans-serif;
+            --body: 'Barlow', sans-serif;
+        }
+        * { font-family: var(--body); }
+        h1,h2,h3,h4 { font-family: var(--display); }
+        body { background: #f1f5f9; color: #0f172a; }
+
+        /* NAV */
+        .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
+        #mobile-menu { display: none; }
+        #mobile-menu.open { display: block; }
+        .dropdown-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); width: 18rem; background: white; border-radius: 0.75rem; box-shadow: 0 20px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0; z-index: 100; overflow: hidden; }
+        .dropdown-trigger:hover .dropdown-menu, .dropdown-trigger:focus-within .dropdown-menu { display: block; }
+        .menu-lesson { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; text-decoration: none; }
+        .menu-lesson:hover { background: #fff7ed; }
+        .menu-lesson:last-child { border-bottom: none; }
+        .menu-lesson-num { font-family: var(--mono); font-size: 0.6rem; color: var(--orange); letter-spacing: 0.1em; text-transform: uppercase; display: block; }
+        .menu-lesson-title { font-size: 0.85rem; color: #1e293b; font-weight: 500; }
+        .menu-lesson.active { background: #fff7ed; }
+        .menu-lesson.active .menu-lesson-num, .menu-lesson.active .menu-lesson-title { color: var(--orange); font-weight: 700; }
+        .menu-lesson.done .menu-lesson-num { color: #22c55e; }
+        .menu-lesson.pro:hover { background: #eef2ff; }
+        .menu-lesson.pro .menu-lesson-num { color: #6366f1; }
+        .badge-pro { font-size: 0.6rem; background: #6366f1; color: white; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.4rem; }
+        .btn-primary { background: var(--orange); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 2rem; border-radius: 6px; transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none; }
+        .btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); }
+        .btn-secondary { border: 2px solid #e2e8f0; color: #475569; font-family: var(--display); font-weight: 700; text-transform: uppercase; padding: 0.75rem 1.5rem; border-radius: 6px; transition: all 0.2s; display: inline-block; text-decoration: none; font-size: 0.9rem; }
+        .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+
+        /* PROGRESS */
+        .progress-bar { background: var(--navy-mid); border-bottom: 1px solid #1e293b; overflow-x: auto; }
+        .progress-step { display: flex; align-items: center; gap: 0.4rem; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; color: #475569; padding: 0.75rem 0; white-space: nowrap; }
+        .progress-step.active { color: var(--orange); }
+        .progress-step.done { color: #22c55e; }
+        .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #334155; flex-shrink: 0; }
+        .progress-step.active .progress-dot { background: var(--orange); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+        .progress-step.done .progress-dot { background: #22c55e; }
+        .progress-line { height: 1px; background: #334155; flex: 1; }
+        .progress-line.done { background: #22c55e; }
+
+        /* PAGE HEADER */
+        .page-header { background: var(--navy); position: relative; overflow: hidden; padding: 3rem 1.5rem; }
+        .page-header::before { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(249,115,22,0.06) 39px, rgba(249,115,22,0.06) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(249,115,22,0.06) 39px, rgba(249,115,22,0.06) 40px); pointer-events: none; }
+        .page-header-inner { position: relative; z-index: 1; }
+        .level-badge { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.35); color: var(--orange); padding: 0.3rem 0.8rem; border-radius: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 1rem; }
+        .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1; text-transform: uppercase; color: white; }
+        .page-sub { color: #94a3b8; font-size: 0.95rem; margin-top: 0.75rem; max-width: 560px; line-height: 1.6; }
+
+        /* VOCAB CARDS */
+        .vocab-card { background: white; border-radius: 12px; padding: 1.25rem; border-bottom: 4px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: border-color 0.2s, background 0.2s; }
+        .vocab-card:hover { border-color: var(--orange); background: #fffcf9; }
+
+        /* CYCLE CARDS */
+        .cycle-card { background: white; border-radius: 14px; padding: 1.5rem; border-left: 5px solid; box-shadow: 0 2px 10px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; }
+        .cycle-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        .cycle-badge { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; display: block; margin-bottom: 0.5rem; }
+
+        /* ANATOMY ROW */
+        .anatomy-token { background: white; border-radius: 10px; padding: 0.75rem 0.5rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+        .anatomy-token .tok-code { font-family: var(--mono); font-size: 0.8rem; font-weight: 700; color: white; border-radius: 5px; padding: 0.25rem 0.5rem; display: inline-block; margin-bottom: 0.4rem; }
+        .anatomy-token .tok-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.07em; color: #94a3b8; font-weight: 700; }
+
+        /* CODE BLOCK */
+        .code-block { background: var(--navy); border-radius: 10px; padding: 1.25rem 1.5rem; font-family: var(--mono); font-size: 0.78rem; line-height: 1.9; color: #64748b; border-left: 3px solid var(--orange); }
+        .code-block .kw { color: var(--orange); }
+        .code-block .val { color: #7dd3fc; }
+        .code-block .cm { color: #475569; font-style: italic; }
+        .code-block .g83 { color: #a78bfa; font-weight: 700; }
+        .code-block .r-plane { color: #4ade80; }
+        .code-block .q-val { color: #f87171; }
+        .code-block .z-val { color: #60a5fa; }
+        .code-block .f-val { color: #fbbf24; }
+
+        /* DIAGRAM WRAP */
+        .diagram-wrap { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.07); border: 1px solid #e2e8f0; }
+
+        /* LESSON NAV */
+        .lesson-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; }
+
+        /* IMAGE FRAME */
+        .img-frame { background: var(--navy-mid); border-radius: 12px; overflow: hidden; }
+        .img-frame img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.5s ease both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+    </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+    <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+        <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+        <div class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+            <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+            <div class="relative dropdown-trigger">
+                <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-orange-400 transition">
+                    COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                    <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
+                    <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
+                    <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
+                    <a href="lecon4.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 04</span><span class="menu-lesson-title">Compensation (G41/G42)</span></a>
+                    <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
+                    <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
+                    <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
+                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                </div>
+            </div>
+            <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+            <a href="feedback.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+        </div>
+        <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+            <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+        <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
+        <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
+        <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
+        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
+        <div>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
+            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
+            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
+            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
+            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
+            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
+            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
+            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══ PROGRESS ═══ -->
+<div class="progress-bar">
+    <div class="container mx-auto max-w-5xl px-6">
+        <div class="flex items-center gap-2 py-1">
+            <div class="progress-step done"><span class="progress-dot"></span>L.1 Axes</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.2 G54</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.3 F/S</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.4 Comp.</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step active"><span class="progress-dot"></span>L.5 Perçage</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.6 M98</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.7 Sécu.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="page-header">
+    <div class="container mx-auto max-w-5xl page-header-inner fade-up">
+        <div class="level-badge">Automatisation · Leçon 05 / 10</div>
+        <h2 class="page-title">Les Cycles<br>de <span style="color:var(--orange)">Perçage</span></h2>
+        <p class="page-sub italic">"Percer vite, percer profond, percer juste." — Les cycles fixes font en une ligne ce qui prendrait 10 lignes de code manuel.</p>
+    </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="container mx-auto max-w-5xl py-12 px-6">
+
+    <!-- ── VOCABULAIRE ── -->
+    <section class="mb-12 fade-up">
+        <h3 class="text-xl font-black uppercase text-slate-700 mb-5" style="font-family:var(--display)">Vocabulaire du perçage</h3>
+        <div class="grid md:grid-cols-3 gap-4">
+            <div class="vocab-card">
+                <h4 class="font-bold text-orange-600 uppercase text-xs mb-2" style="font-family:var(--mono)">Le Débourrage</h4>
+                <p class="text-xs text-gray-500 leading-relaxed">Sortie complète du foret du trou pour évacuer les copeaux et laisser entrer le liquide de coupe. Indispensable pour les trous profonds (G83).</p>
+            </div>
+            <div class="vocab-card">
+                <h4 class="font-bold text-orange-600 uppercase text-xs mb-2" style="font-family:var(--mono)">Le Brise-copeau</h4>
+                <p class="text-xs text-gray-500 leading-relaxed">Petite remontée de quelques dixièmes pour casser le ruban de métal sans sortir complètement du trou. Plus rapide que le débourrage (G73).</p>
+            </div>
+            <div class="vocab-card">
+                <h4 class="font-bold text-orange-600 uppercase text-xs mb-2" style="font-family:var(--mono)">La Garde (Plan R)</h4>
+                <p class="text-xs text-gray-500 leading-relaxed">Distance de sécurité au-dessus de la pièce (souvent 2mm) où le foret s'arrête en rapide (G00) avant de commencer à percer à l'avance F.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── CYCLES + SCHÉMAS SVG ── -->
+    <section class="mb-12 fade-up delay-1">
+        <h3 class="text-xl font-black uppercase text-slate-700 mb-5" style="font-family:var(--display)">Les 3 cycles principaux</h3>
+        <div class="grid md:grid-cols-3 gap-5 mb-8">
+            <!-- G81 -->
+            <div class="cycle-card" style="border-left-color:#3b82f6">
+                <span class="cycle-badge text-blue-600">G81</span>
+                <h4 class="font-black uppercase text-slate-800 mb-2" style="font-family:var(--display)">Perçage Simple</h4>
+                <p class="text-xs text-gray-500 leading-relaxed mb-3">L'outil descend en une seule passe jusqu'à Z final, puis remonte en rapide. Pour trous peu profonds, centrage ou tôle fine.</p>
+                <div class="bg-blue-50 rounded px-3 py-1.5 text-xs" style="font-family:var(--mono); color:#1d4ed8">G81 X.. Y.. Z.. R.. F..</div>
+            </div>
+            <!-- G83 -->
+            <div class="cycle-card" style="border-left-color:var(--orange)">
+                <span class="cycle-badge text-orange-600">G83</span>
+                <h4 class="font-black uppercase text-slate-800 mb-2" style="font-family:var(--display)">Perçage Profond</h4>
+                <p class="text-xs text-gray-500 leading-relaxed mb-3">L'outil descend par passes Q et remonte au plan R à chaque fois pour vider les copeaux. Indispensable dès que profondeur &gt; 3×D.</p>
+                <div class="bg-orange-50 rounded px-3 py-1.5 text-xs" style="font-family:var(--mono); color:#9a3412">G83 X.. Y.. Z.. R.. Q.. F..</div>
+            </div>
+            <!-- G73 -->
+            <div class="cycle-card" style="border-left-color:#22c55e">
+                <span class="cycle-badge text-green-600">G73</span>
+                <h4 class="font-black uppercase text-slate-800 mb-2" style="font-family:var(--display)">Brise-copeau</h4>
+                <p class="text-xs text-gray-500 leading-relaxed mb-3">L'outil remonte juste de quelques dixièmes (d) pour casser le copeau sans ressortir. Bien plus rapide que G83.</p>
+                <div class="bg-green-50 rounded px-3 py-1.5 text-xs" style="font-family:var(--mono); color:#166534">G73 X.. Y.. Z.. R.. Q.. F..</div>
+            </div>
+        </div>
+
+        <!-- SVG schéma comparatif des 3 cycles -->
+        <div class="diagram-wrap">
+            <p style="font-family:var(--mono); font-size:0.6rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem">Schéma comparatif — trajectoires des 3 cycles</p>
+            <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" width="100%">
+                <!-- G81 -->
+                <text x="80" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#3b82f6" font-family="monospace">G81</text>
+                <text x="80" y="26" text-anchor="middle" font-size="8" fill="#64748b" font-family="monospace">Simple</text>
+                <!-- Surface pièce G81 -->
+                <line x1="20" y1="50" x2="140" y2="50" stroke="#cbd5e1" stroke-width="1.5"/>
+                <text x="135" y="48" font-size="7" fill="#94a3b8" font-family="monospace">R</text>
+                <!-- Plan R G81 -->
+                <line x1="20" y1="40" x2="140" y2="40" stroke="#4ade80" stroke-width="1" stroke-dasharray="3,2"/>
+                <!-- Descente rapide G00 -->
+                <line x1="80" y1="10" x2="80" y2="40" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,2"/>
+                <!-- Descente travail G01 -->
+                <line x1="80" y1="40" x2="80" y2="160" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#arrowB)"/>
+                <!-- Remontée rapide -->
+                <line x1="82" y1="160" x2="82" y2="10" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,2"/>
+                <!-- Trou G81 -->
+                <rect x="74" y="50" width="12" height="110" rx="2" fill="rgba(59,130,246,0.08)" stroke="#3b82f6" stroke-width="0.5" stroke-dasharray="2,2"/>
+                <text x="80" y="175" text-anchor="middle" font-size="7" fill="#3b82f6" font-family="monospace">Z final</text>
+
+                <!-- G83 -->
+                <text x="240" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#f97316" font-family="monospace">G83</text>
+                <text x="240" y="26" text-anchor="middle" font-size="8" fill="#64748b" font-family="monospace">Débourrage</text>
+                <line x1="180" y1="50" x2="300" y2="50" stroke="#cbd5e1" stroke-width="1.5"/>
+                <line x1="180" y1="40" x2="300" y2="40" stroke="#4ade80" stroke-width="1" stroke-dasharray="3,2"/>
+                <line x1="240" y1="10" x2="240" y2="40" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,2"/>
+                <!-- Passe 1 -->
+                <line x1="240" y1="40" x2="240" y2="80" stroke="#f97316" stroke-width="2.5"/>
+                <!-- Remontée plan R -->
+                <line x1="242" y1="80" x2="242" y2="40" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,2"/>
+                <!-- Passe 2 -->
+                <line x1="240" y1="40" x2="240" y2="115" stroke="#f97316" stroke-width="2.5"/>
+                <line x1="242" y1="115" x2="242" y2="40" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,2"/>
+                <!-- Passe 3 -->
+                <line x1="240" y1="40" x2="240" y2="160" stroke="#f97316" stroke-width="2.5" marker-end="url(#arrowO)"/>
+                <line x1="242" y1="160" x2="242" y2="10" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,2"/>
+                <!-- Trou -->
+                <rect x="234" y="50" width="12" height="110" rx="2" fill="rgba(249,115,22,0.08)" stroke="#f97316" stroke-width="0.5" stroke-dasharray="2,2"/>
+                <!-- Q annotations -->
+                <line x1="255" y1="40" x2="255" y2="80" stroke="#f97316" stroke-width="0.8"/>
+                <text x="258" y="62" font-size="8" fill="#f97316" font-family="monospace">Q</text>
+                <text x="240" y="175" text-anchor="middle" font-size="7" fill="#f97316" font-family="monospace">Z final</text>
+
+                <!-- G73 -->
+                <text x="400" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#22c55e" font-family="monospace">G73</text>
+                <text x="400" y="26" text-anchor="middle" font-size="8" fill="#64748b" font-family="monospace">Brise-copeau</text>
+                <line x1="340" y1="50" x2="460" y2="50" stroke="#cbd5e1" stroke-width="1.5"/>
+                <line x1="340" y1="40" x2="460" y2="40" stroke="#4ade80" stroke-width="1" stroke-dasharray="3,2"/>
+                <line x1="400" y1="10" x2="400" y2="40" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,2"/>
+                <!-- Passe 1 avec mini remontée -->
+                <line x1="400" y1="40" x2="400" y2="80" stroke="#22c55e" stroke-width="2.5"/>
+                <line x1="402" y1="80" x2="402" y2="73" stroke="#fbbf24" stroke-width="1.5"/>
+                <!-- Passe 2 -->
+                <line x1="400" y1="73" x2="400" y2="115" stroke="#22c55e" stroke-width="2.5"/>
+                <line x1="402" y1="115" x2="402" y2="108" stroke="#fbbf24" stroke-width="1.5"/>
+                <!-- Passe 3 -->
+                <line x1="400" y1="108" x2="400" y2="160" stroke="#22c55e" stroke-width="2.5" marker-end="url(#arrowG)"/>
+                <line x1="402" y1="160" x2="402" y2="10" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,2"/>
+                <rect x="394" y="50" width="12" height="110" rx="2" fill="rgba(34,197,94,0.08)" stroke="#22c55e" stroke-width="0.5" stroke-dasharray="2,2"/>
+                <!-- d annotation mini remontée -->
+                <line x1="415" y1="73" x2="415" y2="80" stroke="#22c55e" stroke-width="0.8"/>
+                <text x="418" y="78" font-size="8" fill="#22c55e" font-family="monospace">d</text>
+                <text x="400" y="175" text-anchor="middle" font-size="7" fill="#22c55e" font-family="monospace">Z final</text>
+
+                <!-- Légende commune -->
+                <line x1="20" y1="200" x2="35" y2="200" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,2"/>
+                <text x="38" y="204" font-size="8" fill="#64748b" font-family="monospace">Rapide (G00)</text>
+                <line x1="140" y1="200" x2="155" y2="200" stroke="#4ade80" stroke-width="1" stroke-dasharray="3,2"/>
+                <text x="158" y="204" font-size="8" fill="#64748b" font-family="monospace">Plan R (garde)</text>
+                <line x1="280" y1="200" x2="295" y2="200" stroke="#f97316" stroke-width="2"/>
+                <text x="298" y="204" font-size="8" fill="#64748b" font-family="monospace">Travail (F)</text>
+
+                <defs>
+                    <marker id="arrowB" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#3b82f6"/></marker>
+                    <marker id="arrowO" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#f97316"/></marker>
+                    <marker id="arrowG" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#22c55e"/></marker>
+                </defs>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ── ANATOMIE G83 ── -->
+    <section class="mb-12 fade-up delay-1">
+        <h3 class="text-xl font-black uppercase text-slate-700 mb-5" style="font-family:var(--display)">Anatomie d'une ligne G83</h3>
+        <!-- Ligne de code -->
+        <div class="code-block mb-6">
+            <span class="g83">G83</span> X<span class="val">50.</span> Y<span class="val">25.</span> <span class="z-val">Z-30.</span> <span class="r-plane">R2.</span> <span class="q-val">Q5.</span> <span class="f-val">F150.</span>
+            <span class="cm"> ; perçage profond Ø8 acier</span>
+        </div>
+        <!-- Tokens -->
+        <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
+            <div class="anatomy-token">
+                <span class="tok-code" style="background:#7c3aed">G83</span>
+                <div class="tok-label">Type cycle</div>
+            </div>
+            <div class="anatomy-token">
+                <span class="tok-code" style="background:#475569">X50. Y25.</span>
+                <div class="tok-label">Position XY</div>
+            </div>
+            <div class="anatomy-token">
+                <span class="tok-code" style="background:#2563eb">Z-30.</span>
+                <div class="tok-label">Prof. finale</div>
+            </div>
+            <div class="anatomy-token">
+                <span class="tok-code" style="background:#16a34a">R2.</span>
+                <div class="tok-label">Plan garde</div>
+            </div>
+            <div class="anatomy-token">
+                <span class="tok-code" style="background:#dc2626">Q5.</span>
+                <div class="tok-label">Pas descente</div>
+            </div>
+            <div class="anatomy-token">
+                <span class="tok-code" style="background:#d97706">F150.</span>
+                <div class="tok-label">Avance mm/min</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── IMAGE + PROGRAMME COMPLET ── -->
+    <section class="mb-12 fade-up delay-2">
+        <h3 class="text-xl font-black uppercase text-slate-700 mb-5" style="font-family:var(--display)">Programme complet — Réseau de trous</h3>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="code-block">
+                <span class="cm">( PERCAGE RESEAU 3 TROUS — G83 )</span><br>
+                <span class="kw">T02 M06</span>           <span class="cm">; foret Ø8</span><br>
+                <span class="kw">S1200 M03 M08</span><br>
+                <span class="kw">G54 G00</span> X<span class="val">50.</span> Y<span class="val">25.</span><br>
+                <span class="kw">G43</span> H<span class="val">02</span> Z<span class="val">5.</span><br>
+                <span class="g83">G83</span> X<span class="val">50.</span> Y<span class="val">25.</span> <span class="z-val">Z-30.</span> <span class="r-plane">R2.</span> <span class="q-val">Q5.</span> <span class="f-val">F150.</span><br>
+                X<span class="val">100.</span> Y<span class="val">25.</span>  <span class="cm">; 2ème trou (cycle modal)</span><br>
+                X<span class="val">150.</span> Y<span class="val">25.</span>  <span class="cm">; 3ème trou</span><br>
+                <span class="kw" style="color:#f87171; font-weight:700">G80</span>               <span class="cm">; annulation OBLIGATOIRE</span><br>
+                <span class="kw">G00</span> Z<span class="val">100.</span> <span class="kw">M09 M05</span><br>
+                <span class="kw">M30</span>
+            </div>
+            <div class="space-y-3">
+                <!-- Photo perçage -->
+                <div class="img-frame h-36">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Drilling_bit_in_operation.jpg/640px-Drilling_bit_in_operation.jpg"
+                         alt="Perçage CNC en opération"
+                         class="w-full h-full object-cover"
+                         onerror="this.parentElement.style.background='#1e293b'; this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;gap:0.5rem;color:#475569;font-size:0.75rem;font-family:monospace\'>📸 Photo perçage CNC</div>'">
+                </div>
+                <div class="bg-white border border-slate-200 rounded-xl p-4 text-sm">
+                    <span class="font-bold text-slate-700 block mb-1" style="font-family:var(--display); text-transform:uppercase">Cycle modal = gain de temps</span>
+                    <p class="text-xs text-gray-500 leading-relaxed">Une fois G83 activé, chaque nouvelle position <code style="font-family:var(--mono)">X.. Y..</code> déclenche automatiquement le cycle complet. Pas besoin de répéter tous les paramètres.</p>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-xl p-4 text-sm">
+                    <span class="font-bold text-slate-700 block mb-1" style="font-family:var(--display); text-transform:uppercase">G84 — Taraudage rigide</span>
+                    <p class="text-xs text-gray-500 leading-relaxed">Même structure que G83 mais synchronise rotation et avance pour faire un filet. Le pas est calculé automatiquement : <code style="font-family:var(--mono); color:var(--orange)">F = pas × S</code>.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── ALERTE SÉCURITÉ G80 ── -->
+    <section class="mb-4 fade-up">
+        <div class="bg-red-50 border-l-8 border-red-500 rounded-r-2xl p-6">
+            <div class="flex items-start gap-4">
+                <div class="text-2xl flex-shrink-0">⚠️</div>
+                <div>
+                    <h4 class="font-black text-red-700 uppercase text-sm mb-2" style="font-family:var(--display)">Règle de sécurité absolue — G80</h4>
+                    <p class="text-xs text-red-600 leading-relaxed mb-3">
+                        Un cycle fixe est <strong>"modal"</strong> — il reste actif pour tous les mouvements X/Y suivants. Si vous oubliez <code style="font-family:var(--mono); background:#fee2e2; padding:0 4px; border-radius:3px">G80</code>, la machine percera un trou à chaque position suivante, y compris lors du retour outil ou du changement d'outil !
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <div class="bg-red-100 rounded-lg px-3 py-2 text-xs font-bold text-red-700" style="font-family:var(--mono)">G80 → Annule le cycle</div>
+                        <div class="bg-red-100 rounded-lg px-3 py-2 text-xs text-red-600">Toujours après le dernier trou</div>
+                        <div class="bg-red-100 rounded-lg px-3 py-2 text-xs text-red-600">Avant tout changement d'outil</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── NAV LEÇONS ── -->
+    <div class="lesson-nav">
+        <a href="lecon4.html" class="btn-secondary">← Leçon 4 : G41/G42</a>
+        <div class="text-center"><p style="font-family:var(--mono)" class="text-xs text-slate-400 uppercase tracking-widest">Leçon 5 / 10</p></div>
+        <a href="lecon6.html" class="btn-primary">Leçon 6 : Sous-Programmes →</a>
+    </div>
+
+</main>
+
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-8">
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Masterclass 2026</p>
+</footer>
+
+<script>
+    const burgerBtn = document.getElementById('burger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const burgerIcon = document.getElementById('burger-icon');
+    const closeIcon = document.getElementById('close-icon');
+    burgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+        burgerIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+    });
+</script>
+</body>
+</html>

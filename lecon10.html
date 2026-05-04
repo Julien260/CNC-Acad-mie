@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leçon 10 PRO : Programmation Paramétrée - CNC Académie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #f97316; --orange-dark: #ea6c0a;
+            --indigo: #6366f1; --indigo-dark: #4f46e5;
+            --navy: #0f172a; --navy-mid: #1e293b;
+            --mono: 'Space Mono', monospace;
+            --display: 'Barlow Condensed', sans-serif;
+            --body: 'Barlow', sans-serif;
+        }
+        * { font-family: var(--body); }
+        h1,h2,h3,h4 { font-family: var(--display); }
+        body { background: #f1f5f9; color: #0f172a; }
+
+        /* NAV */
+        .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
+        #mobile-menu { display: none; }
+        #mobile-menu.open { display: block; }
+        .dropdown-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); width: 18rem; background: white; border-radius: 0.75rem; box-shadow: 0 20px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0; z-index: 100; overflow: hidden; }
+        .dropdown-trigger:hover .dropdown-menu, .dropdown-trigger:focus-within .dropdown-menu { display: block; }
+        .menu-lesson { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; text-decoration: none; }
+        .menu-lesson:hover { background: #fff7ed; }
+        .menu-lesson:last-child { border-bottom: none; }
+        .menu-lesson-num { font-family: var(--mono); font-size: 0.6rem; color: var(--orange); letter-spacing: 0.1em; text-transform: uppercase; display: block; }
+        .menu-lesson-title { font-size: 0.85rem; color: #1e293b; font-weight: 500; }
+        .menu-lesson.active { background: #eef2ff; }
+        .menu-lesson.active .menu-lesson-num,.menu-lesson.active .menu-lesson-title { color: var(--indigo); font-weight: 700; }
+        .menu-lesson.done .menu-lesson-num { color: #22c55e; }
+        .menu-lesson.pro:hover { background: #eef2ff; }
+        .menu-lesson.pro .menu-lesson-num { color: var(--indigo); }
+        .badge-pro { font-size: 0.6rem; background: var(--indigo); color: white; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.4rem; }
+        .btn-primary { background: var(--orange); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 2rem; border-radius: 6px; transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none; }
+        .btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); }
+        .btn-pro { background: var(--indigo); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 2rem; border-radius: 6px; transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none; }
+        .btn-pro:hover { background: var(--indigo-dark); transform: translateY(-1px); }
+        .btn-secondary { border: 2px solid #e2e8f0; color: #475569; font-family: var(--display); font-weight: 700; text-transform: uppercase; padding: 0.75rem 1.5rem; border-radius: 6px; transition: all 0.2s; display: inline-block; text-decoration: none; font-size: 0.9rem; }
+        .btn-secondary:hover { border-color: var(--indigo); color: var(--indigo); }
+
+        /* PROGRESS */
+        .progress-bar { background: #1e1b4b; border-bottom: 1px solid #312e81; overflow-x: auto; }
+        .progress-step { display: flex; align-items: center; gap: 0.4rem; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; color: #475569; padding: 0.75rem 0; white-space: nowrap; }
+        .progress-step.active { color: var(--indigo); }
+        .progress-step.done { color: #22c55e; }
+        .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #334155; flex-shrink: 0; }
+        .progress-step.active .progress-dot { background: var(--indigo); box-shadow: 0 0 0 3px rgba(99,102,241,0.25); }
+        .progress-step.done .progress-dot { background: #22c55e; }
+        .progress-line { height: 1px; background: #334155; flex: 1; }
+        .progress-line.done { background: #22c55e; }
+
+        /* PAGE HEADER */
+        .page-header { background: #1e1b4b; position: relative; overflow: hidden; padding: 3.5rem 1.5rem; }
+        .page-header::before { content: '#VAR'; font-family: var(--display); font-size: 11rem; font-weight: 900; position: absolute; right: -2rem; top: -1rem; color: rgba(99,102,241,0.07); pointer-events: none; line-height: 1; }
+        .page-header::after { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(99,102,241,0.06) 39px, rgba(99,102,241,0.06) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(99,102,241,0.06) 39px, rgba(99,102,241,0.06) 40px); pointer-events: none; }
+        .page-header-inner { position: relative; z-index: 1; }
+        .level-badge { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.4); color: #a5b4fc; padding: 0.3rem 0.8rem; border-radius: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 1rem; }
+        .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1; text-transform: uppercase; color: white; }
+        .page-sub { color: #a5b4fc; font-size: 0.95rem; margin-top: 0.75rem; max-width: 560px; line-height: 1.6; }
+
+        /* MODULE */
+        .module-num { font-family: var(--mono); font-size: 2.5rem; font-weight: 700; color: rgba(99,102,241,0.18); line-height: 1; }
+        .content-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+
+        /* VAR TYPE CARDS */
+        .var-card { background: white; border-radius: 12px; padding: 1.25rem; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: border-color 0.2s, transform 0.2s; }
+        .var-card:hover { border-color: var(--indigo); transform: translateY(-2px); }
+        .var-num { font-family: var(--mono); font-size: 1.2rem; font-weight: 700; color: var(--indigo); display: block; margin-bottom: 0.5rem; }
+
+        /* CODE BLOCK */
+        .code-block { background: var(--navy); border-radius: 10px; padding: 1.25rem 1.5rem; font-family: var(--mono); font-size: 0.78rem; line-height: 1.9; color: #64748b; border-left: 3px solid var(--indigo); }
+        .kw { color: var(--orange); }
+        .val { color: #7dd3fc; }
+        .cm { color: #475569; font-style: italic; }
+        .var { color: #a78bfa; font-weight: 700; }
+        .fn { color: #34d399; font-weight: 700; }
+        .lp { color: #fb923c; font-weight: 700; }
+        .cond { color: #f472b6; font-weight: 700; }
+
+        /* DARK PANEL */
+        .dark-panel { background: var(--navy); border-radius: 16px; padding: 2rem; }
+
+        /* SIMULATOR */
+        .sim-box { background: #0d1117; border-radius: 12px; padding: 1.25rem; border: 1px solid #21262d; font-family: var(--mono); font-size: 0.75rem; min-height: 180px; }
+        .sim-line { color: #64748b; padding: 0.1rem 0; }
+        .sim-line.active-line { background: rgba(99,102,241,0.15); color: #a5b4fc; border-left: 3px solid var(--indigo); padding-left: 0.5rem; margin-left: -3px; }
+        .sim-line.done-line { color: #22c55e; }
+        .sim-output { color: #34d399; }
+        .sim-var { color: #a78bfa; }
+
+        /* CALC */
+        .calc-input { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 0.6rem 0.9rem; font-family: var(--mono); font-size: 0.85rem; color: white; outline: none; transition: border-color 0.2s; }
+        .calc-input:focus { border-color: var(--indigo); }
+        .calc-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 0.3rem; }
+
+        /* DANGER */
+        .danger-box { background: #fff1f2; border: 2px solid #dc2626; border-radius: 16px; padding: 2rem; }
+
+        /* COMPLETION */
+        .master-box { background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; position: relative; overflow: hidden; }
+        .master-box::before { content: '★'; font-size: 16rem; font-weight: 900; position: absolute; left: -2rem; top: -3rem; color: rgba(99,102,241,0.08); pointer-events: none; line-height: 1; }
+
+        /* LESSON NAV */
+        .lesson-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.5s ease both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+        .animate-pulse { animation: pulse 2s ease-in-out infinite; }
+    </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+    <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+        <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+        <div class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+            <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+            <div class="relative dropdown-trigger">
+                <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-orange-400 transition">
+                    COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                    <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
+                    <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
+                    <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
+                    <a href="lecon4.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 04</span><span class="menu-lesson-title">Compensation (G41/G42)</span></a>
+                    <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
+                    <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
+                    <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
+                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                </div>
+            </div>
+            <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+            <a href="feedback.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+        </div>
+        <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+            <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+        <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
+        <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
+        <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
+        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
+        <div>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
+            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
+            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
+            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
+            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
+            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
+            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
+            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══ PROGRESS ═══ -->
+<div class="progress-bar">
+    <div class="container mx-auto max-w-5xl px-6">
+        <div class="flex items-center gap-2 py-1">
+            <div class="progress-step done"><span class="progress-dot"></span>L.1→7 ✓</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.8 G96 ✓</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.9 G76 ✓</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step active"><span class="progress-dot"></span>L.10 Param. 🏆</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="page-header">
+    <div class="container mx-auto max-w-5xl page-header-inner fade-up">
+        <div class="level-badge">Module Master · Leçon 10 PRO · Finale</div>
+        <h2 class="page-title">Programmation<br><span style="color:#818cf8">Paramétrée</span></h2>
+        <p class="page-sub">Le niveau final : apprenez à coder des programmes qui réfléchissent, calculent et s'adaptent. Un seul programme pour mille pièces différentes.</p>
+    </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="container mx-auto max-w-5xl py-12 px-6">
+
+    <!-- ── MODULE 01 : Concept ── -->
+    <section class="mb-12 fade-up">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">01.</span>
+            <h3 class="text-2xl font-black uppercase text-slate-800">Le Concept des Variables</h3>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="content-card">
+                <p class="text-gray-600 leading-relaxed text-sm mb-4">En programmation standard on écrit <code style="font-family:var(--mono); background:#f1f5f9; padding:0 4px; border-radius:3px">X100.0</code> — une valeur fixe, figée. En paramétré on écrit <code style="font-family:var(--mono); background:#eef2ff; color:#6366f1; padding:0 4px; border-radius:3px">X#100</code> — une variable qui peut changer.</p>
+                <div class="bg-indigo-50 border-l-4 border-indigo-500 rounded-r-xl p-4 text-sm text-indigo-800 mb-4">
+                    <strong>Pourquoi utiliser les variables ?</strong>
+                    <ul class="mt-2 space-y-1 text-xs">
+                        <li>• <strong>Universalité :</strong> Un seul programme pour 100 diamètres différents</li>
+                        <li>• <strong>Calculs :</strong> Trigonométrie directement dans le CNC</li>
+                        <li>• <strong>Sécurité :</strong> Vérifier les valeurs avant d'usiner</li>
+                        <li>• <strong>Compteurs :</strong> Tracer la production pièce par pièce</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Mini démo interactive -->
+            <div class="dark-panel">
+                <h4 style="font-family:var(--mono); font-size:0.65rem; color:#818cf8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem">// Démo — variable en action</h4>
+                <div class="space-y-2 mb-4">
+                    <div>
+                        <span class="calc-label">Valeur de #100 (diamètre)</span>
+                        <input type="number" id="demo-val" class="calc-input w-full" value="50" step="5">
+                    </div>
+                </div>
+                <div class="sim-box">
+                    <div class="sim-line"><span style="color:#64748b">#100 =</span> <span id="d-val" class="sim-var">50.0</span><span style="color:#475569; font-style:italic"> ; (diamètre)</span></div>
+                    <div class="sim-line"><span style="color:#f97316">G00</span> X<span id="d-x1" class="sim-var">52.0</span><span style="color:#475569; font-style:italic"> ; (#100+2 = approche)</span></div>
+                    <div class="sim-line"><span style="color:#f97316">G01</span> X<span id="d-x2" class="sim-var">50.0</span> F<span style="color:#7dd3fc">0.25</span><span style="color:#475569; font-style:italic"> ; (= #100)</span></div>
+                    <div class="sim-line"><span style="color:#475569; font-style:italic">; Rayon = </span><span id="d-rad" class="sim-output">25.0</span><span style="color:#475569; font-style:italic"> mm (#100/2)</span></div>
+                    <div class="sim-line"><span style="color:#475569; font-style:italic">; Section = </span><span id="d-area" class="sim-output">1963.5</span><span style="color:#475569; font-style:italic"> mm²</span></div>
+                </div>
+                <p style="font-family:var(--mono); font-size:0.6rem; color:#475569; margin-top:0.5rem">Modifiez #100 — tout se recalcule automatiquement.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── MODULE 02 : Types de variables ── -->
+    <section class="mb-12 fade-up delay-1">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">02.</span>
+            <h3 class="text-2xl font-black uppercase text-slate-800">Hiérarchie des #Variables</h3>
+        </div>
+        <div class="grid md:grid-cols-3 gap-5">
+            <div class="var-card">
+                <span class="var-num">#1 → #33</span>
+                <h5 class="font-bold text-xs uppercase mb-2 text-slate-500 tracking-widest" style="font-family:var(--mono)">Locales</h5>
+                <p class="text-xs text-gray-500 leading-relaxed">Utilisées à l'intérieur d'un seul sous-programme. Effacées à chaque appel M98. Idéal pour les calculs temporaires.</p>
+                <div class="mt-3 bg-slate-50 rounded px-3 py-1.5 text-xs" style="font-family:var(--mono); color:#64748b">#1 = 10.0 ; temporaire</div>
+            </div>
+            <div class="var-card">
+                <span class="var-num">#100 → #199</span>
+                <h5 class="font-bold text-xs uppercase mb-2 text-slate-500 tracking-widest" style="font-family:var(--mono)">Communes</h5>
+                <p class="text-xs text-gray-500 leading-relaxed">Partagées entre tous les programmes actifs. S'effacent à l'extinction de la machine. Idéal pour passer des données entre programmes.</p>
+                <div class="mt-3 bg-indigo-50 rounded px-3 py-1.5 text-xs" style="font-family:var(--mono); color:#6366f1">#100 = 50.0 ; diamètre</div>
+            </div>
+            <div class="var-card" style="border-color:#c7d2fe">
+                <span class="var-num">#500 → #999</span>
+                <h5 class="font-bold text-xs uppercase mb-2 text-indigo-500 tracking-widest" style="font-family:var(--mono)">Permanentes</h5>
+                <p class="text-xs text-gray-500 leading-relaxed">Restent en mémoire même après extinction. Idéal pour les compteurs de pièces, les offsets dynamiques et les recettes.</p>
+                <div class="mt-3 bg-indigo-50 rounded px-3 py-1.5 text-xs" style="font-family:var(--mono); color:#4f46e5">#500 = #500 + 1 ; compteur</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── MODULE 03 : Opérations mathématiques ── -->
+    <section class="mb-12 fade-up delay-1">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">03.</span>
+            <h3 class="text-2xl font-black uppercase text-slate-800">Logique et Calculs</h3>
+        </div>
+        <div class="dark-panel mb-4">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h4 style="font-family:var(--mono); font-size:0.65rem; color:#818cf8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.75rem">Arithmétique de base</h4>
+                    <div class="code-block" style="border-left-color:#34d399">
+                        <span class="var">#100</span> = <span class="val">50.0</span>          <span class="cm">; affectation</span><br>
+                        <span class="var">#101</span> = <span class="var">#100</span> + <span class="val">10.</span>     <span class="cm">; addition</span><br>
+                        <span class="var">#102</span> = <span class="var">#100</span> * <span class="val">2.</span>      <span class="cm">; multiplication</span><br>
+                        <span class="var">#103</span> = <span class="var">#100</span> / <span class="val">2.</span>      <span class="cm">; division (rayon)</span>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="font-family:var(--mono); font-size:0.65rem; color:#818cf8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.75rem">Fonctions avancées</h4>
+                    <div class="code-block" style="border-left-color:#a78bfa">
+                        <span class="var">#104</span> = <span class="fn">SIN</span>[<span class="val">45</span>]      <span class="cm">; sinus (°)</span><br>
+                        <span class="var">#105</span> = <span class="fn">COS</span>[<span class="val">30</span>]      <span class="cm">; cosinus</span><br>
+                        <span class="var">#106</span> = <span class="fn">SQRT</span>[<span class="val">16</span>]     <span class="cm">; racine carrée → 4</span><br>
+                        <span class="var">#107</span> = <span class="fn">ABS</span>[<span class="var">#100</span>]  <span class="cm">; valeur absolue</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── MODULE 04 : Boucle WHILE ── -->
+    <section class="mb-12 fade-up delay-2">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">04.</span>
+            <h3 class="text-2xl font-black uppercase text-slate-800">Les Boucles WHILE — Automatisation</h3>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="content-card">
+                <p class="text-gray-600 text-sm leading-relaxed mb-4">La boucle WHILE répète un bloc d'instructions tant qu'une condition est vraie. Idéale pour usiner N rainures espacées régulièrement sans répéter le code.</p>
+                <div class="code-block">
+                    <span class="var">#100</span> = <span class="val">0</span>           <span class="cm">; compteur init</span><br>
+                    <span class="lp">WHILE</span> [<span class="var">#100</span> <span class="cond">LT</span> <span class="val">10</span>] <span class="lp">DO 1</span><br>
+                    &nbsp;&nbsp;<span class="kw">G01</span> Z<span class="val">-10.</span> F<span class="val">0.2</span>  <span class="cm">; usinage</span><br>
+                    &nbsp;&nbsp;<span class="kw">G00</span> Z<span class="val">2.</span>         <span class="cm">; retrait</span><br>
+                    &nbsp;&nbsp;<span class="kw">G00</span> X[<span class="var">#101</span> * <span class="var">#100</span>]  <span class="cm">; décalage</span><br>
+                    &nbsp;&nbsp;<span class="var">#100</span> = <span class="var">#100</span> + <span class="val">1</span>  <span class="cm">; incrément</span><br>
+                    <span class="lp">END 1</span>
+                </div>
+                <div class="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
+                    <div style="background:#f0fdf4; border-radius:6px; padding:0.4rem"><span style="font-family:var(--mono); color:#16a34a">LT</span><br><span style="color:#64748b">inférieur</span></div>
+                    <div style="background:#f0fdf4; border-radius:6px; padding:0.4rem"><span style="font-family:var(--mono); color:#16a34a">GT</span><br><span style="color:#64748b">supérieur</span></div>
+                    <div style="background:#f0fdf4; border-radius:6px; padding:0.4rem"><span style="font-family:var(--mono); color:#16a34a">EQ</span><br><span style="color:#64748b">égal</span></div>
+                </div>
+            </div>
+
+            <!-- Simulateur boucle -->
+            <div class="dark-panel">
+                <h4 style="font-family:var(--mono); font-size:0.65rem; color:#818cf8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem">// Simulateur boucle</h4>
+                <div class="space-y-2 mb-4">
+                    <div>
+                        <span class="calc-label">Nombre de répétitions (N)</span>
+                        <input type="number" id="loop-n" class="calc-input w-full" value="5" min="1" max="20">
+                    </div>
+                    <div>
+                        <span class="calc-label">Espacement entre passes (mm)</span>
+                        <input type="number" id="loop-step" class="calc-input w-full" value="10" step="5">
+                    </div>
+                </div>
+                <div class="sim-box" id="loop-output" style="min-height:160px; overflow-y:auto; max-height:200px"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── MODULE 05 : IF / Sécurité ── -->
+    <section class="mb-12 fade-up">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">05.</span>
+            <h3 class="text-2xl font-black uppercase text-red-700">Sécurité Anti-Crash — IF / GOTO</h3>
+        </div>
+        <div class="danger-box">
+            <div class="grid md:grid-cols-2 gap-6 items-start">
+                <div>
+                    <h4 class="font-black text-red-800 text-lg uppercase mb-3" style="font-family:var(--display)">⚠️ Vérification avant usinage</h4>
+                    <p class="text-red-800 text-sm leading-relaxed mb-4">Le paramétré permet de forcer l'arrêt de la machine si une valeur incorrecte est détectée — avant même que l'outil ne bouge.</p>
+                    <div class="code-block" style="border-left-color:#dc2626">
+                        <span class="cm">( Vérifie que #100 est raisonnable )</span><br>
+                        <span class="cond">IF</span> [<span class="var">#100</span> <span class="cond">GT</span> <span class="val">200</span>] <span class="lp">GOTO 999</span><br>
+                        <span class="cond">IF</span> [<span class="var">#100</span> <span class="cond">LT</span> <span class="val">5</span>]   <span class="lp">GOTO 999</span><br>
+                        <span class="cm">(...programme normal...)</span><br>
+                        N<span class="val">999</span> <span class="var">#3000</span> = <span class="val">1</span> <span class="cm">(DIAMETRE INVALIDE)</span>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="bg-white rounded-xl p-4 border-l-4 border-red-600 shadow-sm">
+                        <h5 style="font-family:var(--mono); font-size:0.65rem; color:#dc2626; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem">#3000 — Alarme personnalisée</h5>
+                        <p class="text-xs text-gray-600 leading-relaxed">Le code <code style="font-family:var(--mono); color:#dc2626">#3000</code> affiche un message d'alarme sur l'écran Fanuc et coupe instantanément tous les axes. C'est votre bouton d'arrêt d'urgence logiciel.</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 border-l-4 border-indigo-500 shadow-sm">
+                        <h5 style="font-family:var(--mono); font-size:0.65rem; color:var(--indigo); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem">Compteur de pièces en #500</h5>
+                        <div class="code-block mt-2" style="font-size:0.7rem; border-left-color:var(--indigo)">
+                            <span class="var">#500</span> = <span class="var">#500</span> + <span class="val">1</span><br>
+                            <span class="cm">( pièce #{#500} usinée )</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── BLOC MASTER / COMPLETION ── -->
+    <section class="mb-4 fade-up">
+        <div class="master-box">
+            <p style="font-family:var(--mono); font-size:0.65rem; color:#818cf8; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.75rem">// Cursus complet — 10 / 10 leçons</p>
+            <h3 class="text-white text-4xl font-black uppercase mb-2" style="font-family:var(--display)">Maître Technicien CNC</h3>
+            <p class="text-indigo-200 mb-8 text-lg">Vous maîtrisez maintenant l'intégralité du G-Code Fanuc — des bases aux macros avancées.</p>
+
+            <!-- Badge cursus -->
+            <div class="flex flex-wrap justify-center gap-2 mb-8">
+                <span style="background:rgba(34,197,94,0.15); color:#4ade80; font-family:var(--mono); font-size:0.6rem; letter-spacing:0.08em; padding:0.35rem 0.8rem; border-radius:4px; border:1px solid rgba(34,197,94,0.3)">✓ Axes & Mouvements</span>
+                <span style="background:rgba(34,197,94,0.15); color:#4ade80; font-family:var(--mono); font-size:0.6rem; letter-spacing:0.08em; padding:0.35rem 0.8rem; border-radius:4px; border:1px solid rgba(34,197,94,0.3)">✓ G54 Zéro Pièce</span>
+                <span style="background:rgba(34,197,94,0.15); color:#4ade80; font-family:var(--mono); font-size:0.6rem; letter-spacing:0.08em; padding:0.35rem 0.8rem; border-radius:4px; border:1px solid rgba(34,197,94,0.3)">✓ Avances & Vitesses</span>
+                <span style="background:rgba(34,197,94,0.15); color:#4ade80; font-family:var(--mono); font-size:0.6rem; letter-spacing:0.08em; padding:0.35rem 0.8rem; border-radius:4px; border:1px solid rgba(34,197,94,0.3)">✓ G41/G42</span>
+                <span style="background:rgba(34,197,94,0.15); color:#4ade80; font-family:var(--mono); font-size:0.6rem; letter-spacing:0.08em; padding:0.35rem 0.8rem; border-radius:4px; border:1px solid rgba(34,197,94,0.3)">✓ Cycles Perçage</span>
+                <span style="background:rgba(34,197,94,0.15); color:#4ade80; font-family:var(--mono); font-size:0.6rem; letter-spacing:0.08em; padding:0.35rem 0.8rem; border-radius:4px; border:1px solid rgba(34,197,94,0.3)">✓ M98 Sous-prog.</span>
+                <span style="background:rgba(34,197,94,0.15); color:#4ade80; font-family:var(--mono); font-size:0.6rem; letter-spacing:0.08em; padding:0.35rem 0.8rem; border-radius:4px; border:1px solid rgba(34,197,94,0.3)">✓ Sécurité</span>
+                <span style="background:rgba(99,102,241,0.2); color:#a5b4fc; font-family:var(--mono); font-size:0.6rem; letter-spacing:0.08em; padding:0.35rem 0.8rem; border-radius:4px; border:1px solid rgba(99,102,241,0.4)">✓ G96 G97 PRO</span>
+                <span style="background:rgba(99,102,241,0.2); color:#a5b4fc; font-family:var(--mono); font-size:0.6rem; letter-spacing:0.08em; padding:0.35rem 0.8rem; border-radius:4px; border:1px solid rgba(99,102,241,0.4)">✓ Filetage G76 PRO</span>
+                <span style="background:rgba(99,102,241,0.3); color:#c7d2fe; font-family:var(--mono); font-size:0.6rem; letter-spacing:0.08em; padding:0.35rem 0.8rem; border-radius:4px; border:1px solid rgba(99,102,241,0.5)">✓ Paramétré MASTER</span>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="index.html" style="background:rgba(255,255,255,0.1); color:white; border:2px solid rgba(255,255,255,0.25); font-family:var(--display)" class="inline-block font-black uppercase py-3 px-7 rounded-lg text-sm hover:bg-white hover:text-indigo-900 transition">← Menu principal</a>
+                <a href="examen1-7.html" style="background:var(--orange); color:white; font-family:var(--display)" class="inline-block font-black uppercase py-3 px-7 rounded-lg text-sm hover:bg-orange-600 transition">Examen Final →</a>
+                <a href="simulateur.html" style="background:rgba(99,102,241,0.3); color:#c7d2fe; border:2px solid rgba(99,102,241,0.5); font-family:var(--display)" class="inline-block font-black uppercase py-3 px-7 rounded-lg text-sm hover:bg-indigo-600 hover:text-white transition">Simulateur</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── NAV LEÇONS ── -->
+    <div class="lesson-nav">
+        <a href="lecon9.html" class="btn-secondary">← Leçon 9 : G76</a>
+        <div class="text-center">
+            <p style="font-family:var(--mono); font-size:0.65rem; color:var(--indigo); text-transform:uppercase; letter-spacing:0.1em">Leçon 10 / 10 — MASTER</p>
+        </div>
+        <a href="examen1-7.html" class="btn-primary">Examen Final →</a>
+    </div>
+
+</main>
+
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-8">
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Le Savoir est votre Force</p>
+</footer>
+
+<script>
+    // Burger
+    const burgerBtn = document.getElementById('burger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const burgerIcon = document.getElementById('burger-icon');
+    const closeIcon = document.getElementById('close-icon');
+    burgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+        burgerIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+    });
+
+    // Demo variable
+    function updateDemo() {
+        const v = parseFloat(document.getElementById('demo-val').value) || 0;
+        document.getElementById('d-val').textContent  = v.toFixed(1);
+        document.getElementById('d-x1').textContent   = (v + 2).toFixed(1);
+        document.getElementById('d-x2').textContent   = v.toFixed(1);
+        document.getElementById('d-rad').textContent  = (v / 2).toFixed(1);
+        document.getElementById('d-area').textContent = (Math.PI * Math.pow(v / 2, 2)).toFixed(1);
+    }
+    document.getElementById('demo-val').addEventListener('input', updateDemo);
+    updateDemo();
+
+    // Simulateur boucle WHILE
+    function updateLoop() {
+        const n    = parseInt(document.getElementById('loop-n').value) || 1;
+        const step = parseFloat(document.getElementById('loop-step').value) || 10;
+        const out  = document.getElementById('loop-output');
+        let html = `<div class="sim-line"><span style="color:#818cf8">#100</span> = <span style="color:#7dd3fc">0</span>  <span style="color:#475569;font-style:italic">; init compteur</span></div>`;
+        html += `<div class="sim-line"><span style="color:#fb923c">WHILE</span> [<span style="color:#818cf8">#100</span> LT <span style="color:#7dd3fc">${n}</span>] <span style="color:#fb923c">DO 1</span></div>`;
+        for (let i = 0; i < Math.min(n, 8); i++) {
+            const x = (i * step).toFixed(1);
+            html += `<div class="sim-line" style="padding-left:1rem">→ passe ${i + 1} : X<span style="color:#34d399">${x}</span> Z<span style="color:#7dd3fc">-10.</span></div>`;
+        }
+        if (n > 8) html += `<div class="sim-line" style="padding-left:1rem;color:#475569">  ... ${n - 8} passes supplémentaires</div>`;
+        html += `<div class="sim-line"><span style="color:#fb923c">END 1</span></div>`;
+        html += `<div class="sim-output" style="margin-top:0.5rem">→ ${n} passes × ${step}mm = ${(n * step).toFixed(0)}mm total</div>`;
+        out.innerHTML = html;
+    }
+    ['loop-n','loop-step'].forEach(id => document.getElementById(id).addEventListener('input', updateLoop));
+    updateLoop();
+</script>
+</body>
+</html>

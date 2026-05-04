@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leçon 3 : Vitesses et Avances - CNC Académie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #f97316;
+            --orange-dark: #ea6c0a;
+            --navy: #0f172a;
+            --navy-mid: #1e293b;
+            --mono: 'Space Mono', monospace;
+            --display: 'Barlow Condensed', sans-serif;
+            --body: 'Barlow', sans-serif;
+        }
+        * { font-family: var(--body); }
+        h1,h2,h3,h4 { font-family: var(--display); }
+        body { background: #f1f5f9; color: #0f172a; }
+
+        /* ── NAV ── */
+        .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
+        #mobile-menu { display: none; }
+        #mobile-menu.open { display: block; }
+        .dropdown-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); width: 18rem; background: white; border-radius: 0.75rem; box-shadow: 0 20px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0; z-index: 100; overflow: hidden; }
+        .dropdown-trigger:hover .dropdown-menu, .dropdown-trigger:focus-within .dropdown-menu { display: block; }
+        .menu-lesson { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; text-decoration: none; }
+        .menu-lesson:hover { background: #fff7ed; }
+        .menu-lesson:last-child { border-bottom: none; }
+        .menu-lesson-num { font-family: var(--mono); font-size: 0.6rem; color: var(--orange); letter-spacing: 0.1em; text-transform: uppercase; display: block; }
+        .menu-lesson-title { font-size: 0.85rem; color: #1e293b; font-weight: 500; }
+        .menu-lesson.active { background: #fff7ed; }
+        .menu-lesson.active .menu-lesson-num,.menu-lesson.active .menu-lesson-title { color: var(--orange); font-weight: 700; }
+        .menu-lesson.done .menu-lesson-num { color: #22c55e; }
+        .menu-lesson.pro:hover { background: #eef2ff; }
+        .menu-lesson.pro .menu-lesson-num { color: #6366f1; }
+        .badge-pro { font-size: 0.6rem; background: #6366f1; color: white; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.4rem; }
+        .btn-primary { background: var(--orange); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 2rem; border-radius: 6px; transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none; }
+        .btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); }
+        .btn-secondary { border: 2px solid #e2e8f0; color: #475569; font-family: var(--display); font-weight: 700; text-transform: uppercase; padding: 0.75rem 1.5rem; border-radius: 6px; transition: all 0.2s; display: inline-block; text-decoration: none; font-size: 0.9rem; }
+        .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+
+        /* ── PROGRESS ── */
+        .progress-bar { background: var(--navy-mid); border-bottom: 1px solid #1e293b; overflow-x: auto; }
+        .progress-step { display: flex; align-items: center; gap: 0.4rem; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; color: #475569; padding: 0.75rem 0; white-space: nowrap; }
+        .progress-step.active { color: var(--orange); }
+        .progress-step.done { color: #22c55e; }
+        .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #334155; flex-shrink: 0; }
+        .progress-step.active .progress-dot { background: var(--orange); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+        .progress-step.done .progress-dot { background: #22c55e; }
+        .progress-line { height: 1px; background: #334155; flex: 1; }
+        .progress-line.done { background: #22c55e; }
+
+        /* ── PAGE HEADER ── */
+        .page-header { background: var(--navy); position: relative; overflow: hidden; padding: 3rem 1.5rem; }
+        .page-header::before { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(249,115,22,0.06) 39px, rgba(249,115,22,0.06) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(249,115,22,0.06) 39px, rgba(249,115,22,0.06) 40px); pointer-events: none; }
+        .page-header-inner { position: relative; z-index: 1; }
+        .level-badge { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.35); color: var(--orange); padding: 0.3rem 0.8rem; border-radius: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 1rem; }
+        .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1; text-transform: uppercase; color: white; }
+        .page-sub { color: #94a3b8; font-size: 0.95rem; margin-top: 0.75rem; max-width: 560px; line-height: 1.6; }
+
+        /* ── PARAM CARDS ── */
+        .param-card { background: white; border-radius: 16px; padding: 2rem; border-top: 5px solid; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; }
+        .param-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.1); }
+        .param-letter { font-family: var(--mono); font-size: 3rem; font-weight: 700; line-height: 1; display: block; }
+
+        /* ── FORMULA BOX ── */
+        .formula-card { background: white; border-radius: 16px; padding: 1.75rem; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; overflow: hidden; }
+        .formula-card .tag { position: absolute; top: 0; right: 0; padding: 0.3rem 0.9rem; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: white; border-radius: 0 0 0 8px; }
+        .formula-display { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem; text-align: center; font-family: var(--mono); font-size: 1.2rem; font-weight: 700; color: var(--navy); margin: 1rem 0; letter-spacing: -0.02em; }
+
+        /* ── CALCULATOR ── */
+        .calc-box { background: var(--navy); border-radius: 16px; padding: 1.5rem; }
+        .calc-box h4 { font-family: var(--display); font-weight: 800; font-size: 1.1rem; text-transform: uppercase; color: white; margin-bottom: 1rem; }
+        .calc-input { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 0.6rem 0.9rem; font-family: var(--mono); font-size: 0.85rem; color: white; outline: none; transition: border-color 0.2s; }
+        .calc-input:focus { border-color: var(--orange); }
+        .calc-input::placeholder { color: #475569; }
+        .calc-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 0.3rem; }
+        .calc-result { background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.3); border-radius: 8px; padding: 0.9rem 1rem; font-family: var(--mono); color: var(--orange); font-size: 1rem; font-weight: 700; text-align: center; margin-top: 0.75rem; }
+
+        /* ── CODE BLOCK ── */
+        .code-block { background: var(--navy); border-radius: 10px; padding: 1.25rem 1.5rem; font-family: var(--mono); font-size: 0.78rem; line-height: 1.9; color: #64748b; border-left: 3px solid var(--orange); }
+        .code-block .kw { color: var(--orange); }
+        .code-block .val { color: #7dd3fc; }
+        .code-block .cm { color: #475569; font-style: italic; }
+        .code-block .hi-s { color: #fb923c; font-weight: 700; }
+        .code-block .hi-f { color: #60a5fa; font-weight: 700; }
+
+        /* ── DIAG TABLE ── */
+        .diag-table { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+        .diag-table table { width: 100%; border-collapse: collapse; }
+        .diag-table thead tr { background: var(--navy); }
+        .diag-table thead th { padding: 0.75rem 1rem; font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em; color: #94a3b8; text-align: left; font-weight: 400; }
+        .diag-table tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.12s; }
+        .diag-table tbody tr:last-child { border-bottom: none; }
+        .diag-table tbody tr:hover { background: #fef2f2; }
+        .diag-table td { padding: 1rem; font-size: 0.875rem; }
+        .symptom { font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+
+        /* ── MATIERE TABLE ── */
+        .mat-table { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .mat-table table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .mat-table thead tr { background: var(--navy-mid); }
+        .mat-table thead th { padding: 0.65rem 1rem; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; color: #94a3b8; text-align: left; font-weight: 400; }
+        .mat-table tbody tr { border-bottom: 1px solid #f1f5f9; }
+        .mat-table tbody tr:last-child { border-bottom: none; }
+        .mat-table tbody tr:hover { background: #f8fafc; }
+        .mat-table td { padding: 0.7rem 1rem; }
+
+        /* Image frame */
+        .img-frame { background: var(--navy-mid); border-radius: 12px; overflow: hidden; }
+        .img-frame img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+
+        /* Nav */
+        .lesson-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.5s ease both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+    </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+    <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+        <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+        <div class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+            <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+            <div class="relative dropdown-trigger">
+                <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-orange-400 transition">
+                    COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                    <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
+                    <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
+                    <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
+                    <a href="lecon4.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 04</span><span class="menu-lesson-title">Compensation (G41/G42)</span></a>
+                    <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
+                    <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
+                    <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
+                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                </div>
+            </div>
+            <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+            <a href="feedback.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+        </div>
+        <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+            <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+        <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
+        <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
+        <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
+        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
+        <div>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
+            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
+            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
+            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
+            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
+            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
+            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
+            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══ PROGRESS ═══ -->
+<div class="progress-bar">
+    <div class="container mx-auto max-w-5xl px-6">
+        <div class="flex items-center gap-2 py-1">
+            <div class="progress-step done"><span class="progress-dot"></span>L.1 Axes</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step done"><span class="progress-dot"></span>L.2 G54</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step active"><span class="progress-dot"></span>L.3 F/S</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.4 Comp.</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.5 Perçage</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.6 M98</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.7 Sécu.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="page-header">
+    <div class="container mx-auto max-w-5xl page-header-inner fade-up">
+        <div class="level-badge">Module Avancé · Leçon 03 / 10</div>
+        <h2 class="page-title">Le Rythme<br>de la <span style="color:var(--orange)">Coupe</span></h2>
+        <p class="page-sub">Maîtriser la rotation <strong style="color:white">(S)</strong> et l'avance <strong style="color:white">(F)</strong> — les deux paramètres qui font la différence entre une bonne et une mauvaise pièce.</p>
+    </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="container mx-auto max-w-5xl py-12 px-6">
+
+    <!-- ── PARAM CARDS S et F ── -->
+    <div class="grid md:grid-cols-2 gap-6 mb-12 fade-up">
+        <div class="param-card" style="border-top-color: var(--orange)">
+            <span class="param-letter text-orange-500">S</span>
+            <h3 class="text-2xl font-black text-orange-600 uppercase mb-3">La Vitesse Broche</h3>
+            <p class="text-gray-600 text-sm leading-relaxed">Vitesse de rotation de la broche en <strong>tr/min</strong>. Elle dépend de la matière usinée, du diamètre de l'outil et du revêtement de la fraise.</p>
+            <div class="mt-4 bg-orange-50 rounded-lg px-4 py-2 text-xs" style="font-family:var(--mono); color:#9a3412">
+                G97 S2000 M03  <span style="color:#d97706">← tr/min fixe</span><br>
+                G96 S180 M03   <span style="color:#d97706">← Vc constante (tournage)</span>
+            </div>
+        </div>
+        <div class="param-card" style="border-top-color: #2563eb">
+            <span class="param-letter text-blue-600">F</span>
+            <h3 class="text-2xl font-black text-blue-700 uppercase mb-3">L'Avance Outil</h3>
+            <p class="text-gray-600 text-sm leading-relaxed">Vitesse de déplacement de l'outil. En <strong>mm/min</strong> en fraisage (G94) ou en <strong>mm/tr</strong> en tournage (G95).</p>
+            <div class="mt-4 bg-blue-50 rounded-lg px-4 py-2 text-xs" style="font-family:var(--mono); color:#1d4ed8">
+                G01 X100. F200.   <span style="color:#2563eb">← mm/min (fraisage)</span><br>
+                G01 Z-25. F0.2    <span style="color:#2563eb">← mm/tr (tournage)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── IMAGE + FORMULES ── -->
+    <section class="mb-12 fade-up delay-1">
+        <div class="grid md:grid-cols-5 gap-6 mb-6">
+            <!-- Image fraise en coupe -->
+            <div class="md:col-span-2 img-frame h-52 md:h-auto">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Milling_cutter_slotting.jpg/640px-Milling_cutter_slotting.jpg"
+                     alt="Fraise en cours d'usinage"
+                     class="w-full h-full object-cover"
+                     onerror="this.parentElement.innerHTML='<div class=\'flex flex-col items-center justify-center h-full text-slate-500 gap-2 p-4\'><svg class=\'w-10 h-10\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z\'></path><circle cx=\'12\' cy=\'12\' r=\'3\'></circle></svg><span class=\'text-xs text-center\'>Fraise en usinage</span></div>'">
+            </div>
+            <!-- Formules -->
+            <div class="md:col-span-3 space-y-4">
+                <!-- Formule S -->
+                <div class="formula-card">
+                    <div class="tag bg-orange-500">Rotation</div>
+                    <h4 class="font-bold text-slate-700 uppercase text-sm tracking-widest mb-2" style="font-family:var(--mono)">Calculer S (tr/min)</h4>
+                    <div class="formula-display">S = (Vc × 1000) / (π × D)</div>
+                    <div class="grid grid-cols-3 gap-2 text-xs text-slate-500">
+                        <div><strong style="color:var(--orange)">Vc</strong> — vitesse de coupe (m/min)</div>
+                        <div><strong style="color:var(--orange)">D</strong> — diamètre outil (mm)</div>
+                        <div class="text-orange-600 font-semibold italic">Ex Alu Vc=400, D=10mm → 12 738 tr/min</div>
+                    </div>
+                </div>
+                <!-- Formule F -->
+                <div class="formula-card">
+                    <div class="tag bg-blue-600">Avance</div>
+                    <h4 class="font-bold text-slate-700 uppercase text-sm tracking-widest mb-2" style="font-family:var(--mono)">Calculer F (mm/min)</h4>
+                    <div class="formula-display">F = fz × Z × S</div>
+                    <div class="grid grid-cols-3 gap-2 text-xs text-slate-500">
+                        <div><strong style="color:#2563eb">fz</strong> — avance/dent (mm)</div>
+                        <div><strong style="color:#2563eb">Z</strong> — nb de dents</div>
+                        <div class="text-blue-600 font-semibold italic">Ex fz=0.05, Z=3, S=12000 → 1800 mm/min</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── CALCULATEUR INTERACTIF ── -->
+        <div class="calc-box">
+            <h4>⚡ Calculateur de coupe interactif</h4>
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Calc S -->
+                <div>
+                    <p style="font-family:var(--mono); font-size:0.65rem; color:var(--orange); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.75rem">→ Vitesse broche (S)</p>
+                    <div class="space-y-3">
+                        <div>
+                            <span class="calc-label">Vc — vitesse de coupe (m/min)</span>
+                            <input type="number" id="vc" class="calc-input" placeholder="ex: 200" value="200">
+                        </div>
+                        <div>
+                            <span class="calc-label">D — diamètre outil (mm)</span>
+                            <input type="number" id="diam" class="calc-input" placeholder="ex: 10" value="10">
+                        </div>
+                    </div>
+                    <div class="calc-result" id="result-s">S = — tr/min</div>
+                </div>
+                <!-- Calc F -->
+                <div>
+                    <p style="font-family:var(--mono); font-size:0.65rem; color:#60a5fa; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.75rem">→ Avance outil (F)</p>
+                    <div class="space-y-3">
+                        <div>
+                            <span class="calc-label">fz — avance par dent (mm)</span>
+                            <input type="number" id="fz" class="calc-input" placeholder="ex: 0.05" value="0.05" step="0.01">
+                        </div>
+                        <div>
+                            <span class="calc-label">Z — nombre de dents</span>
+                            <input type="number" id="zdents" class="calc-input" placeholder="ex: 3" value="3">
+                        </div>
+                    </div>
+                    <div class="calc-result" id="result-f" style="border-color:rgba(96,165,250,0.4); color:#60a5fa">F = — mm/min</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── TABLEAU MATIÈRES ── -->
+    <section class="mb-12 fade-up delay-1">
+        <div class="flex items-center gap-4 mb-4">
+            <div class="h-px flex-1 bg-slate-200"></div>
+            <h3 class="text-xl font-black uppercase text-slate-700" style="font-family:var(--display)">Vitesses de coupe par matière</h3>
+            <div class="h-px flex-1 bg-slate-200"></div>
+        </div>
+        <div class="mat-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Matière</th>
+                        <th>Vc (m/min) — HSS</th>
+                        <th>Vc (m/min) — Carbure</th>
+                        <th>fz typique (mm)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="font-semibold">Aluminium</td>
+                        <td style="font-family:var(--mono); color:#16a34a">100 – 200</td>
+                        <td style="font-family:var(--mono); color:#16a34a">300 – 500</td>
+                        <td style="font-family:var(--mono)">0.04 – 0.10</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Acier doux (S235)</td>
+                        <td style="font-family:var(--mono); color:#ca8a04">20 – 40</td>
+                        <td style="font-family:var(--mono); color:#ca8a04">80 – 150</td>
+                        <td style="font-family:var(--mono)">0.03 – 0.06</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Inox (316L)</td>
+                        <td style="font-family:var(--mono); color:#dc2626">10 – 20</td>
+                        <td style="font-family:var(--mono); color:#dc2626">40 – 80</td>
+                        <td style="font-family:var(--mono)">0.02 – 0.04</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Fonte grise</td>
+                        <td style="font-family:var(--mono); color:#ca8a04">15 – 30</td>
+                        <td style="font-family:var(--mono); color:#ca8a04">60 – 120</td>
+                        <td style="font-family:var(--mono)">0.04 – 0.08</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Plastique / POM</td>
+                        <td style="font-family:var(--mono); color:#2563eb">100 – 300</td>
+                        <td style="font-family:var(--mono); color:#2563eb">400 – 800</td>
+                        <td style="font-family:var(--mono)">0.05 – 0.15</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ── PROGRAMME EXEMPLE ── -->
+    <section class="mb-12 fade-up delay-2">
+        <h3 class="text-xl font-black uppercase text-slate-700 mb-4" style="font-family:var(--display)">Exemple de programmation complet</h3>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="code-block">
+                <span class="cm">( FRAISE D10 - 3 DENTS - ALUMINIUM )</span><br>
+                <span class="kw">T01 M06</span>           <span class="cm">; appel outil 1</span><br>
+                <span class="hi-s">S4500</span> <span class="kw">M03 M08</span>      <span class="cm">; broche + arrosage</span><br>
+                <span class="kw">G54 G00</span> X<span class="val">0.</span> Y<span class="val">0.</span>  <span class="cm">; zéro pièce</span><br>
+                <span class="kw">G43</span> H<span class="val">01</span> Z<span class="val">10.</span>    <span class="cm">; comp. longueur</span><br>
+                <span class="kw">G01</span> Z<span class="val">-5.</span> <span class="hi-f">F600.</span>   <span class="cm">; plongée (F réduite)</span><br>
+                <span class="kw">G01</span> X<span class="val">100.</span> <span class="hi-f">F1800.</span>  <span class="cm">; avance travail</span><br>
+                <span class="kw">G00</span> Z<span class="val">50.</span> <span class="kw">M09</span>    <span class="cm">; dégagement</span><br>
+                <span class="kw">M30</span>
+            </div>
+            <div class="space-y-3">
+                <div class="bg-white rounded-xl p-4 border border-slate-200 text-sm">
+                    <span class="font-bold text-orange-600 block mb-1" style="font-family:var(--display); text-transform:uppercase">Astuce plongée</span>
+                    <p class="text-gray-600 text-xs leading-relaxed">En plongée (Z-), réduisez F à <strong>30–50%</strong> de l'avance de travail. L'outil sollicité en bout est plus fragile qu'en flanc.</p>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-slate-200 text-sm">
+                    <span class="font-bold text-blue-600 block mb-1" style="font-family:var(--display); text-transform:uppercase">Override en cours d'usinage</span>
+                    <p class="text-gray-600 text-xs leading-relaxed">Sur le pupitre, les potentiomètres <strong>% S</strong> et <strong>% F</strong> permettent d'ajuster en temps réel sans modifier le programme.</p>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-orange-100 border text-sm">
+                    <span class="font-bold text-orange-700 block mb-1" style="font-family:var(--display); text-transform:uppercase">G94 vs G95</span>
+                    <p class="text-gray-600 text-xs leading-relaxed"><strong>G94</strong> = mm/min (fraisage). <strong>G95</strong> = mm/tr (tournage). Ne pas les confondre — une avance de F0.2 en G95 = 0.2mm par tour, et non 0.2mm/min !</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── DIAGNOSTIC ── -->
+    <section class="mb-4 fade-up">
+        <div class="flex items-center gap-3 mb-4">
+            <h3 class="text-xl font-black uppercase text-red-600" style="font-family:var(--display)">🔧 Diagnostic Atelier</h3>
+        </div>
+        <div class="diag-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:40%">Symptôme observé</th>
+                        <th>Cause probable</th>
+                        <th>Solution immédiate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="symptom">🔊 L'outil siffle (son aigu)</span></td>
+                        <td class="text-sm text-gray-600">Vitesse trop élevée / avance trop faible</td>
+                        <td class="font-bold text-orange-600 text-sm">↓ S ou ↑ F</td>
+                    </tr>
+                    <tr>
+                        <td><span class="symptom">🔥 Traces de brûlure</span></td>
+                        <td class="text-sm text-gray-600">S trop élevé — friction excessive</td>
+                        <td class="font-bold text-red-600 text-sm">↓ S + vérifier arrosage</td>
+                    </tr>
+                    <tr>
+                        <td><span class="symptom">〰️ Finition rugueuse</span></td>
+                        <td class="text-sm text-gray-600">F trop élevée — marque de dents visible</td>
+                        <td class="font-bold text-blue-600 text-sm">↑ S ou ↓ F en finition</td>
+                    </tr>
+                    <tr>
+                        <td><span class="symptom">💥 Outil cassé brusquement</span></td>
+                        <td class="text-sm text-gray-600">F trop élevée ou plongée directe</td>
+                        <td class="font-bold text-red-700 text-sm">↓↓ F plongée + rampe d'entrée</td>
+                    </tr>
+                    <tr>
+                        <td><span class="symptom">📐 Cote hors tolérance</span></td>
+                        <td class="text-sm text-gray-600">Déflexion outil — avance trop forte</td>
+                        <td class="font-bold text-purple-600 text-sm">↓ passe radiale + ↓ F</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ── NAV LEÇONS ── -->
+    <div class="lesson-nav">
+        <a href="lecon2.html" class="btn-secondary">← Leçon 2 : G54</a>
+        <div class="text-center"><p style="font-family:var(--mono)" class="text-xs text-slate-400 uppercase tracking-widest">Leçon 3 / 10</p></div>
+        <a href="lecon4.html" class="btn-primary">Leçon 4 : Compensation Rayon →</a>
+    </div>
+
+</main>
+
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-8">
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Masterclass Usinage</p>
+</footer>
+
+<script>
+    // Burger
+    const burgerBtn = document.getElementById('burger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const burgerIcon = document.getElementById('burger-icon');
+    const closeIcon = document.getElementById('close-icon');
+    burgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+        burgerIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+    });
+
+    // Calculateur
+    function calculate() {
+        const vc = parseFloat(document.getElementById('vc').value) || 0;
+        const d  = parseFloat(document.getElementById('diam').value) || 0;
+        const fz = parseFloat(document.getElementById('fz').value) || 0;
+        const z  = parseFloat(document.getElementById('zdents').value) || 0;
+
+        const s = d > 0 ? Math.round((vc * 1000) / (Math.PI * d)) : 0;
+        const f = Math.round(fz * z * s);
+
+        document.getElementById('result-s').textContent = s > 0 ? `S = ${s.toLocaleString('fr-FR')} tr/min` : 'S = — tr/min';
+        document.getElementById('result-f').textContent = f > 0 ? `F = ${f.toLocaleString('fr-FR')} mm/min` : 'F = — mm/min';
+    }
+
+    ['vc','diam','fz','zdents'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calculate);
+    });
+    calculate(); // init
+</script>
+</body>
+</html>

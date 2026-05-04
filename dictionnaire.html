@@ -1,0 +1,633 @@
+
+Copier
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codes G/M Fanuc - CNC Académie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #f97316;
+            --orange-dark: #ea6c0a;
+            --navy: #0f172a;
+            --navy-mid: #1e293b;
+            --mono: 'Space Mono', monospace;
+            --display: 'Barlow Condensed', sans-serif;
+            --body: 'Barlow', sans-serif;
+        }
+        * { font-family: var(--body); }
+        h1,h2,h3,h4,.display { font-family: var(--display); }
+        code,.mono { font-family: var(--mono); }
+        body { background: #f1f5f9; color: #0f172a; }
+ 
+        /* ── NAV ── */
+        .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
+        #mobile-menu { display: none; }
+        #mobile-menu.open { display: block; }
+        .dropdown-menu {
+            display: none; position: absolute; right: 0; top: calc(100% + 4px);
+            width: 18rem; background: white; border-radius: 0.75rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0;
+            z-index: 100; overflow: hidden;
+        }
+        .dropdown-trigger:hover .dropdown-menu,
+        .dropdown-trigger:focus-within .dropdown-menu { display: block; }
+        .menu-lesson { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; text-decoration: none; }
+        .menu-lesson:hover { background: #fff7ed; }
+        .menu-lesson:last-child { border-bottom: none; }
+        .menu-lesson-num { font-family: var(--mono); font-size: 0.6rem; color: var(--orange); letter-spacing: 0.1em; text-transform: uppercase; display: block; }
+        .menu-lesson-title { font-size: 0.85rem; color: #1e293b; font-weight: 500; }
+        .menu-lesson.pro:hover { background: #eef2ff; }
+        .menu-lesson.pro .menu-lesson-num { color: #6366f1; }
+        .badge-pro { font-size: 0.6rem; background: #6366f1; color: white; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.4rem; }
+        .btn-primary { background: var(--orange); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.6rem 1.4rem; border-radius: 6px; transition: background 0.2s; display: inline-block; text-decoration: none; }
+        .btn-primary:hover { background: var(--orange-dark); }
+ 
+        /* ── HERO / HEADER ── */
+        .page-header {
+            background: var(--navy);
+            position: relative; overflow: hidden;
+            padding: 3.5rem 1.5rem;
+        }
+        .page-header::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(249,115,22,0.06) 39px, rgba(249,115,22,0.06) 40px),
+                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(249,115,22,0.06) 39px, rgba(249,115,22,0.06) 40px);
+            pointer-events: none;
+        }
+        .page-header-inner { position: relative; z-index: 1; }
+        .page-badge { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.35); color: var(--orange); padding: 0.3rem 0.8rem; border-radius: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 1rem; }
+        .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1; text-transform: uppercase; color: white; }
+        .page-title .accent { color: var(--orange); }
+        .page-sub { color: #94a3b8; font-size: 0.95rem; margin-top: 0.75rem; max-width: 500px; }
+ 
+        /* ── SEARCH ── */
+        .search-box {
+            background: white;
+            border-radius: 10px;
+            padding: 0.6rem 1rem;
+            display: flex; align-items: center; gap: 0.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .search-box:focus-within { border-color: var(--orange); }
+        .search-box input { border: none; outline: none; font-family: var(--mono); font-size: 0.85rem; flex: 1; color: #1e293b; }
+        .search-box svg { color: #94a3b8; flex-shrink: 0; }
+ 
+        /* ── FILTER TABS ── */
+        .filter-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .filter-tab { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.35rem 0.9rem; border-radius: 4px; border: 1px solid #e2e8f0; background: white; cursor: pointer; transition: all 0.15s; color: #64748b; }
+        .filter-tab:hover, .filter-tab.active { background: var(--navy); color: white; border-color: var(--navy); }
+        .filter-tab[data-cat="mouvements"].active { background: #ea580c; border-color: #ea580c; }
+        .filter-tab[data-cat="plans"].active { background: #16a34a; border-color: #16a34a; }
+        .filter-tab[data-cat="corrections"].active { background: #dc2626; border-color: #dc2626; }
+        .filter-tab[data-cat="cycles"].active { background: #7c3aed; border-color: #7c3aed; }
+        .filter-tab[data-cat="auxiliaires"].active { background: #2563eb; border-color: #2563eb; }
+        .filter-tab[data-cat="tournage"].active { background: #d97706; border-color: #d97706; }
+ 
+        /* ── SECTION TITLES ── */
+        .section-heading {
+            font-family: var(--display); font-weight: 800; font-size: 1.1rem;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            padding: 0.6rem 1rem; border-radius: 6px 6px 0 0;
+            display: flex; align-items: center; gap: 0.6rem;
+        }
+        .section-heading .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+ 
+        /* ── TABLES ── */
+        .dict-table { background: white; border-radius: 0 0 12px 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+        .dict-table table { width: 100%; border-collapse: collapse; }
+        .dict-table thead tr { background: var(--navy); color: white; }
+        .dict-table thead th { padding: 0.75rem 1rem; font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; text-align: left; font-weight: 400; }
+        .dict-table tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.12s; }
+        .dict-table tbody tr:last-child { border-bottom: none; }
+        .dict-table tbody tr:hover { background: #fafafa; }
+        .dict-table td { padding: 0.85rem 1rem; font-size: 0.875rem; vertical-align: top; }
+        .code-cell { font-family: var(--mono); font-weight: 700; font-size: 0.8rem; white-space: nowrap; }
+        .desc-cell { color: #475569; line-height: 1.5; }
+        .warning-row td { background: #fff7ed; }
+        .warning-row .code-cell { color: #dc2626; }
+        .tip-badge { display: inline-block; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.05em; padding: 0.15rem 0.5rem; border-radius: 3px; margin-left: 0.4rem; font-weight: 700; vertical-align: middle; }
+        .tip-vital { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .tip-note { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
+ 
+        /* ── ILLUSTRATION CARDS ── */
+        .illus-card {
+            background: var(--navy-mid); border-radius: 12px;
+            overflow: hidden; position: relative;
+        }
+        .illus-card img { width: 100%; height: 200px; object-fit: cover; opacity: 0.85; }
+        .illus-card .caption { padding: 0.9rem 1rem; }
+        .illus-card .caption h4 { font-family: var(--display); font-weight: 700; font-size: 1rem; color: white; text-transform: uppercase; }
+        .illus-card .caption p { font-size: 0.75rem; color: #94a3b8; margin-top: 0.2rem; }
+ 
+        /* ── QUICK REF BOX ── */
+        .quick-ref {
+            background: var(--navy);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative; overflow: hidden;
+        }
+        .quick-ref::before {
+            content: 'REF';
+            font-family: var(--display); font-size: 7rem; font-weight: 900;
+            position: absolute; right: -0.5rem; top: -1rem;
+            color: rgba(255,255,255,0.03); pointer-events: none; line-height: 1;
+        }
+        .quick-ref h4 { font-family: var(--display); font-weight: 800; font-size: 1.1rem; color: white; text-transform: uppercase; margin-bottom: 1rem; }
+        .quick-ref-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+        .qr-item { background: rgba(255,255,255,0.05); border-radius: 6px; padding: 0.6rem 0.75rem; display: flex; align-items: baseline; gap: 0.5rem; }
+        .qr-code { font-family: var(--mono); font-size: 0.75rem; color: var(--orange); font-weight: 700; }
+        .qr-label { font-size: 0.75rem; color: #94a3b8; }
+ 
+        /* Animations */
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.5s ease both; }
+        .section-block { transition: opacity 0.2s; }
+        .section-block.hidden { display: none; }
+    </style>
+</head>
+<body>
+ 
+<!-- ═══ NAV (identique index.html) ═══ -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+    <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+        <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+        <div class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+            <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+            <div class="relative dropdown-trigger">
+                <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-orange-400 transition">
+                    COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                    <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
+                    <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
+                    <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
+                    <a href="lecon4.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 04</span><span class="menu-lesson-title">Compensation (G41/G42)</span></a>
+                    <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
+                    <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
+                    <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
+                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                </div>
+            </div>
+            <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+            <a href="feedback.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+        </div>
+        <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+            <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+        <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
+        <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
+        <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
+        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
+        <div>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
+            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
+            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
+            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
+            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
+            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
+            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
+            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+        </div>
+    </div>
+</nav>
+ 
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="page-header">
+    <div class="container mx-auto max-w-5xl page-header-inner">
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div class="fade-up">
+                <div class="page-badge">Référence ISO 6983 · Fanuc Series 0i</div>
+                <h2 class="page-title">Dictionnaire<br><span class="accent">G/M Codes</span></h2>
+                <p class="page-sub">Référence complète pour la programmation ISO — Fraisage &amp; Tournage. Filtrez, cherchez, mémorisez.</p>
+            </div>
+            <!-- Quick ref box -->
+            <div class="fade-up hidden md:block">
+                <div class="quick-ref">
+                    <h4>Aide-mémoire rapide</h4>
+                    <div class="quick-ref-grid">
+                        <div class="qr-item"><span class="qr-code">G00</span><span class="qr-label">Rapide</span></div>
+                        <div class="qr-item"><span class="qr-code">G01</span><span class="qr-label">Linéaire</span></div>
+                        <div class="qr-item"><span class="qr-code">G02/03</span><span class="qr-label">Arc CW/CCW</span></div>
+                        <div class="qr-item"><span class="qr-code">G54</span><span class="qr-label">Zéro pièce</span></div>
+                        <div class="qr-item"><span class="qr-code">M03/04</span><span class="qr-label">Broche ↻↺</span></div>
+                        <div class="qr-item"><span class="qr-code">M30</span><span class="qr-label">Fin prog.</span></div>
+                        <div class="qr-item"><span class="qr-code">G96</span><span class="qr-label">Vc constante</span></div>
+                        <div class="qr-item"><span class="qr-code">G83</span><span class="qr-label">Débourrage</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+<!-- ═══ MAIN ═══ -->
+<main class="container mx-auto max-w-5xl py-10 px-6">
+ 
+    <!-- Search + Filters -->
+    <div class="mb-6 fade-up">
+        <div class="search-box mb-4 max-w-md">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"/></svg>
+            <input type="text" id="search-input" placeholder="Rechercher un code... ex: G83, M06, taraudage" autocomplete="off">
+        </div>
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-cat="all">Tout</button>
+            <button class="filter-tab" data-cat="mouvements">🔴 Mouvements</button>
+            <button class="filter-tab" data-cat="plans">🟢 Plans/Unités</button>
+            <button class="filter-tab" data-cat="corrections">🔴 Corrections</button>
+            <button class="filter-tab" data-cat="cycles">🟣 Cycles Perçage</button>
+            <button class="filter-tab" data-cat="auxiliaires">🔵 Fonctions M</button>
+            <button class="filter-tab" data-cat="tournage">🟠 Tournage</button>
+        </div>
+    </div>
+ 
+    <!-- ── ILLUSTRATION STRIP ── -->
+    <div class="grid grid-cols-3 gap-4 mb-10 fade-up">
+        <div class="illus-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Fanuc_Controller.jpg/640px-Fanuc_Controller.jpg"
+                 alt="Pupitre Fanuc" onerror="this.style.display='none'; this.parentElement.style.paddingTop='3rem';">
+            <div class="caption">
+                <h4>Commande Fanuc</h4>
+                <p>Pupitre 0i-MF standard</p>
+            </div>
+        </div>
+        <div class="illus-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/CNC_Milling_Machine.jpg/640px-CNC_Milling_Machine.jpg"
+                 alt="Fraiseuse CNC" onerror="this.style.display='none'; this.parentElement.style.paddingTop='3rem';">
+            <div class="caption">
+                <h4>Fraisage CNC</h4>
+                <p>Axes X · Y · Z</p>
+            </div>
+        </div>
+        <div class="illus-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/CNC_Lathe.jpg/640px-CNC_Lathe.jpg"
+                 alt="Tour CNC" onerror="this.style.display='none'; this.parentElement.style.paddingTop='3rem';">
+            <div class="caption">
+                <h4>Tournage CNC</h4>
+                <p>Axes X · Z</p>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!-- 1. MOUVEMENTS GÉOMÉTRIQUES -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <section class="mb-8 section-block fade-up" data-section="mouvements">
+        <div class="section-heading bg-orange-600 text-white">
+            <span class="dot bg-white"></span>
+            1. Mouvements Géométriques
+        </div>
+        <div class="dict-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:100px">Code</th>
+                        <th style="width:220px">Désignation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-search="g00 positionnement rapide déplacement">
+                        <td class="code-cell text-orange-600">G00</td>
+                        <td class="font-semibold">Positionnement rapide</td>
+                        <td class="desc-cell">Déplacement à vitesse maximale machine, sans usinage. <span class="tip-badge tip-note">Hors matière</span></td>
+                    </tr>
+                    <tr data-search="g01 interpolation linéaire usinage droit avance">
+                        <td class="code-cell text-orange-600">G01</td>
+                        <td class="font-semibold">Interpolation linéaire</td>
+                        <td class="desc-cell">Usinage en ligne droite à l'avance programmée F. Le code G le plus utilisé.</td>
+                    </tr>
+                    <tr data-search="g02 interpolation circulaire horaire arc cw">
+                        <td class="code-cell text-orange-600">G02</td>
+                        <td class="font-semibold">Interpolation circulaire CW</td>
+                        <td class="desc-cell">Arc de cercle sens horaire. Paramètres : X, Y/Z, I, J/K ou R.</td>
+                    </tr>
+                    <tr data-search="g03 interpolation circulaire antihoraire arc ccw">
+                        <td class="code-cell text-orange-600">G03</td>
+                        <td class="font-semibold">Interpolation circulaire CCW</td>
+                        <td class="desc-cell">Arc de cercle sens anti-horaire.</td>
+                    </tr>
+                    <tr data-search="g04 temporisation pause dwell">
+                        <td class="code-cell text-orange-600">G04</td>
+                        <td class="font-semibold">Temporisation (Dwell)</td>
+                        <td class="desc-cell">Arrêt temporaire. <code class="bg-gray-100 px-1 rounded text-xs">G04 P1000</code> = 1 seconde. Utile pour finition fond de poche. <span class="tip-badge tip-note">P = ms</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+ 
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!-- 2. PLANS & UNITÉS -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <section class="mb-8 section-block fade-up" data-section="plans">
+        <div class="section-heading bg-green-700 text-white">
+            <span class="dot bg-white"></span>
+            2. Plans, Unités et Formats
+        </div>
+        <div class="dict-table">
+            <table>
+                <thead><tr><th style="width:140px">Code</th><th style="width:220px">Désignation</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr data-search="g17 g18 g19 plan fraisage tournage xy zx yz">
+                        <td class="code-cell text-green-700">G17 / G18 / G19</td>
+                        <td class="font-semibold">Choix du Plan</td>
+                        <td class="desc-cell">XY (Fraisage standard), ZX (Tournage / plan frontal), YZ (Latéral).</td>
+                    </tr>
+                    <tr data-search="g20 g21 pouces métrique millimètre inch">
+                        <td class="code-cell text-green-700">G20 / G21</td>
+                        <td class="font-semibold">Pouces / Métrique</td>
+                        <td class="desc-cell">G21 est le standard millimètres en Europe. G20 pour les ateliers anglo-saxons.</td>
+                    </tr>
+                    <tr data-search="g28 retour origine machine pom référence">
+                        <td class="code-cell text-green-700">G28</td>
+                        <td class="font-semibold">Retour origine machine</td>
+                        <td class="desc-cell">Retour aux points de référence machine (POM). Toujours précédé d'un point intermédiaire. <span class="tip-badge tip-vital">Sécurité</span></td>
+                    </tr>
+                    <tr data-search="g90 g91 absolu incrémental programmation">
+                        <td class="code-cell text-green-700">G90 / G91</td>
+                        <td class="font-semibold">Absolu / Incrémental</td>
+                        <td class="desc-cell">G90 : coordonnées par rapport au zéro pièce. G91 : déplacements relatifs au point courant.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+ 
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!-- ILLUSTRATION : axes CNC -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <div class="mb-8 rounded-2xl overflow-hidden bg-slate-800 flex flex-col md:flex-row items-center gap-0 shadow-lg fade-up" data-section-illus="corrections">
+        <div class="md:w-1/2 p-8">
+            <p class="page-badge mb-3">Schéma de référence</p>
+            <h3 class="text-white font-black text-2xl uppercase mb-2" style="font-family:var(--display)">Corrections d'outils</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">La compensation de rayon (G41/G42) permet au programmeur de coder sur le profil exact de la pièce — la commande décale automatiquement la trajectoire du rayon de l'outil. G43 applique la jauge longueur enregistrée dans la table des offsets.</p>
+            <div class="mt-4 bg-slate-900 rounded-lg p-3" style="font-family:var(--mono); font-size:0.72rem; color:#94a3b8; border-left: 3px solid #f97316">
+                <span style="color:#f97316">G41</span> D01  <span style="color:#475569">; comp. gauche, outil 1</span><br>
+                <span style="color:#f97316">G01</span> X100. <span style="color:#7dd3fc">F150.</span><br>
+                <span style="color:#f97316">G40</span>      <span style="color:#475569">; annulation obligatoire</span>
+            </div>
+        </div>
+        <div class="md:w-1/2 self-stretch">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Cutter_radius_compensation.svg/640px-Cutter_radius_compensation.svg.png"
+                 alt="Compensation de rayon G41/G42"
+                 class="w-full h-full object-contain bg-white p-4"
+                 onerror="this.parentElement.innerHTML='<div class=\'flex items-center justify-center h-40 text-slate-500 text-sm p-6\'>Schéma compensation rayon</div>'">
+        </div>
+    </div>
+ 
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!-- 3. CORRECTIONS -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <section class="mb-8 section-block fade-up" data-section="corrections">
+        <div class="section-heading bg-red-700 text-white">
+            <span class="dot bg-white"></span>
+            3. Corrections d'Outils et Zéros Pièce
+        </div>
+        <div class="dict-table">
+            <table>
+                <thead><tr><th style="width:140px">Code</th><th style="width:220px">Désignation</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr class="bg-amber-50 border-l-4 border-amber-400" data-search="sécurité annulation g40 g80 obligatoire">
+                        <td colspan="3" class="p-3 text-amber-800 text-xs font-bold uppercase" style="font-family:var(--mono)">
+                            ⚠ Règle de sécurité : annuler G41/G42 avec G40 et les cycles actifs avec G80 avant tout changement d'outil.
+                        </td>
+                    </tr>
+                    <tr data-search="g40 g41 g42 compensation rayon outil gauche droite">
+                        <td class="code-cell text-red-600">G40 / G41 / G42</td>
+                        <td class="font-semibold">Comp. Rayon Fraise</td>
+                        <td class="desc-cell">G40 : annulation. G41 : comp. gauche (fraise à gauche du profil). G42 : comp. droite.</td>
+                    </tr>
+                    <tr data-search="g43 compensation longueur outil jauge hauteur">
+                        <td class="code-cell text-red-600">G43</td>
+                        <td class="font-semibold">Comp. Longueur Outil</td>
+                        <td class="desc-cell">Active la correction de longueur outil enregistrée dans la table H. Ex : <code class="bg-gray-100 px-1 rounded text-xs">G43 H01 Z50.</code> <span class="tip-badge tip-vital">Vital</span></td>
+                    </tr>
+                    <tr data-search="g54 g55 g56 g57 g58 g59 zéro pièce origine offset">
+                        <td class="code-cell text-blue-700">G54 – G59</td>
+                        <td class="font-semibold text-blue-700">Zéros Pièce (WCS)</td>
+                        <td class="desc-cell text-blue-800 font-medium">6 origines programmées dans la table des offsets pièce. G54 est l'origine standard. Indispensable sur toute machine moderne.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+ 
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!-- 4. CYCLES PERÇAGE -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <section class="mb-8 section-block fade-up" data-section="cycles">
+        <div class="section-heading bg-purple-700 text-white">
+            <span class="dot bg-white"></span>
+            4. Cycles de Perçage
+        </div>
+        <div class="dict-table">
+            <table>
+                <thead><tr><th style="width:100px">Code</th><th style="width:220px">Désignation</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr data-search="g80 annulation cycle perçage">
+                        <td class="code-cell text-purple-600">G80</td>
+                        <td class="font-semibold">Annulation Cycle</td>
+                        <td class="desc-cell">Stoppe le cycle de perçage actif. À programmer après la dernière position. <span class="tip-badge tip-vital">Obligatoire</span></td>
+                    </tr>
+                    <tr data-search="g81 g82 perçage simple chambrage fraisage">
+                        <td class="code-cell text-purple-600">G81 / G82</td>
+                        <td class="font-semibold">Perçage Simple / Chambrage</td>
+                        <td class="desc-cell">G81 : descente directe, remontée rapide. G82 : idem avec temporisation au fond (finition).</td>
+                    </tr>
+                    <tr data-search="g83 débourrage peck perçage profond q brise copeaux">
+                        <td class="code-cell text-purple-600">G83</td>
+                        <td class="font-semibold">Perçage Débourrage (Peck)</td>
+                        <td class="desc-cell">Descente par passes Q avec retour en haut à chaque passe pour évacuer les copeaux. <span class="tip-badge tip-vital">Trous profonds</span></td>
+                    </tr>
+                    <tr data-search="g84 taraudage rigide filet synchronisé">
+                        <td class="code-cell text-purple-600 text-green-700">G84</td>
+                        <td class="font-semibold text-green-700">Taraudage Rigide</td>
+                        <td class="desc-cell">Synchronisation parfaite rotation broche / avance axiale. Pas de filet calculé automatiquement via F et S.</td>
+                    </tr>
+                    <tr data-search="g85 g86 alésage roulage outil boring">
+                        <td class="code-cell text-purple-600">G85 / G86</td>
+                        <td class="font-semibold">Alésage</td>
+                        <td class="desc-cell">G85 : montée à avance F (finition alésage). G86 : montée rapide après arrêt broche.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+ 
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!-- 5. FONCTIONS M -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <section class="mb-8 section-block fade-up" data-section="auxiliaires">
+        <div class="section-heading bg-blue-700 text-white">
+            <span class="dot bg-white"></span>
+            5. Fonctions Auxiliaires (M)
+        </div>
+        <div class="dict-table">
+            <table>
+                <thead><tr><th style="width:100px">Code</th><th style="width:220px">Désignation</th><th>Action</th></tr></thead>
+                <tbody>
+                    <tr data-search="m00 m01 arrêt programme optionnel pause">
+                        <td class="code-cell text-blue-600">M00 / M01</td>
+                        <td class="font-semibold">Arrêt Prog. / Optionnel</td>
+                        <td class="desc-cell">Pause pour contrôle pièce ou opération manuelle. M01 ne s'active que si le mode optionnel est ON.</td>
+                    </tr>
+                    <tr data-search="m03 m04 rotation broche horaire antihoraire spindle">
+                        <td class="code-cell text-orange-600">M03 / M04</td>
+                        <td class="font-semibold">Rotation Broche ↻ / ↺</td>
+                        <td class="desc-cell">M03 : sens horaire (fraisage standard). M04 : sens anti-horaire. Toujours associé à S (vitesse en Tr/min).</td>
+                    </tr>
+                    <tr data-search="m05 arrêt broche stop spindle">
+                        <td class="code-cell text-blue-600">M05</td>
+                        <td class="font-semibold">Arrêt Broche</td>
+                        <td class="desc-cell">Arrête la rotation avant changement d'outil ou fin de programme.</td>
+                    </tr>
+                    <tr data-search="m06 changement outil tool change t">
+                        <td class="code-cell text-blue-600">M06</td>
+                        <td class="font-semibold">Changement d'Outil</td>
+                        <td class="desc-cell">Déclenche l'ATC (changeur automatique). Ex : <code class="bg-gray-100 px-1 rounded text-xs">T02 M06</code> — appel outil 2 avec correcteur.</td>
+                    </tr>
+                    <tr data-search="m08 m09 arrosage liquide coupe coolant">
+                        <td class="code-cell text-blue-600">M08 / M09</td>
+                        <td class="font-semibold">Arrosage ON / OFF</td>
+                        <td class="desc-cell">Contrôle le liquide de coupe. M08 en début d'usinage, M09 avant retour outil ou fin.</td>
+                    </tr>
+                    <tr data-search="m30 fin programme reset retour début end">
+                        <td class="code-cell text-red-600">M30</td>
+                        <td class="font-semibold text-red-700">Fin de Programme</td>
+                        <td class="desc-cell font-semibold">Reset complet + retour au début du programme. Ferme tous les modes actifs. Obligatoire en fin de prog.</td>
+                    </tr>
+                    <tr data-search="m98 m99 sous-programme appel retour subprogram">
+                        <td class="code-cell text-blue-600">M98 / M99</td>
+                        <td class="font-semibold">Sous-Programmes</td>
+                        <td class="desc-cell">M98 P.. : appel sous-programme numéro P. M99 : retour au programme principal. <a href="lecon6.html" class="text-orange-500 underline text-xs">→ Voir Leçon 6</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+ 
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!-- 6. TOURNAGE -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <section class="mb-8 section-block fade-up" data-section="tournage">
+        <div class="section-heading bg-amber-600 text-white">
+            <span class="dot bg-white"></span>
+            6. Spécificités Tournage &amp; Avance
+        </div>
+        <div class="dict-table">
+            <table>
+                <thead><tr><th style="width:120px">Code</th><th style="width:220px">Désignation</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr data-search="g96 g97 vitesse coupe constante fixe tournage">
+                        <td class="code-cell text-amber-600">G96 / G97</td>
+                        <td class="font-semibold">Vitesse de Coupe</td>
+                        <td class="desc-cell">G96 S180 : vitesse de coupe constante à 180 m/min (adaptée au diamètre). G97 S1200 : vitesse fixe en Tr/min. <a href="lecon8.html" class="text-orange-500 underline text-xs">→ Leçon 8</a></td>
+                    </tr>
+                    <tr data-search="g50 sécurité vitesse limite tours maxi">
+                        <td class="code-cell text-red-600">G50</td>
+                        <td class="font-semibold text-red-700">Limite Vitesse Maxi</td>
+                        <td class="desc-cell text-red-700 font-medium">Limite les Tr/min max en mode G96. <span class="tip-badge tip-vital">Sécurité</span> Ex : <code class="bg-gray-100 px-1 rounded text-xs">G50 S3000</code></td>
+                    </tr>
+                    <tr data-search="g94 g95 avance mm/min mm/tr format fraisage tournage">
+                        <td class="code-cell text-amber-600">G94 / G95</td>
+                        <td class="font-semibold">Format d'Avance</td>
+                        <td class="desc-cell">G94 : mm/min (fraisage). G95 : mm/tr (tournage — la valeur F suit automatiquement la broche).</td>
+                    </tr>
+                    <tr data-search="g71 g72 cycle ébauche tournage dressage chariotage">
+                        <td class="code-cell text-amber-600">G71 / G72</td>
+                        <td class="font-semibold">Cycles Ébauche</td>
+                        <td class="desc-cell">G71 : ébauche axiale (chariotage). G72 : ébauche frontale (dressage). Définissent automatiquement les passes. <a href="lecon8.html" class="text-orange-500 underline text-xs">→ Leçon 8</a></td>
+                    </tr>
+                    <tr data-search="g76 filetage cycle tournage pas">
+                        <td class="code-cell text-amber-600">G76</td>
+                        <td class="font-semibold">Cycle Filetage</td>
+                        <td class="desc-cell">Cycle complet de filetage multi-passes. Définit le pas, la profondeur et le nombre de passes. <a href="lecon9.html" class="text-orange-500 underline text-xs">→ Leçon 9</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+ 
+    <!-- CTA Navigation leçons -->
+    <div class="mt-12 bg-slate-800 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 fade-up">
+        <div>
+            <p class="text-orange-400 text-xs font-bold uppercase tracking-widest mb-1" style="font-family:var(--mono)">// Prochaine étape</p>
+            <h4 class="text-white text-2xl font-black uppercase" style="font-family:var(--display)">Mettre en pratique</h4>
+            <p class="text-slate-400 text-sm mt-1">Appliquez ces codes dans les leçons structurées ou directement dans le simulateur.</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a href="lecon1.html" class="btn-primary">Leçon 1 →</a>
+            <a href="simulateur.html" class="inline-block border border-slate-600 text-slate-300 hover:border-orange-500 hover:text-orange-400 transition font-bold py-2.5 px-5 rounded-md text-sm uppercase" style="font-family:var(--display)">Simulateur</a>
+        </div>
+    </div>
+ 
+</main>
+ 
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-8">
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Le savoir est une arme</p>
+</footer>
+ 
+<script>
+    // ── Burger menu ──
+    const burgerBtn = document.getElementById('burger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const burgerIcon = document.getElementById('burger-icon');
+    const closeIcon = document.getElementById('close-icon');
+    burgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+        burgerIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+    });
+ 
+    // ── Search ──
+    const searchInput = document.getElementById('search-input');
+    searchInput.addEventListener('input', () => {
+        const q = searchInput.value.toLowerCase().trim();
+        document.querySelectorAll('tbody tr[data-search]').forEach(row => {
+            const match = !q || row.dataset.search.includes(q) ||
+                          row.textContent.toLowerCase().includes(q);
+            row.style.display = match ? '' : 'none';
+        });
+    });
+ 
+    // ── Filter tabs ──
+    const tabs = document.querySelectorAll('.filter-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const cat = tab.dataset.cat;
+            document.querySelectorAll('.section-block').forEach(s => {
+                if (cat === 'all' || s.dataset.section === cat) {
+                    s.style.display = '';
+                } else {
+                    s.style.display = 'none';
+                }
+            });
+            // reset search
+            searchInput.value = '';
+            document.querySelectorAll('tbody tr[data-search]').forEach(r => r.style.display = '');
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leçon 8 PRO : G96 & G97 - CNC Académie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #f97316; --orange-dark: #ea6c0a;
+            --indigo: #6366f1; --indigo-dark: #4f46e5;
+            --navy: #0f172a; --navy-mid: #1e293b;
+            --mono: 'Space Mono', monospace;
+            --display: 'Barlow Condensed', sans-serif;
+            --body: 'Barlow', sans-serif;
+        }
+        * { font-family: var(--body); }
+        h1,h2,h3,h4 { font-family: var(--display); }
+        body { background: #f1f5f9; color: #0f172a; }
+
+        /* NAV */
+        .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
+        #mobile-menu { display: none; }
+        #mobile-menu.open { display: block; }
+        .dropdown-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); width: 18rem; background: white; border-radius: 0.75rem; box-shadow: 0 20px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0; z-index: 100; overflow: hidden; }
+        .dropdown-trigger:hover .dropdown-menu, .dropdown-trigger:focus-within .dropdown-menu { display: block; }
+        .menu-lesson { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; text-decoration: none; }
+        .menu-lesson:hover { background: #fff7ed; }
+        .menu-lesson:last-child { border-bottom: none; }
+        .menu-lesson-num { font-family: var(--mono); font-size: 0.6rem; color: var(--orange); letter-spacing: 0.1em; text-transform: uppercase; display: block; }
+        .menu-lesson-title { font-size: 0.85rem; color: #1e293b; font-weight: 500; }
+        .menu-lesson.active { background: #eef2ff; }
+        .menu-lesson.active .menu-lesson-num { color: var(--indigo); }
+        .menu-lesson.active .menu-lesson-title { color: var(--indigo); font-weight: 700; }
+        .menu-lesson.done .menu-lesson-num { color: #22c55e; }
+        .menu-lesson.pro:hover { background: #eef2ff; }
+        .menu-lesson.pro .menu-lesson-num { color: var(--indigo); }
+        .badge-pro { font-size: 0.6rem; background: var(--indigo); color: white; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.4rem; }
+        .btn-primary { background: var(--orange); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 2rem; border-radius: 6px; transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none; }
+        .btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); }
+        .btn-pro { background: var(--indigo); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 2rem; border-radius: 6px; transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none; }
+        .btn-pro:hover { background: var(--indigo-dark); transform: translateY(-1px); }
+        .btn-secondary { border: 2px solid #e2e8f0; color: #475569; font-family: var(--display); font-weight: 700; text-transform: uppercase; padding: 0.75rem 1.5rem; border-radius: 6px; transition: all 0.2s; display: inline-block; text-decoration: none; font-size: 0.9rem; }
+        .btn-secondary:hover { border-color: var(--indigo); color: var(--indigo); }
+
+        /* PROGRESS PRO */
+        .progress-bar { background: #1e1b4b; border-bottom: 1px solid #312e81; overflow-x: auto; }
+        .progress-step { display: flex; align-items: center; gap: 0.4rem; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; color: #475569; padding: 0.75rem 0; white-space: nowrap; }
+        .progress-step.active { color: var(--indigo); }
+        .progress-step.done { color: #22c55e; }
+        .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #334155; flex-shrink: 0; }
+        .progress-step.active .progress-dot { background: var(--indigo); box-shadow: 0 0 0 3px rgba(99,102,241,0.25); }
+        .progress-step.done .progress-dot { background: #22c55e; }
+        .progress-line { height: 1px; background: #334155; flex: 1; }
+        .progress-line.done { background: #22c55e; }
+
+        /* PAGE HEADER — indigo PRO */
+        .page-header { background: #1e1b4b; position: relative; overflow: hidden; padding: 3.5rem 1.5rem; }
+        .page-header::before { content: 'VCC'; font-family: var(--display); font-size: 14rem; font-weight: 900; position: absolute; right: -2rem; top: -2rem; color: rgba(99,102,241,0.07); pointer-events: none; line-height: 1; text-transform: uppercase; }
+        .page-header::after { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(99,102,241,0.06) 39px, rgba(99,102,241,0.06) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(99,102,241,0.06) 39px, rgba(99,102,241,0.06) 40px); pointer-events: none; }
+        .page-header-inner { position: relative; z-index: 1; }
+        .level-badge { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.4); color: #a5b4fc; padding: 0.3rem 0.8rem; border-radius: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 1rem; }
+        .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1; text-transform: uppercase; color: white; }
+        .page-sub { color: #a5b4fc; font-size: 0.95rem; margin-top: 0.75rem; max-width: 560px; line-height: 1.6; }
+
+        /* MODULE CARDS */
+        .module-num { font-family: var(--mono); font-size: 2.5rem; font-weight: 700; color: rgba(99,102,241,0.2); line-height: 1; }
+        .content-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+
+        /* CODE BLOCK */
+        .code-block { background: var(--navy); border-radius: 10px; padding: 1.25rem 1.5rem; font-family: var(--mono); font-size: 0.78rem; line-height: 1.9; color: #64748b; border-left: 3px solid var(--indigo); }
+        .kw { color: var(--orange); }
+        .val { color: #7dd3fc; }
+        .cm { color: #475569; font-style: italic; }
+        .g96 { color: #818cf8; font-weight: 700; }
+        .g97 { color: #34d399; font-weight: 700; }
+        .g50 { color: #f87171; font-weight: 700; }
+
+        /* G96 dark card */
+        .g96-card { background: #1e1b4b; border-radius: 16px; padding: 2rem; }
+        .g96-row { background: rgba(255,255,255,0.07); border-radius: 8px; padding: 0.75rem 1.25rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; border: 1px solid rgba(255,255,255,0.06); }
+
+        /* G50 danger */
+        .danger-box { background: #fff1f2; border: 2px solid #dc2626; border-radius: 16px; padding: 2rem; position: relative; overflow: hidden; }
+        .danger-box::before { content: '⚠'; font-size: 8rem; position: absolute; right: -1rem; bottom: -2rem; color: rgba(220,38,38,0.06); pointer-events: none; }
+
+        /* DIAGRAM */
+        .diagram-wrap { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.07); border: 1px solid #e2e8f0; }
+
+        /* LESSON NAV */
+        .lesson-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; }
+
+        /* IMAGE FRAME */
+        .img-frame { background: var(--navy-mid); border-radius: 12px; overflow: hidden; }
+        .img-frame img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.5s ease both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+    </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+    <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+        <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+        <div class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+            <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+            <div class="relative dropdown-trigger">
+                <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-orange-400 transition">
+                    COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                    <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
+                    <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
+                    <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
+                    <a href="lecon4.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 04</span><span class="menu-lesson-title">Compensation (G41/G42)</span></a>
+                    <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
+                    <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
+                    <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
+                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                </div>
+            </div>
+            <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+            <a href="feedback.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+        </div>
+        <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+            <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+        <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
+        <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
+        <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
+        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
+        <div>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
+            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
+            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
+            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
+            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
+            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
+            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
+            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══ PROGRESS PRO ═══ -->
+<div class="progress-bar">
+    <div class="container mx-auto max-w-5xl px-6">
+        <div class="flex items-center gap-2 py-1">
+            <div class="progress-step done"><span class="progress-dot"></span>L.1→7 ✓</div>
+            <div class="progress-line done"></div>
+            <div class="progress-step active"><span class="progress-dot"></span>L.8 G96/G97</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.9 G76</div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span class="progress-dot"></span>L.10 Param.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="page-header">
+    <div class="container mx-auto max-w-5xl page-header-inner fade-up">
+        <div class="level-badge">Niveau Expert · Leçon 08 PRO</div>
+        <h2 class="page-title">La Vitesse<br><span style="color:#818cf8">Dynamique</span></h2>
+        <p class="page-sub">Maîtriser G96 (Vc constante) et G97 (tr/min fixe) — la différence entre un régleur et un expert en tournage CNC.</p>
+    </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="container mx-auto max-w-5xl py-12 px-6">
+
+    <!-- ── MODULE 01 : Définition Vc ── -->
+    <section class="mb-12 fade-up">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">01.</span>
+            <h3 class="text-2xl font-black uppercase text-slate-800" style="font-family:var(--display)">Définition de la Vc</h3>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="content-card">
+                <p class="text-gray-600 leading-relaxed mb-4 text-sm">La <strong>Vitesse de Coupe (Vc)</strong> n'est pas la vitesse à laquelle la machine tourne, mais la vitesse à laquelle la matière "court" sur le tranchant de la plaquette. C'est l'élément vital du tournage.</p>
+                <p class="text-gray-600 leading-relaxed text-sm">Si la Vc est correcte, la chaleur s'évacue <strong>dans le copeau</strong> et non dans l'outil. Une Vc trop faible = usure par cratère. Une Vc trop forte = fusion du tranchant.</p>
+            </div>
+            <!-- Formule -->
+            <div class="content-card border-t-4" style="border-top-color:var(--indigo)">
+                <h4 style="font-family:var(--mono); font-size:0.65rem; color:var(--indigo); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:1rem">Calcul universel</h4>
+                <div style="font-family:var(--mono); font-size:1.4rem; font-weight:700; color:#312e81; text-align:center; background:#eef2ff; border-radius:8px; padding:1rem; margin-bottom:1rem">
+                    N = (Vc × 1000) / (π × D)
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-xs text-slate-500">
+                    <div><strong style="color:var(--indigo)">N</strong> — tr/min</div>
+                    <div><strong style="color:var(--indigo)">Vc</strong> — m/min</div>
+                    <div><strong style="color:var(--indigo)">D</strong> — diamètre mm</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── MODULE 02 : G96 ── -->
+    <section class="mb-12 fade-up delay-1">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">02.</span>
+            <h3 class="text-2xl font-black uppercase text-slate-800" style="font-family:var(--display)">G96 — La Vitesse de Coupe Constante</h3>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="g96-card">
+                <h4 style="font-family:var(--mono); font-size:0.65rem; color:#818cf8; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:1rem">Mode VCC — le CNC recalcule N en permanence</h4>
+                <p class="text-indigo-200 text-sm leading-relaxed mb-5">En activant G96, vous demandez au CNC de recalculer la rotation (N) à chaque micro-déplacement sur l'axe X. Quand le diamètre diminue → les tr/min augmentent pour maintenir Vc constante.</p>
+                <div class="g96-row">
+                    <span class="text-indigo-200 text-sm">Ø 80 mm</span>
+                    <span style="font-family:var(--mono); color:white; font-weight:700">875 tr/min</span>
+                </div>
+                <div class="g96-row">
+                    <span class="text-indigo-200 text-sm">Ø 60 mm</span>
+                    <span style="font-family:var(--mono); color:#a5b4fc; font-weight:700">1 165 tr/min</span>
+                </div>
+                <div class="g96-row" style="border:1px solid rgba(129,140,248,0.4)">
+                    <span class="text-indigo-200 text-sm">Ø 40 mm</span>
+                    <span style="font-family:var(--mono); color:#818cf8; font-weight:700; font-size:1rem">1 750 tr/min ↑</span>
+                </div>
+                <p style="font-family:var(--mono); font-size:0.6rem; color:#475569; text-transform:uppercase; letter-spacing:0.08em; margin-top:0.75rem">Vc = 220 m/min — constante sur toute la passe</p>
+            </div>
+
+            <!-- Schéma SVG G96 -->
+            <div class="diagram-wrap">
+                <p style="font-family:var(--mono); font-size:0.6rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem">Schéma — G96 : N augmente quand D diminue</p>
+                <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" width="100%">
+                    <!-- Axes -->
+                    <line x1="40" y1="170" x2="280" y2="170" stroke="#cbd5e1" stroke-width="1.5"/>
+                    <line x1="40" y1="20" x2="40" y2="170" stroke="#cbd5e1" stroke-width="1.5"/>
+                    <!-- Labels axes -->
+                    <text x="155" y="190" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="monospace">Diamètre D (mm) →</text>
+                    <text x="12" y="100" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="monospace" transform="rotate(-90,12,100)">N (tr/min) ↑</text>
+                    <!-- Courbe N = Vc*1000/(π*D) -->
+                    <path d="M 55,160 C 70,140 90,110 120,88 C 150,68 185,55 220,47 C 250,41 270,38 280,36"
+                          stroke="#818cf8" stroke-width="2.5" fill="none"/>
+                    <!-- Points annotés -->
+                    <circle cx="80" cy="148" r="4" fill="#818cf8"/>
+                    <text x="83" y="144" font-size="8" fill="#818cf8" font-family="monospace">Ø80 → 875</text>
+                    <circle cx="150" cy="80" r="4" fill="#a5b4fc"/>
+                    <text x="153" y="76" font-size="8" fill="#a5b4fc" font-family="monospace">Ø40 → 1750</text>
+                    <!-- Vc label -->
+                    <text x="160" y="130" font-size="9" fill="#6366f1" font-family="monospace" font-style="italic">Vc = 220 m/min</text>
+                    <!-- Ligne danger -->
+                    <line x1="40" y1="30" x2="280" y2="30" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,2"/>
+                    <text x="200" y="26" font-size="8" fill="#ef4444" font-family="monospace">N max (G50)</text>
+                    <!-- D axis ticks -->
+                    <text x="55" y="182" font-size="7" fill="#94a3b8" font-family="monospace" text-anchor="middle">80</text>
+                    <text x="100" y="182" font-size="7" fill="#94a3b8" font-family="monospace" text-anchor="middle">60</text>
+                    <text x="150" y="182" font-size="7" fill="#94a3b8" font-family="monospace" text-anchor="middle">40</text>
+                    <text x="220" y="182" font-size="7" fill="#94a3b8" font-family="monospace" text-anchor="middle">20</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Code G96 -->
+        <div class="code-block mt-5">
+            <span class="cm">( Tournage extérieur acier — Vc constante )</span><br>
+            <span class="kw">T0101</span>              <span class="cm">; appel outil + correcteur</span><br>
+            <span class="g50">G50 S3000</span>          <span class="cm">; limite N max → sécurité</span><br>
+            <span class="g96">G96</span> S<span class="val">220</span> <span class="kw">M03 M08</span>   <span class="cm">; Vc = 220 m/min</span><br>
+            <span class="kw">G00</span> X<span class="val">82.</span> Z<span class="val">2.</span><br>
+            <span class="kw">G01</span> Z<span class="val">-60.</span> F<span class="val">0.25</span>   <span class="cm">; chariotage</span><br>
+            <span class="kw">G00</span> X<span class="val">100.</span> Z<span class="val">100.</span><br>
+            <span class="kw">M30</span>
+        </div>
+    </section>
+
+    <!-- ── MODULE 03 : G97 ── -->
+    <section class="mb-12 fade-up delay-1">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">03.</span>
+            <h3 class="text-2xl font-black uppercase text-slate-800" style="font-family:var(--display)">G97 — La Stabilité (tr/min fixe)</h3>
+        </div>
+        <div class="content-card mb-5">
+            <p class="text-gray-600 text-sm leading-relaxed mb-4">G97 annule G96. La vitesse de rotation devient fixe en tr/min, quel que soit le diamètre. Voici les 3 cas où il est indispensable :</p>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                    <span class="text-2xl block mb-2">🌀</span>
+                    <h5 class="font-bold text-xs uppercase mb-2 text-slate-700" style="font-family:var(--display)">Perçage Axial</h5>
+                    <p class="text-xs text-gray-500 leading-relaxed">L'outil est à X0 — le diamètre ne varie pas. G96 forcerait inutilement le moteur vers l'infini.</p>
+                </div>
+                <div class="bg-red-50 rounded-xl p-4 border border-red-100">
+                    <span class="text-2xl block mb-2">⚙️</span>
+                    <h5 class="font-bold text-xs uppercase mb-2 text-red-700" style="font-family:var(--display)">Filetage ISO</h5>
+                    <p class="text-xs text-red-600 font-semibold leading-relaxed">CRITIQUE : toute variation de vitesse brise la synchronisation du pas. Toujours G97 pour les filets.</p>
+                </div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                    <span class="text-2xl block mb-2">🔧</span>
+                    <h5 class="font-bold text-xs uppercase mb-2 text-slate-700" style="font-family:var(--display)">Outils Tournants</h5>
+                    <p class="text-xs text-gray-500 leading-relaxed">Pour le fraisage sur tour (outil motorisé), toujours en vitesse fixe.</p>
+                </div>
+            </div>
+        </div>
+        <div class="code-block">
+            <span class="cm">( Transition G96 → G97 pour perçage )</span><br>
+            <span class="g96">G96</span> S<span class="val">220</span> <span class="kw">M03</span>      <span class="cm">; chariotage Vc constante</span><br>
+            <span class="kw">G01</span> Z<span class="val">-60.</span> F<span class="val">0.25</span><br>
+            <span class="kw">G00</span> X<span class="val">100.</span> Z<span class="val">5.</span><br>
+            <span class="g97">G97</span> S<span class="val">800</span>           <span class="cm">; → fixe pour perçage axial</span><br>
+            <span class="kw">G00</span> X<span class="val">0.</span> Z<span class="val">2.</span><br>
+            <span class="kw">G83</span> Z<span class="val">-30.</span> R<span class="val">2.</span> Q<span class="val">5.</span> F<span class="val">80.</span>  <span class="cm">; perçage</span><br>
+            <span class="kw">G80</span>
+        </div>
+    </section>
+
+    <!-- ── MODULE 04 : G50 Danger ── -->
+    <section class="mb-12 fade-up delay-2">
+        <div class="flex items-baseline gap-4 mb-5">
+            <span class="module-num">04.</span>
+            <h3 class="text-2xl font-black uppercase text-red-700" style="font-family:var(--display)">G50 — Le Bouclier de Sécurité</h3>
+        </div>
+        <div class="danger-box">
+            <div class="grid md:grid-cols-2 gap-6 items-start">
+                <div>
+                    <h4 class="font-black text-red-800 text-lg uppercase mb-3" style="font-family:var(--display)">⚠️ Le Danger du G96</h4>
+                    <p class="text-red-800 text-sm leading-relaxed mb-4">À mesure que l'outil s'approche de X=0, le calcul N = Vc×1000/(π×D) tend vers l'<strong>infini</strong>. La machine peut atteindre ses limites mécaniques en quelques secondes :</p>
+                    <ul class="space-y-2 text-sm text-red-700">
+                        <li class="flex gap-2"><span>💥</span> Éclatement du mandrin</li>
+                        <li class="flex gap-2"><span>🔴</span> Éjection de la pièce</li>
+                        <li class="flex gap-2"><span>⚡</span> Surchauffe et fusion roulements</li>
+                    </ul>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-white rounded-xl p-4 border-l-4 border-red-600 shadow-sm">
+                        <h5 class="font-bold text-xs uppercase mb-2 text-red-700" style="font-family:var(--mono)">La Protection PRO</h5>
+                        <div style="font-family:var(--mono); font-size:1.3rem; font-weight:700; color:#dc2626">G50 S3000</div>
+                        <p class="text-xs text-gray-500 mt-1">Empêche la broche de dépasser 3000 tr/min même si G96 le demande. Toujours placer G50 <strong>avant</strong> G96.</p>
+                    </div>
+                    <div class="bg-red-800 text-white rounded-xl p-4 text-sm italic">
+                        "En atelier, on place toujours le G50 en début de bloc outil, avant le G96 — sans exception."
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code complet sécurisé -->
+        <div class="code-block mt-5">
+            <span class="cm">( PROGRAMME COMPLET — G96 SÉCURISÉ )</span><br>
+            <span class="kw">T0101</span>               <span class="cm">; outil 1 plaquette tournage</span><br>
+            <span class="g50">G50 S3000</span>           <span class="cm">; ← TOUJOURS EN 1ER</span><br>
+            <span class="g96">G96</span> S<span class="val">220</span> <span class="kw">M03 M08</span><br>
+            <span class="kw">G00</span> X<span class="val">82.</span> Z<span class="val">2.</span><br>
+            <span class="kw">G71</span> U<span class="val">1.5</span> R<span class="val">0.5</span>     <span class="cm">; cycle ébauche</span><br>
+            <span class="kw">G71</span> P<span class="val">10</span> Q<span class="val">20</span> F<span class="val">0.3</span><br>
+            N<span class="val">10</span> <span class="kw">G00</span> X<span class="val">30.</span><br>
+            <span class="kw">G01</span> Z<span class="val">-25.</span> F<span class="val">0.15</span>  <span class="cm">; profil finition</span><br>
+            N<span class="val">20</span> <span class="kw">X</span><span class="val">82.</span><br>
+            <span class="kw">G00</span> X<span class="val">100.</span> Z<span class="val">100.</span><br>
+            <span class="kw">M30</span>
+        </div>
+    </section>
+
+    <!-- ── TABLEAU RECAP G96 vs G97 ── -->
+    <section class="mb-4 fade-up">
+        <h3 class="text-xl font-black uppercase text-slate-700 mb-4" style="font-family:var(--display)">Récapitulatif G96 vs G97</h3>
+        <div style="background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.07)">
+            <table style="width:100%; border-collapse:collapse; font-size:0.875rem">
+                <thead>
+                    <tr style="background:var(--navy)">
+                        <th style="padding:0.75rem 1rem; font-family:var(--mono); font-size:0.62rem; letter-spacing:0.08em; color:#94a3b8; text-align:left; font-weight:400">Critère</th>
+                        <th style="padding:0.75rem 1rem; font-family:var(--mono); font-size:0.62rem; letter-spacing:0.08em; color:#818cf8; text-align:left; font-weight:400">G96 — VCC</th>
+                        <th style="padding:0.75rem 1rem; font-family:var(--mono); font-size:0.62rem; letter-spacing:0.08em; color:#34d399; text-align:left; font-weight:400">G97 — N fixe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom:1px solid #f1f5f9">
+                        <td style="padding:0.85rem 1rem; font-weight:600">Unité de S</td>
+                        <td style="padding:0.85rem 1rem; font-family:var(--mono); color:#6366f1">m/min (Vc)</td>
+                        <td style="padding:0.85rem 1rem; font-family:var(--mono); color:#10b981">tr/min (N)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #f1f5f9; background:#fafafa">
+                        <td style="padding:0.85rem 1rem; font-weight:600">N varie selon D ?</td>
+                        <td style="padding:0.85rem 1rem; color:#6366f1">Oui — en permanence</td>
+                        <td style="padding:0.85rem 1rem; color:#10b981">Non — fixe</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #f1f5f9">
+                        <td style="padding:0.85rem 1rem; font-weight:600">Usage principal</td>
+                        <td style="padding:0.85rem 1rem">Chariotage, dressage, ébauche</td>
+                        <td style="padding:0.85rem 1rem">Filetage, perçage, outils tournants</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:0.85rem 1rem; font-weight:600">Obligatoire avec</td>
+                        <td style="padding:0.85rem 1rem; color:#dc2626; font-weight:600">G50 S.. (limite N max)</td>
+                        <td style="padding:0.85rem 1rem; color:#10b981">Rien — mode stable</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ── NAV LEÇONS ── -->
+    <div class="lesson-nav">
+        <a href="lecon7.html" class="btn-secondary">← Leçon 7 : Sécurité</a>
+        <div class="text-center">
+            <p style="font-family:var(--mono); font-size:0.65rem; color:var(--indigo); text-transform:uppercase; letter-spacing:0.1em">Leçon 8 PRO / 10</p>
+        </div>
+        <a href="lecon9.html" class="btn-pro">Leçon 9 PRO : Filetage G76 →</a>
+    </div>
+
+</main>
+
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-8">
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Le Savoir est votre Force</p>
+</footer>
+
+<script>
+    const burgerBtn = document.getElementById('burger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const burgerIcon = document.getElementById('burger-icon');
+    const closeIcon = document.getElementById('close-icon');
+    burgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+        burgerIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+    });
+</script>
+</body>
+</html>

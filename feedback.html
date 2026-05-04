@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ & Feedback - CNC Académie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #f97316; --orange-dark: #ea6c0a;
+            --navy: #0f172a; --navy-mid: #1e293b;
+            --mono: 'Space Mono', monospace;
+            --display: 'Barlow Condensed', sans-serif;
+            --body: 'Barlow', sans-serif;
+        }
+        * { font-family: var(--body); }
+        h1,h2,h3,h4 { font-family: var(--display); }
+        body { background: #f1f5f9; color: #0f172a; }
+
+        /* ── NAV ── */
+        .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
+        #mobile-menu { display: none; }
+        #mobile-menu.open { display: block; }
+        .dropdown-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); width: 18rem; background: white; border-radius: 0.75rem; box-shadow: 0 20px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0; z-index: 100; overflow: hidden; }
+        .dropdown-trigger:hover .dropdown-menu, .dropdown-trigger:focus-within .dropdown-menu { display: block; }
+        .menu-lesson { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; text-decoration: none; }
+        .menu-lesson:hover { background: #fff7ed; }
+        .menu-lesson:last-child { border-bottom: none; }
+        .menu-lesson-num { font-family: var(--mono); font-size: 0.6rem; color: var(--orange); letter-spacing: 0.1em; text-transform: uppercase; display: block; }
+        .menu-lesson-title { font-size: 0.85rem; color: #1e293b; font-weight: 500; }
+        .menu-lesson.pro:hover { background: #eef2ff; }
+        .menu-lesson.pro .menu-lesson-num { color: #6366f1; }
+        .badge-pro { font-size: 0.6rem; background: #6366f1; color: white; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.4rem; }
+        .btn-primary { background: var(--orange); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.75rem 2rem; border-radius: 6px; transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none; cursor: pointer; border: none; }
+        .btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); }
+
+        /* ── PAGE HEADER ── */
+        .page-header { background: var(--navy); position: relative; overflow: hidden; padding: 3rem 1.5rem; }
+        .page-header::before { content: '?'; font-family: var(--display); font-size: 20rem; font-weight: 900; position: absolute; right: -2rem; top: -4rem; color: rgba(249,115,22,0.04); pointer-events: none; line-height: 1; }
+        .page-header::after { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(249,115,22,0.05) 39px, rgba(249,115,22,0.05) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(249,115,22,0.05) 39px, rgba(249,115,22,0.05) 40px); pointer-events: none; }
+        .page-header-inner { position: relative; z-index: 1; }
+        .level-badge { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.35); color: var(--orange); padding: 0.3rem 0.8rem; border-radius: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 1rem; }
+        .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1; text-transform: uppercase; color: white; }
+        .page-sub { color: #94a3b8; font-size: 0.95rem; margin-top: 0.75rem; max-width: 560px; line-height: 1.6; }
+
+        /* ── FAQ ── */
+        .faq-item { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: box-shadow 0.2s; }
+        .faq-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        .faq-question { width: 100%; text-align: left; padding: 1.1rem 1.25rem; font-family: var(--display); font-weight: 700; font-size: 1rem; text-transform: uppercase; color: #1e293b; background: none; border: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: color 0.15s; }
+        .faq-question:hover { color: var(--orange); }
+        .faq-question .arrow { font-size: 0.75rem; color: #94a3b8; transition: transform 0.25s; }
+        .faq-question.open .arrow { transform: rotate(180deg); color: var(--orange); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.2s; }
+        .faq-answer.open { max-height: 400px; }
+        .faq-answer-inner { padding: 0 1.25rem 1.25rem; font-size: 0.875rem; color: #475569; line-height: 1.7; border-top: 1px solid #f1f5f9; padding-top: 1rem; }
+        .faq-answer-inner code { font-family: var(--mono); background: #f1f5f9; padding: 0.1rem 0.4rem; border-radius: 3px; font-size: 0.8rem; color: var(--orange); }
+        .faq-cat { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange); margin-bottom: 0.75rem; margin-top: 2rem; }
+
+        /* ── FEEDBACK FORM ── */
+        .feedback-form { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+        .form-label { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 0.4rem; }
+        .form-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.7rem 1rem; font-size: 0.875rem; color: #1e293b; outline: none; transition: border-color 0.2s, box-shadow 0.2s; background: #f8fafc; }
+        .form-input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(249,115,22,0.1); background: white; }
+        textarea.form-input { resize: vertical; min-height: 120px; font-family: var(--body); }
+        select.form-input { cursor: pointer; }
+
+        /* ── FEEDBACK CARDS ── */
+        .feedback-card { background: white; border-radius: 12px; padding: 1.25rem; border: 1px solid #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.04); position: relative; transition: box-shadow 0.2s; }
+        .feedback-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        .feedback-type-badge { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 3px; display: inline-block; }
+        .type-suggestion { background: #eff6ff; color: #1d4ed8; }
+        .type-bug { background: #fef2f2; color: #dc2626; }
+        .type-question { background: #f0fdf4; color: #16a34a; }
+        .type-compliment { background: #fff7ed; color: #ea580c; }
+        .vote-btn { font-family: var(--mono); font-size: 0.65rem; padding: 0.25rem 0.6rem; border-radius: 4px; border: 1px solid #e2e8f0; background: #f8fafc; cursor: pointer; transition: all 0.15s; color: #64748b; }
+        .vote-btn:hover { border-color: var(--orange); color: var(--orange); background: #fff7ed; }
+        .vote-btn.voted { background: var(--orange); color: white; border-color: var(--orange); }
+        .delete-btn { position: absolute; top: 0.75rem; right: 0.75rem; font-size: 0.7rem; color: #cbd5e1; cursor: pointer; transition: color 0.15s; background: none; border: none; }
+        .delete-btn:hover { color: #ef4444; }
+
+        /* ── TOAST ── */
+        .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 999; font-family: var(--mono); font-size: 0.75rem; padding: 0.75rem 1.25rem; border-radius: 8px; transform: translateY(80px); opacity: 0; transition: all 0.3s; pointer-events: none; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast-success { background: #f0fdf4; color: #16a34a; border: 1px solid #86efac; }
+        .toast-error { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
+
+        /* SORT/FILTER TABS */
+        .filter-tab { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.07em; text-transform: uppercase; padding: 0.35rem 0.85rem; border-radius: 4px; cursor: pointer; transition: all 0.15s; border: 1px solid #e2e8f0; background: white; color: #64748b; }
+        .filter-tab.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.4s ease both; }
+    </style>
+</head>
+<body>
+
+<!-- ═══ NAV UNIVERSELLE ═══ -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+    <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+        <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+        <div class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+            <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+            <div class="relative dropdown-trigger">
+                <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-orange-400 transition">
+                    COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                    <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
+                    <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
+                    <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
+                    <a href="lecon4.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 04</span><span class="menu-lesson-title">Compensation (G41/G42)</span></a>
+                    <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
+                    <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
+                    <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
+                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                </div>
+            </div>
+            <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+            <a href="feedback.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+        </div>
+        <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+            <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+        <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
+        <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
+        <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
+        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
+        <div>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
+            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
+            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
+            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
+            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
+            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
+            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
+            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══ HEADER ═══ -->
+<div class="page-header">
+    <div class="container mx-auto max-w-5xl page-header-inner fade-up">
+        <div class="level-badge">Communauté · CNC Académie</div>
+        <h2 class="page-title">FAQ &amp;<br><span style="color:var(--orange)">Feedback</span></h2>
+        <p class="page-sub">Trouvez des réponses aux questions fréquentes sur le G-Code Fanuc, et partagez vos suggestions pour améliorer le site.</p>
+    </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="container mx-auto max-w-5xl py-12 px-6">
+
+    <!-- ── STATS ── -->
+    <div class="grid grid-cols-3 gap-4 mb-10 fade-up">
+        <div class="bg-white rounded-xl p-4 text-center border border-slate-200 shadow-sm">
+            <div id="stat-total" class="text-2xl font-black" style="font-family:var(--display); color:var(--orange)">0</div>
+            <div style="font-family:var(--mono); font-size:0.6rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.25rem">Suggestions</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 text-center border border-slate-200 shadow-sm">
+            <div id="stat-votes" class="text-2xl font-black" style="font-family:var(--display); color:#6366f1">0</div>
+            <div style="font-family:var(--mono); font-size:0.6rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.25rem">Votes totaux</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 text-center border border-slate-200 shadow-sm">
+            <div id="stat-bugs" class="text-2xl font-black" style="font-family:var(--display); color:#dc2626">0</div>
+            <div style="font-family:var(--mono); font-size:0.6rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.25rem">Bugs signalés</div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- FAQ -->
+    <!-- ══════════════════════════════════════ -->
+    <section class="mb-16 fade-up">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="h-px flex-1 bg-slate-200"></div>
+            <h3 class="text-2xl font-black uppercase" style="font-family:var(--display)">Questions Fréquentes</h3>
+            <div class="h-px flex-1 bg-slate-200"></div>
+        </div>
+
+        <!-- CATÉGORIE : G-Code -->
+        <div class="faq-cat">// G-Code & Programmation</div>
+        <div class="space-y-3">
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    Quelle est la différence entre G00 et G01 ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <strong>G00</strong> est le déplacement rapide — la machine se déplace à sa vitesse maximale, sans usinage. Il est représenté en pointillés oranges dans le simulateur.<br><br>
+                        <strong>G01</strong> est l'interpolation linéaire — la machine se déplace à l'avance programmée <code>F</code>, en usinant la matière. C'est le code le plus utilisé.<br><br>
+                        Règle d'or : <strong>G00 hors matière, G01 dans la matière.</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    Pourquoi mon programme commence-t-il par G21 G90 G40 G80 ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        C'est le "bloc de sécurité" standard Fanuc. Il garantit que la machine est dans un état connu avant de démarrer :<br><br>
+                        • <code>G21</code> — Mode millimètres (et non pouces G20)<br>
+                        • <code>G90</code> — Mode absolu (coordonnées par rapport au G54)<br>
+                        • <code>G40</code> — Annulation compensation rayon (G41/G42)<br>
+                        • <code>G80</code> — Annulation cycle de perçage actif<br><br>
+                        Ces 4 codes ensemble évitent 80% des crashes par état résiduel.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    C'est quoi la différence entre G54 et G90 ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        Ce sont deux choses complètement différentes :<br><br>
+                        <code>G54</code> définit <strong>OÙ</strong> est votre zéro pièce (les offsets X/Y/Z mesurés par le régleur).<br>
+                        <code>G90</code> définit <strong>COMMENT</strong> vous calculez — en absolu (par rapport au G54) plutôt qu'en incrémental (G91).<br><br>
+                        Les deux sont complémentaires et généralement utilisés ensemble.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    Quand utiliser G96 vs G97 en tournage ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        <code>G96</code> — Vitesse de coupe <strong>constante</strong> (m/min). La commande recalcule automatiquement les tr/min selon le diamètre. Idéal pour chariotage et dressage.<br><br>
+                        <code>G97</code> — Vitesse de rotation <strong>fixe</strong> (tr/min). Obligatoire pour : filetage G76 (synchronisation du pas), perçage axial, outils tournants.<br><br>
+                        ⚠️ Toujours utiliser <code>G50 S3000</code> avant G96 pour limiter les tr/min max.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    Pourquoi est-ce que j'oublie toujours le G80 ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        Parce que les cycles de perçage sont "modaux" — ils restent actifs jusqu'à ce qu'on les annule explicitement. Si vous oubliez <code>G80</code>, la machine percera un trou à chaque position X/Y suivante.<br><br>
+                        Astuce : créez un template de programme avec le G80 déjà inclus après chaque section de perçage. Vous ne l'oublierez plus jamais.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CATÉGORIE : Simulateur -->
+        <div class="faq-cat">// Simulateur 3D</div>
+        <div class="space-y-3">
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    Comment naviguer dans la vue 3D ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        • <strong>Clic gauche + glisser</strong> — Orbite (rotation de la vue)<br>
+                        • <strong>Scroll molette</strong> — Zoom avant / arrière<br>
+                        • <strong>Clic droit + glisser</strong> — Pan (déplacement de la vue)<br>
+                        • <strong>Tactile 1 doigt</strong> — Orbite<br>
+                        • <strong>Tactile 2 doigts</strong> — Zoom par pincement<br><br>
+                        Les 5 boutons de vue prédéfinie (Dessus, Face, Côté, Iso) permettent d'aller rapidement aux angles standards.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    Mon programme ne s'exécute pas correctement dans le simulateur ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        Vérifiez ces points dans l'ordre :<br><br>
+                        1. Le simulateur supporte les codes G standard ISO — vérifiez que votre code ne contient pas de codes spécifiques à votre machine<br>
+                        2. Chaque ligne doit avoir un code G ou M valide et reconnu<br>
+                        3. Les commentaires doivent être entre parenthèses <code>(commentaire)</code> ou après un <code>;</code><br>
+                        4. Essayez le bouton "Exemple" pour voir un programme de référence<br>
+                        5. Le simulateur affiche l'alarme et la ligne en erreur en rouge
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    Comment choisir les bonnes dimensions de brut ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        Le brut doit être légèrement plus grand que votre pièce finie pour simuler l'enlèvement de matière réel.<br><br>
+                        En <strong>fraisage</strong> : entrez les dimensions du bloc brut (longueur × largeur × hauteur).<br>
+                        En <strong>tournage</strong> : entrez le diamètre brut (plus grand que le diamètre final) et la longueur totale.<br><br>
+                        Cliquez sur "Appliquer le brut" après chaque modification pour mettre à jour la vue 3D.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CATÉGORIE : Site -->
+        <div class="faq-cat">// Site & Formation</div>
+        <div class="space-y-3">
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    Les leçons sont-elles vraiment gratuites ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        Oui, 100% gratuites — toutes les leçons, le simulateur, le dictionnaire et les examens. Aucun compte requis, aucune inscription.<br><br>
+                        CNC Académie est un projet de formation libre pour rendre le G-Code Fanuc accessible à tous les apprenants, débutants comme techniciens en reconversion.
+                    </div>
+                </div>
+            </div>
+
+    
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    Comment puis-je contribuer au projet ?
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        La meilleure façon de contribuer est d'utiliser le formulaire de feedback ci-dessous ! Vos suggestions, signalements de bugs et idées d'amélioration sont précieux.<br><br>
+                        Vous pouvez suggérer :<br>
+                        • De nouvelles leçons ou exemples de programmes<br>
+                        • Des corrections sur le contenu technique<br>
+                        • Des améliorations du simulateur<br>
+                        • Des fonctionnalités manquantes
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- FORMULAIRE FEEDBACK -->
+    <!-- ══════════════════════════════════════ -->
+    <section class="mb-12 fade-up">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="h-px flex-1 bg-slate-200"></div>
+            <h3 class="text-2xl font-black uppercase" style="font-family:var(--display)">Laisser un Feedback</h3>
+            <div class="h-px flex-1 bg-slate-200"></div>
+        </div>
+
+        <div class="feedback-form">
+            <div class="grid md:grid-cols-2 gap-5 mb-5">
+                <div>
+                    <label class="form-label">Votre prénom (optionnel)</label>
+                    <input type="text" id="fb-name" class="form-input" placeholder="Ex: Pierre">
+                </div>
+                <div>
+                    <label class="form-label">Type de message</label>
+                    <select id="fb-type" class="form-input">
+                        <option value="suggestion">💡 Suggestion d'amélioration</option>
+                        <option value="bug">🐛 Signaler un bug</option>
+                        <option value="question">❓ Question technique</option>
+                        <option value="compliment">⭐ Compliment / Encouragement</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-5">
+                <label class="form-label">Concerne quelle page / leçon ?</label>
+                <select id="fb-page" class="form-input">
+                    <option value="general">Le site en général</option>
+                    <option value="index">Page d'accueil</option>
+                    <option value="simulateur">Simulateur 3D</option>
+                    <option value="dictionnaire">Dictionnaire G/M</option>
+                    <option value="lecon1">Leçon 1 — Axes</option>
+                    <option value="lecon2">Leçon 2 — G54</option>
+                    <option value="lecon3">Leçon 3 — F/S</option>
+                    <option value="lecon4">Leçon 4 — G41/G42</option>
+                    <option value="lecon5">Leçon 5 — Perçage</option>
+                    <option value="lecon6">Leçon 6 — M98</option>
+                    <option value="lecon7">Leçon 7 — Sécurité</option>
+                    <option value="lecon8">Leçon 8 — G96/G97</option>
+                    <option value="lecon9">Leçon 9 — G76</option>
+                    <option value="lecon10">Leçon 10 — Paramétré</option>
+                </select>
+            </div>
+            <div class="mb-5">
+                <label class="form-label">Votre message *</label>
+                <textarea id="fb-message" class="form-input" placeholder="Décrivez votre suggestion, bug ou question..."></textarea>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="submitFeedback()" class="btn-primary">Envoyer le feedback →</button>
+                <span id="char-count" style="font-family:var(--mono); font-size:0.65rem; color:#94a3b8">0 / 500</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- FEEDBACKS SAUVEGARDÉS -->
+    <!-- ══════════════════════════════════════ -->
+    <section class="fade-up">
+        <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+            <h3 class="text-2xl font-black uppercase" style="font-family:var(--display)">Suggestions de la Communauté</h3>
+            <div class="flex gap-2 flex-wrap">
+                <button class="filter-tab active" onclick="filterFeedbacks('all', this)">Tous</button>
+                <button class="filter-tab" onclick="filterFeedbacks('suggestion', this)">💡 Suggestions</button>
+                <button class="filter-tab" onclick="filterFeedbacks('bug', this)">🐛 Bugs</button>
+                <button class="filter-tab" onclick="filterFeedbacks('question', this)">❓ Questions</button>
+                <button class="filter-tab" onclick="filterFeedbacks('compliment', this)">⭐ Compliments</button>
+            </div>
+        </div>
+
+        <div id="feedback-list" class="space-y-4">
+            <div id="empty-state" class="text-center py-16 text-slate-400">
+                <div style="font-size:3rem; margin-bottom:1rem">💬</div>
+                <p style="font-family:var(--mono); font-size:0.75rem">Aucun feedback pour le moment.<br>Soyez le premier à partager vos suggestions !</p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-16">
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Vos retours nous aident à progresser</p>
+</footer>
+
+<!-- TOAST -->
+<div id="toast" class="toast toast-success">✓ Feedback envoyé !</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// BURGER MENU
+// ═══════════════════════════════════════════════
+const burgerBtn = document.getElementById('burger-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+const burgerIcon = document.getElementById('burger-icon');
+const closeIcon  = document.getElementById('close-icon');
+burgerBtn.addEventListener('click', () => {
+    mobileMenu.classList.toggle('open');
+    burgerIcon.classList.toggle('hidden');
+    closeIcon.classList.toggle('hidden');
+});
+
+// ═══════════════════════════════════════════════
+// FAQ ACCORDION
+// ═══════════════════════════════════════════════
+function toggleFAQ(btn) {
+    const answer  = btn.nextElementSibling;
+    const isOpen  = answer.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'));
+    document.querySelectorAll('.faq-question').forEach(q => q.classList.remove('open'));
+    // Open clicked if it was closed
+    if (!isOpen) {
+        answer.classList.add('open');
+        btn.classList.add('open');
+    }
+}
+
+// ═══════════════════════════════════════════════
+// CHAR COUNTER
+// ═══════════════════════════════════════════════
+document.getElementById('fb-message').addEventListener('input', function() {
+    const len = this.value.length;
+    document.getElementById('char-count').textContent = `${len} / 500`;
+    if (len > 480) document.getElementById('char-count').style.color = '#ef4444';
+    else document.getElementById('char-count').style.color = '#94a3b8';
+    if (len > 500) this.value = this.value.slice(0, 500);
+});
+
+// ═══════════════════════════════════════════════
+// LOCALSTORAGE FEEDBACK
+// ═══════════════════════════════════════════════
+const STORAGE_KEY = 'cnc_academie_feedbacks';
+
+function getFeedbacks() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch { return []; }
+}
+
+function saveFeedbacks(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = type === 'success' ? `✓ ${msg}` : `✕ ${msg}`;
+    toast.className = `toast toast-${type} show`;
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function submitFeedback() {
+    const name    = document.getElementById('fb-name').value.trim();
+    const type    = document.getElementById('fb-type').value;
+    const page    = document.getElementById('fb-page').value;
+    const message = document.getElementById('fb-message').value.trim();
+
+    if (!message) {
+        showToast('Veuillez écrire un message.', 'error');
+        document.getElementById('fb-message').focus();
+        return;
+    }
+    if (message.length < 10) {
+        showToast('Message trop court (min. 10 caractères).', 'error');
+        return;
+    }
+
+    const feedback = {
+        id: Date.now(),
+        name: name || 'Anonyme',
+        type, page, message,
+        date: new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }),
+        votes: 0,
+        voted: false
+    };
+
+    const list = getFeedbacks();
+    list.unshift(feedback);
+    saveFeedbacks(list);
+
+    // Reset form
+    document.getElementById('fb-name').value    = '';
+    document.getElementById('fb-message').value = '';
+    document.getElementById('char-count').textContent = '0 / 500';
+
+    renderFeedbacks();
+    updateStats();
+    showToast('Feedback enregistré, merci !');
+
+    // Scroll to list
+    document.getElementById('feedback-list').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+const typeConfig = {
+    suggestion: { label: '💡 Suggestion', cls: 'type-suggestion' },
+    bug:        { label: '🐛 Bug',        cls: 'type-bug' },
+    question:   { label: '❓ Question',   cls: 'type-question' },
+    compliment: { label: '⭐ Compliment', cls: 'type-compliment' }
+};
+
+const pageLabels = {
+    general:'Général', index:'Accueil', simulateur:'Simulateur',
+    dictionnaire:'Dictionnaire', lecon1:'L.1', lecon2:'L.2', lecon3:'L.3',
+    lecon4:'L.4', lecon5:'L.5', lecon6:'L.6', lecon7:'L.7',
+    lecon8:'L.8', lecon9:'L.9', lecon10:'L.10'
+};
+
+let activeFilter = 'all';
+
+function filterFeedbacks(type, btn) {
+    activeFilter = type;
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderFeedbacks();
+}
+
+function renderFeedbacks() {
+    const list = getFeedbacks();
+    const filtered = activeFilter === 'all' ? list : list.filter(f => f.type === activeFilter);
+    const container = document.getElementById('feedback-list');
+    const empty = document.getElementById('empty-state');
+
+    if (filtered.length === 0) {
+        empty.style.display = '';
+        // Remove existing cards
+        container.querySelectorAll('.feedback-card').forEach(c => c.remove());
+        return;
+    }
+    empty.style.display = 'none';
+    container.querySelectorAll('.feedback-card').forEach(c => c.remove());
+
+    filtered.forEach(fb => {
+        const tc = typeConfig[fb.type] || typeConfig.suggestion;
+        const card = document.createElement('div');
+        card.className = 'feedback-card fade-up';
+        card.id = `fb-${fb.id}`;
+        card.innerHTML = `
+            <button class="delete-btn" onclick="deleteFeedback(${fb.id})" title="Supprimer">✕</button>
+            <div class="flex items-start gap-3 mb-3">
+                <div class="w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-sm flex-shrink-0" style="background:var(--navy)">
+                    ${fb.name.charAt(0).toUpperCase()}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-bold text-sm text-slate-800">${escapeHtml(fb.name)}</span>
+                        <span class="feedback-type-badge ${tc.cls}">${tc.label}</span>
+                        <span style="font-family:var(--mono); font-size:0.6rem; color:#cbd5e1; background:#f8fafc; padding:0.1rem 0.4rem; border-radius:3px">
+                            ${pageLabels[fb.page] || fb.page}
+                        </span>
+                    </div>
+                    <div style="font-family:var(--mono); font-size:0.6rem; color:#94a3b8; margin-top:0.2rem">${fb.date}</div>
+                </div>
+            </div>
+            <p class="text-sm text-slate-600 leading-relaxed mb-4">${escapeHtml(fb.message)}</p>
+            <div class="flex items-center gap-3">
+                <button class="vote-btn ${fb.voted ? 'voted' : ''}" onclick="voteFeedback(${fb.id}, this)">
+                    👍 ${fb.votes}
+                </button>
+                <span style="font-family:var(--mono); font-size:0.6rem; color:#cbd5e1">
+                    ${fb.votes === 1 ? '1 vote' : `${fb.votes} votes`}
+                </span>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function voteFeedback(id, btn) {
+    const list = getFeedbacks();
+    const fb = list.find(f => f.id === id);
+    if (!fb) return;
+    if (fb.voted) {
+        fb.votes = Math.max(0, fb.votes - 1);
+        fb.voted = false;
+        btn.classList.remove('voted');
+    } else {
+        fb.votes += 1;
+        fb.voted = true;
+        btn.classList.add('voted');
+    }
+    btn.textContent = `👍 ${fb.votes}`;
+    saveFeedbacks(list);
+    updateStats();
+    // Update vote count label
+    const label = btn.nextElementSibling;
+    if (label) label.textContent = fb.votes === 1 ? '1 vote' : `${fb.votes} votes`;
+}
+
+function deleteFeedback(id) {
+    const list = getFeedbacks().filter(f => f.id !== id);
+    saveFeedbacks(list);
+    const card = document.getElementById(`fb-${id}`);
+    if (card) {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(-8px)';
+        card.style.transition = 'all 0.25s';
+        setTimeout(() => { card.remove(); updateStats(); renderFeedbacks(); }, 250);
+    }
+    showToast('Feedback supprimé.');
+}
+
+function updateStats() {
+    const list = getFeedbacks();
+    document.getElementById('stat-total').textContent = list.length;
+    document.getElementById('stat-votes').textContent = list.reduce((s, f) => s + f.votes, 0);
+    document.getElementById('stat-bugs').textContent  = list.filter(f => f.type === 'bug').length;
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══ INIT ═══
+renderFeedbacks();
+updateStats();
+</script>
+</body>
+</html>

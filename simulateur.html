@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur CNC 3D — CNC Académie</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--or:#f97316;--in:#6366f1;--mn:'Space Mono',monospace;--dp:'Barlow Condensed',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Barlow',sans-serif;background:#030712;color:#e2e8f0;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+.logo{font-family:var(--dp);font-weight:900;font-size:1.25rem;letter-spacing:-.02em;}
+.dd-wrap{position:relative;}
+.dd-menu{display:none;position:absolute;right:0;top:calc(100% + 4px);width:14rem;background:#1e293b;border-radius:.65rem;box-shadow:0 16px 32px rgba(0,0,0,.6);border:1px solid #334155;z-index:200;overflow:hidden;}
+.dd-wrap:hover .dd-menu{display:block;}
+.dd-item{display:block;padding:.5rem .85rem;border-bottom:1px solid #0f172a;text-decoration:none;}
+.dd-item:hover{background:#0f172a;}
+.dd-n{font-family:var(--mn);font-size:.5rem;color:var(--or);text-transform:uppercase;letter-spacing:.08em;display:block;}
+.dd-t{font-size:.76rem;color:#94a3b8;}
+.dd-p .dd-n{color:var(--in);}
+.panel{background:#0a0f1e;border:1px solid #1e293b;border-radius:9px;padding:.75rem;}
+.ptitle{font-family:var(--mn);font-size:.5rem;color:#475569;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;}
+.lcd{font-family:var(--mn);font-size:1.2rem;font-weight:700;color:var(--or);text-shadow:0 0 8px rgba(249,115,22,.4);}
+.lcds{font-family:var(--mn);font-size:.82rem;font-weight:700;}
+.inp{background:#020817;border:1px solid #1e293b;border-radius:5px;color:#e2e8f0;font-family:var(--mn);font-size:.68rem;padding:.3rem .5rem;width:100%;outline:none;}
+.inp:focus{border-color:var(--or);}
+select.inp{cursor:pointer;}
+.lbl{font-family:var(--mn);font-size:.48rem;color:#475569;text-transform:uppercase;display:block;margin-bottom:.1rem;}
+.btn-run{background:var(--or);color:#fff;font-family:var(--dp);font-weight:900;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;padding:.6rem 0;border-radius:7px;border:none;cursor:pointer;width:100%;transition:background .15s;}
+.btn-run:hover{background:#ea6c0a;}
+.btn2{background:#1e293b;color:#94a3b8;font-family:var(--dp);font-weight:700;font-size:.72rem;text-transform:uppercase;padding:.5rem 0;border-radius:7px;border:1px solid #334155;cursor:pointer;width:100%;transition:all .15s;}
+.btn2:hover{border-color:#64748b;color:#e2e8f0;}
+.mtab{font-family:var(--mn);font-size:.56rem;text-transform:uppercase;letter-spacing:.07em;padding:.35rem .85rem;border-radius:5px;cursor:pointer;border:none;transition:all .15s;}
+.mtab.on{background:var(--or);color:#fff;}
+.mtab.off{background:#1e293b;color:#64748b;}
+.mtab.off:hover{color:#94a3b8;}
+.vbtn{font-family:var(--mn);font-size:.5rem;text-transform:uppercase;letter-spacing:.06em;padding:.22rem .5rem;border-radius:4px;cursor:pointer;background:#1e293b;color:#64748b;border:1px solid #334155;transition:all .15s;white-space:nowrap;}
+.vbtn:hover{border-color:var(--or);color:var(--or);}
+.led{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.led-g{background:#10b981;box-shadow:0 0 5px #10b981;}
+.led-o{background:var(--or);box-shadow:0 0 5px var(--or);}
+.led-off{background:#334155;}
+#gc{font-family:var(--mn);font-size:10px;line-height:1.75;background:#020817;color:#6ee7b7;border:1px solid #1e293b;border-radius:7px;padding:.75rem;outline:none;resize:none;width:100%;caret-color:var(--or);}
+#gc:focus{border-color:var(--or);}
+#alarm-ov{display:none;position:absolute;inset:0;background:rgba(127,29,29,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;z-index:100;}
+#alarm-ov.show{display:flex;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:#010309;}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:2px;}
+input[type=range]{accent-color:var(--or);width:100%;cursor:pointer;}
+#pb{height:2px;background:var(--or);transition:width .25s;width:0%;}
+@keyframes alm{0%,100%{opacity:1}50%{opacity:.3}}
+.alm{animation:alm .8s infinite;}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav style="background:#030712;border-bottom:1px solid #1e293b;flex-shrink:0;z-index:50;position:relative;">
+  <div style="padding:.5rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:.65rem;">
+    <div style="display:flex;align-items:center;gap:.6rem;">
+      <a href="index.html" class="logo" style="color:white;text-decoration:none;">CNC<span style="color:var(--or)">ACADÉMIE</span></a>
+      <div style="height:15px;width:1px;background:#1e293b;"></div>
+      <div style="display:flex;gap:.18rem;background:#0a0f1e;padding:.16rem;border-radius:6px;border:1px solid #1e293b;">
+        <button class="mtab on" id="tf" onclick="switchMode('fraise')">⬛ Fraisage</button>
+        <button class="mtab off" id="tt" onclick="switchMode('tour')">⭕ Tournage</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:.65rem;">
+      <a href="index.html" style="color:#64748b;font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;text-decoration:none;">Accueil</a>
+      <a href="dictionnaire.html" style="color:#64748b;font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;text-decoration:none;">Codes G/M</a>
+      <div class="dd-wrap">
+        <button style="background:none;border:none;color:#64748b;font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;cursor:pointer;display:flex;align-items:center;gap:.18rem;">
+          Cours<svg style="width:10px;height:10px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="dd-menu">
+          <div style="padding:.3rem .65rem .12rem;font-family:var(--mn);font-size:.48rem;color:#475569;text-transform:uppercase;letter-spacing:.1em;">Bases</div>
+          <a href="lecon1.html" class="dd-item"><span class="dd-n">L.01</span><span class="dd-t">Les Axes</span></a>
+          <a href="lecon2.html" class="dd-item"><span class="dd-n">L.02</span><span class="dd-t">G54 Zéro Pièce</span></a>
+          <a href="lecon3.html" class="dd-item"><span class="dd-n">L.03</span><span class="dd-t">Avances F/S</span></a>
+          <a href="lecon4.html" class="dd-item"><span class="dd-n">L.04</span><span class="dd-t">Compensation G41/G42</span></a>
+          <a href="lecon5.html" class="dd-item"><span class="dd-n">L.05</span><span class="dd-t">Cycles Perçage</span></a>
+          <a href="lecon6.html" class="dd-item"><span class="dd-n">L.06</span><span class="dd-t">Sous-Programmes M98</span></a>
+          <a href="lecon7.html" class="dd-item"><span class="dd-n">L.07</span><span class="dd-t">Sécurité</span></a>
+          <div style="padding:.3rem .65rem .12rem;font-family:var(--mn);font-size:.48rem;color:var(--in);text-transform:uppercase;letter-spacing:.1em;border-top:1px solid #0f172a;margin-top:.18rem;">Expert PRO</div>
+          <a href="lecon8.html" class="dd-item dd-p"><span class="dd-n">L.08</span><span class="dd-t">G96/G97</span></a>
+          <a href="lecon9.html" class="dd-item dd-p"><span class="dd-n">L.09</span><span class="dd-t">Filetage G76</span></a>
+          <a href="lecon10.html" class="dd-item dd-p"><span class="dd-n">L.10</span><span class="dd-t">Paramétré</span></a>
+        </div>
+      </div>
+      <a href="feedback.html" style="color:#64748b;font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;text-decoration:none;">FAQ</a>
+      <a href="mentions-legales.html" style="color:#64748b;font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;text-decoration:none;">Légal</a>
+      <div style="display:flex;align-items:center;gap:.3rem;"><div class="led led-g"></div><span style="font-family:var(--mn);font-size:.48rem;color:#334155;">Fanuc 0i</span></div>
+    </div>
+  </div>
+  <div style="height:2px;background:#0a0f1e;"><div id="pb"></div></div>
+</nav>
+
+<!-- ═══ MAIN LAYOUT ═══ -->
+<div style="flex:1;display:flex;overflow:hidden;min-height:0;">
+
+  <!-- LEFT -->
+  <div style="width:182px;flex-shrink:0;overflow-y:auto;background:#030712;border-right:1px solid #1e293b;padding:.45rem;display:flex;flex-direction:column;gap:.4rem;">
+
+    <div class="panel">
+      <div class="ptitle">Position G54</div>
+      <div style="display:flex;flex-direction:column;gap:.28rem;">
+        <div style="background:#020817;border:1px solid #1e293b;border-radius:5px;padding:.3rem .55rem;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-family:var(--mn);font-size:.58rem;color:#475569;font-weight:700;">X</span><span class="lcd" id="dx">0.000</span>
+        </div>
+        <div id="dyw" style="background:#020817;border:1px solid #1e293b;border-radius:5px;padding:.3rem .55rem;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-family:var(--mn);font-size:.58rem;color:#475569;font-weight:700;">Y</span><span class="lcd" id="dy">0.000</span>
+        </div>
+        <div style="background:#020817;border:1px solid #1e293b;border-radius:5px;padding:.3rem .55rem;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-family:var(--mn);font-size:.58rem;color:#475569;font-weight:700;">Z</span><span class="lcd" id="dz">0.000</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ptitle">Coupe</div>
+      <div style="display:flex;flex-direction:column;gap:.25rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;background:#020817;border:1px solid #1e293b;border-radius:5px;padding:.28rem .55rem;">
+          <span style="font-family:var(--mn);font-size:.53rem;color:#475569;">S</span>
+          <div><span class="lcds" id="ss" style="color:#818cf8;">0</span><span style="font-family:var(--mn);font-size:.45rem;color:#334155;margin-left:.15rem;">tr/min</span></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;background:#020817;border:1px solid #1e293b;border-radius:5px;padding:.28rem .55rem;">
+          <span style="font-family:var(--mn);font-size:.53rem;color:#475569;">F</span>
+          <div><span class="lcds" id="sf" style="color:#34d399;">0</span><span style="font-family:var(--mn);font-size:.45rem;color:#334155;margin-left:.15rem;">mm</span></div>
+        </div>
+        <div style="display:flex;gap:.22rem;">
+          <div style="flex:1;background:#020817;border:1px solid #1e293b;border-radius:5px;padding:.22rem;display:flex;align-items:center;justify-content:center;gap:.22rem;">
+            <div class="led led-off" id="ls"></div><span style="font-family:var(--mn);font-size:.45rem;color:#334155;">Broche</span>
+          </div>
+          <div style="flex:1;background:#020817;border:1px solid #1e293b;border-radius:5px;padding:.22rem;display:flex;align-items:center;justify-content:center;gap:.22rem;">
+            <div class="led led-off" id="lc"></div><span style="font-family:var(--mn);font-size:.45rem;color:#334155;">Arrosage</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ptitle">⬛ Brut</div>
+      <div id="bf" style="display:flex;flex-direction:column;gap:.25rem;">
+        <div><span class="lbl">Long. X (mm)</span><input type="number" class="inp" id="blx" value="100" min="10" max="400"></div>
+        <div><span class="lbl">Larg. Y (mm)</span><input type="number" class="inp" id="bly" value="100" min="10" max="400"></div>
+        <div><span class="lbl">Haut. Z (mm)</span><input type="number" class="inp" id="blz" value="40" min="5" max="200"></div>
+      </div>
+      <div id="bt" style="display:none;flex-direction:column;gap:.25rem;">
+        <div><span class="lbl">Diamètre (mm)</span><input type="number" class="inp" id="bdi" value="60" min="5" max="300"></div>
+        <div><span class="lbl">Longueur Z (mm)</span><input type="number" class="inp" id="blo" value="120" min="10" max="500"></div>
+      </div>
+      <div style="margin-top:.3rem;"><span class="lbl">Matière</span>
+        <select class="inp" id="bmt">
+          <option value="alu">Aluminium 6061</option>
+          <option value="acier">Acier S235</option>
+          <option value="inox">Inox 316L</option>
+          <option value="cuivre">Cuivre</option>
+          <option value="plastique">POM Plastique</option>
+          <option value="bois">Bois / MDF</option>
+        </select>
+      </div>
+      <div style="margin-top:.25rem;"><span class="lbl">Diam. outil (mm)</span><input type="number" class="inp" id="btl" value="10" min="1" max="50"></div>
+      <button onclick="applyBillet()" style="margin-top:.38rem;width:100%;padding:.38rem 0;border-radius:6px;font-family:var(--mn);font-size:.52rem;text-transform:uppercase;letter-spacing:.07em;background:rgba(249,115,22,.12);color:var(--or);border:1px solid rgba(249,115,22,.3);cursor:pointer;">Appliquer ▶</button>
+    </div>
+
+    <div class="panel">
+      <div class="ptitle">Vitesse sim.</div>
+      <input type="range" id="spd" min="1" max="10" value="5" oninput="document.getElementById('spl').textContent='×'+this.value">
+      <div style="display:flex;justify-content:space-between;margin-top:.15rem;">
+        <span style="font-family:var(--mn);font-size:.45rem;color:#334155;">Lent</span>
+        <span style="font-family:var(--mn);font-size:.45rem;color:var(--or);" id="spl">×5</span>
+        <span style="font-family:var(--mn);font-size:.45rem;color:#334155;">Rapide</span>
+      </div>
+    </div>
+
+  </div><!-- end LEFT -->
+
+  <!-- CENTER -->
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">
+    <div style="background:#0a0f1e;border-bottom:1px solid #1e293b;padding:.28rem .6rem;display:flex;align-items:center;gap:.32rem;flex-wrap:wrap;flex-shrink:0;">
+      <span style="font-family:var(--mn);font-size:.48rem;color:#334155;text-transform:uppercase;letter-spacing:.1em;">VUE:</span>
+      <button class="vbtn" onclick="setView('p')">Perspective</button>
+      <button class="vbtn" onclick="setView('t')">Dessus</button>
+      <button class="vbtn" onclick="setView('f')">Face</button>
+      <button class="vbtn" onclick="setView('s')">Côté</button>
+      <button class="vbtn" onclick="setView('i')">ISO</button>
+      <div style="flex:1;"></div>
+      <button class="vbtn" onclick="toggleWire()">Fil de fer</button>
+      <button class="vbtn" onclick="clearCuts()">Effacer coupes</button>
+    </div>
+
+    <div id="cw" style="flex:1;position:relative;overflow:hidden;">
+      <canvas id="c3"></canvas>
+      <div style="position:absolute;top:.45rem;left:.45rem;display:flex;flex-direction:column;gap:.22rem;pointer-events:none;">
+        <div style="background:rgba(0,0,0,.7);backdrop-filter:blur(4px);padding:.22rem .55rem;border-radius:4px;font-family:var(--mn);font-size:.56rem;">
+          <span id="ovm" style="color:var(--or);">FRAISAGE</span>
+          <span style="color:#334155;margin:0 .3rem;">·</span>
+          <span id="ovt" style="color:#64748b;">Aluminium</span>
+        </div>
+        <div style="background:rgba(0,0,0,.7);backdrop-filter:blur(4px);padding:.22rem .55rem;border-radius:4px;font-family:var(--mn);font-size:.56rem;color:#64748b;" id="ovb">100×100×40 mm</div>
+      </div>
+      <div style="position:absolute;bottom:.4rem;right:.55rem;font-family:var(--mn);font-size:.45rem;color:#1e293b;pointer-events:none;">🖱 Orbite · Scroll=Zoom · Clic droit=Pan · ←→↑↓=Déplacer · R=Reset vue</div>
+      <!-- GIZMO XYZ -->
+      <canvas id="gizmo" width="90" height="90" style="position:absolute;bottom:.5rem;left:.5rem;cursor:pointer;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);border:1px solid #1e293b;" title="Cliquer pour changer de vue"></canvas>
+      <div id="alarm-ov">
+        <div style="background:#450a0a;border:2px solid #dc2626;border-radius:12px;padding:1.5rem;text-align:center;max-width:280px;">
+          <div class="alm" style="font-size:2.2rem;margin-bottom:.5rem;">⚠</div>
+          <div style="font-family:var(--mn);font-size:.68rem;color:#fca5a5;font-weight:700;text-transform:uppercase;margin-bottom:.35rem;">ALARME CNC</div>
+          <div id="alm" style="font-family:var(--mn);font-size:.6rem;color:#f87171;margin-bottom:.85rem;line-height:1.5;"></div>
+          <button onclick="doReset()" style="background:#dc2626;color:white;border:none;padding:.4rem 1.2rem;border-radius:5px;font-family:var(--mn);font-size:.6rem;text-transform:uppercase;cursor:pointer;">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="con" style="height:52px;background:#020817;border-top:1px solid #1e293b;padding:.3rem .6rem;overflow-y:auto;flex-shrink:0;font-family:var(--mn);font-size:9px;color:#334155;white-space:pre-wrap;">[SYS] Contrôleur CNC Académie opérationnel.
+</div>
+  </div>
+
+  <!-- RIGHT -->
+  <div style="width:225px;flex-shrink:0;display:flex;flex-direction:column;background:#030712;border-left:1px solid #1e293b;overflow:hidden;">
+    <div style="padding:.45rem .6rem .32rem;border-bottom:1px solid #1e293b;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <span style="font-family:var(--mn);font-size:.52rem;color:#475569;text-transform:uppercase;letter-spacing:.1em;">G-Code</span>
+      <button onclick="loadEx()" style="font-family:var(--mn);font-size:.52rem;color:var(--in);background:none;border:none;cursor:pointer;">Exemple</button>
+    </div>
+    <div style="flex:1;padding:.4rem;overflow:hidden;display:flex;flex-direction:column;min-height:0;">
+      <textarea id="gc" style="flex:1;min-height:0;" spellcheck="false"></textarea>
+    </div>
+    <div style="margin:.32rem .42rem;background:#0a0f1e;border:1px solid #1e293b;border-radius:7px;padding:.5rem .65rem;position:relative;flex-shrink:0;">
+      <div style="font-family:var(--mn);font-size:.48rem;color:#334155;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.18rem;">Diagnostic</div>
+      <div id="diag" style="font-family:var(--mn);font-size:.6rem;color:#475569;">Aucune alarme.</div>
+      <div id="dl" class="led led-off" style="position:absolute;top:.5rem;right:.5rem;"></div>
+    </div>
+    <div style="padding:.32rem .42rem;display:flex;flex-direction:column;gap:.25rem;flex-shrink:0;">
+      <button class="btn-run" onclick="runCycle()">▶ CYCLE START</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.25rem;">
+        <button class="btn2" onclick="togglePause()" id="bpa">⏸ Pause</button>
+        <button class="btn2" onclick="doReset()">↺ Reset</button>
+      </div>
+    </div>
+    <div style="padding:.32rem .42rem .42rem;flex-shrink:0;border-top:1px solid #1e293b;">
+      <div style="font-family:var(--mn);font-size:.48rem;color:#334155;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.22rem;">Exécution</div>
+      <div id="el" style="font-family:var(--mn);font-size:9px;color:#334155;overflow-y:auto;max-height:82px;"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// GLOBALS
+// ═══════════════════════════════════════════════════════
+var mode = 'fraise';
+var pos  = {x:0, y:0, z:0};
+var spOn = false, coOn = false;
+var lathePrevZ = 0; // position Z précédente pour segments de tournage
+var running = false, paused = false;
+var eTmr = null;
+var BP   = {lx:100, ly:100, lz:40, diam:60, lon:120};
+var toolR = 5;
+
+// Three.js objects — all global so every function can access them
+var scene, camera, renderer, toolMesh, trailGrp, cutGrp, billetMesh;
+var lastTP = new THREE.Vector3();
+var orb = {a:false, r:false, lx:0, ly:0};
+var sph = {th: Math.PI/4, ph: Math.PI/3.5, r: 260};
+var pan = {x:0, y:0};
+
+var MC = {alu:0x9eb8cc, acier:0x78909c, inox:0xa0b4bc, cuivre:0xb87333, plastique:0xe0d8c8, bois:0xc4956a};
+var MR = {alu:.35, acier:.55, inox:.3, cuivre:.3, plastique:.8, bois:.9};
+var MM = {alu:.55, acier:.65, inox:.6, cuivre:.6, plastique:0, bois:0};
+var MN = {alu:'Aluminium', acier:'Acier', inox:'Inox', cuivre:'Cuivre', plastique:'POM', bois:'Bois'};
+
+// ═══════════════════════════════════════════════════════
+// THREE.JS INIT
+// ═══════════════════════════════════════════════════════
+function initThree() {
+  var canvas = document.getElementById('c3');
+  renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.setClearColor(0x010309);
+
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(45, 1, 0.5, 5000);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x1a2744, 1.1));
+  var dl = new THREE.DirectionalLight(0xffffff, 1.7);
+  dl.position.set(200, 300, 200);
+  dl.castShadow = true;
+  dl.shadow.mapSize.set(2048, 2048);
+  scene.add(dl);
+  var fl = new THREE.DirectionalLight(0x3060a0, 0.5);
+  fl.position.set(-200, 100, -100);
+  scene.add(fl);
+
+  // Grid + axes
+  scene.add(new THREE.GridHelper(500, 50, 0x0f1f3d, 0x0a1525));
+  scene.add(new THREE.AxesHelper(55));
+
+  // Tool mesh (fraise cylindrique)
+  var tg = new THREE.CylinderGeometry(1.5, 1.5, 18, 12);
+  var tm = new THREE.MeshPhongMaterial({color: 0xffd700, shininess: 120});
+  toolMesh = new THREE.Mesh(tg, tm);
+  toolMesh.rotation.x = Math.PI / 2; // pointe vers le bas
+  scene.add(toolMesh);
+
+  // Groups pour trails et coupes
+  trailGrp = new THREE.Group();
+  scene.add(trailGrp);
+
+  cutGrp = new THREE.Group();
+  scene.add(cutGrp);
+
+  // billetMesh sera créé dans buildBillet()
+
+  setupOrbit(canvas);
+  resizeR();
+
+  // Boucle de rendu
+  initGizmo();
+  (function loop() {
+    requestAnimationFrame(loop);
+    if (spOn && mode==='fraise') toolMesh.rotation.z += 0.1; // fraise tourne, pas le tour
+    renderer.render(scene, camera);
+    drawGizmo();
+  })();
+}
+
+
+// ── Navigation clavier ────────────────────────────────
+// Flèches = pan, +/- = zoom, PageUp/Down = orbite verticale
+window.addEventListener('keydown', function(e) {
+  // Ne pas interférer si on tape dans le textarea
+  if (document.activeElement && document.activeElement.id === 'gc') return;
+  var panStep = 8, zoomStep = 15, orbitStep = 0.06;
+  var changed = true;
+  switch(e.key) {
+    case 'ArrowLeft':  pan.x -= panStep; break;
+    case 'ArrowRight': pan.x += panStep; break;
+    case 'ArrowUp':    pan.y -= panStep; break;   // pan haut (Y inversé)
+    case 'ArrowDown':  pan.y += panStep; break;
+    case '+': case '=': sph.r = Math.max(30,  sph.r - zoomStep); break;
+    case '-': case '_': sph.r = Math.min(1500, sph.r + zoomStep); break;
+    case 'PageUp':   sph.ph = Math.max(0.05, sph.ph - orbitStep); break;
+    case 'PageDown': sph.ph = Math.min(Math.PI/2-0.01, sph.ph + orbitStep); break;
+    case 'r': case 'R': // reset view
+      pan.x=0; pan.y=0; sph.th=Math.PI/4; sph.ph=Math.PI/3.5; sph.r=260; break;
+    default: changed = false;
+  }
+  if (changed) { camUpdate(); e.preventDefault(); }
+});
+
+function resizeR() {
+  var wrap = document.getElementById('cw');
+  var w = wrap.clientWidth, h = wrap.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+
+function camUpdate() {
+  camera.position.x = sph.r * Math.sin(sph.ph) * Math.sin(sph.th) + pan.x;
+  camera.position.y = sph.r * Math.cos(sph.ph);
+  camera.position.z = sph.r * Math.sin(sph.ph) * Math.cos(sph.th) + pan.y;
+  var lookX, lookY;
+  if (mode === 'tour') {
+    lookX = BP.lon / 2 + pan.x;  // centre longueur cylindre
+    lookY = 0;
+  } else {
+    lookX = pan.x;
+    lookY = BP.lz / 2;           // mi-hauteur brut fraisage
+  }
+  camera.lookAt(lookX, lookY, pan.y);
+}
+
+function setupOrbit(cv) {
+  cv.addEventListener('mousedown', function(e) {
+    orb.a = true; orb.r = (e.button === 2);
+    orb.lx = e.clientX; orb.ly = e.clientY;
+  });
+  cv.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+  window.addEventListener('mouseup', function() { orb.a = false; });
+  window.addEventListener('mousemove', function(e) {
+    if (!orb.a) return;
+    var dx = e.clientX - orb.lx, dy = e.clientY - orb.ly;
+    orb.lx = e.clientX; orb.ly = e.clientY;
+    if (orb.r) { pan.x -= dx * 0.4; pan.y += dy * 0.4; }
+    else {
+      sph.th -= dx * 0.008;
+      sph.ph = Math.max(0.05, Math.min(Math.PI/2 - 0.01, sph.ph - dy * 0.006));
+    }
+    camUpdate();
+  });
+  cv.addEventListener('wheel', function(e) {
+    sph.r = Math.max(30, Math.min(1500, sph.r + e.deltaY * 0.5));
+    camUpdate();
+    e.preventDefault();
+  }, {passive: false});
+  // Touch
+  var lt = [];
+  cv.addEventListener('touchstart', function(e) { lt = Array.from(e.touches); });
+  cv.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 1) {
+      sph.th -= (e.touches[0].clientX - lt[0].clientX) * 0.012;
+      sph.ph = Math.max(0.05, Math.min(Math.PI/2-0.01, sph.ph - (e.touches[0].clientY - lt[0].clientY) * 0.009));
+      camUpdate();
+    } else if (e.touches.length === 2) {
+      var d0 = Math.hypot(lt[0].clientX-lt[1].clientX, lt[0].clientY-lt[1].clientY);
+      var d1 = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+      sph.r = Math.max(30, Math.min(1500, sph.r - (d1 - d0)));
+      camUpdate();
+    }
+    lt = Array.from(e.touches);
+    e.preventDefault();
+  }, {passive: false});
+}
+
+function setView(v) {
+  pan.x = 0; pan.y = 0;
+  var r = sph.r;
+  if      (v==='t') { sph.ph=0.01;          sph.th=0; }
+  else if (v==='f') { sph.ph=Math.PI/2-0.01; sph.th=0; }
+  else if (v==='s') { sph.ph=Math.PI/2-0.01; sph.th=Math.PI/2; }
+  else if (v==='i') { sph.ph=Math.PI/4;      sph.th=Math.PI/4; }
+  else              { sph.ph=Math.PI/3.5;     sph.th=Math.PI/4; }
+  sph.r = r;
+  camUpdate();
+}
+
+function toggleWire() {
+  if (billetMesh) billetMesh.material.wireframe = !billetMesh.material.wireframe;
+}
+
+// ═══════════════════════════════════════════════════════
+// BILLET — brut solide lisse
+// ═══════════════════════════════════════════════════════
+function buildBillet() {
+  // Supprimer l'ancien brut
+  if (billetMesh) {
+    scene.remove(billetMesh);
+    billetMesh.geometry.dispose();
+    billetMesh.material.dispose();
+    billetMesh = null;
+  }
+  // Vider les coupes
+  clearCutsOnly();
+  lathePrevZ = 0; // reset position tournage
+
+  var mat = document.getElementById('bmt').value;
+  toolR = (parseFloat(document.getElementById('btl').value) || 10) / 2;
+
+  var geo, px = 0, py = 0, pz = 0, rx = 0, ry = 0, rz = 0;
+
+  if (mode === 'fraise') {
+    var lx = parseFloat(document.getElementById('blx').value) || 100;
+    var ly = parseFloat(document.getElementById('bly').value) || 100;
+    var lz = parseFloat(document.getElementById('blz').value) || 40;
+    BP.lx = lx; BP.ly = ly; BP.lz = lz;
+    // BoxGeometry: centré → repositionner pour que Y=0 soit le bas
+    geo = new THREE.BoxGeometry(lx, lz, ly);
+    px = 0; py = lz / 2; pz = 0;
+    document.getElementById('ovb').textContent = lx + '×' + ly + '×' + lz + ' mm';
+  } else {
+    var diam = parseFloat(document.getElementById('bdi').value) || 60;
+    var lon  = parseFloat(document.getElementById('blo').value) || 120;
+    BP.diam = diam; BP.lon = lon; BP.lx = lon; BP.ly = diam; BP.lz = diam;
+    // Cylindre horizontal (axe X = longueur)
+    geo = new THREE.CylinderGeometry(diam/2, diam/2, lon, 64);
+    rz = Math.PI / 2; // coucher le cylindre sur l'axe X
+    px = lon / 2; py = 0; pz = 0;
+    document.getElementById('ovb').textContent = 'Ø' + diam + '×' + lon + ' mm';
+  }
+
+  var matObj = new THREE.MeshStandardMaterial({
+    color:       MC[mat] || 0xb0c4de,
+    roughness:   MR[mat] || 0.5,
+    metalness:   MM[mat] || 0,
+    transparent: true,
+    opacity:     0.88,
+    side:        THREE.DoubleSide
+  });
+
+  billetMesh = new THREE.Mesh(geo, matObj);
+  billetMesh.position.set(px, py, pz);
+  billetMesh.rotation.set(rx, ry, rz);
+  billetMesh.castShadow  = true;
+  billetMesh.receiveShadow = true;
+  scene.add(billetMesh);
+
+  // Arêtes wireframe
+  var eg = new THREE.EdgesGeometry(geo);
+  var em = new THREE.LineBasicMaterial({color: 0x2a3f55});
+  billetMesh.add(new THREE.LineSegments(eg, em));
+
+  document.getElementById('ovt').textContent = MN[mat] || mat;
+  camUpdate();
+}
+
+function applyBillet() {
+  buildBillet();
+  resetToolPos();
+  clog('SYS', 'Brut rechargé.', '#475569');
+}
+
+// ═══════════════════════════════════════════════════════
+// COUPES — volumes usinés visibles
+// ═══════════════════════════════════════════════════════
+function addCut(np) {
+  if (mode === 'fraise') {
+    var lz  = BP.lz;
+    var wx  = np.x;  // position latérale G-code X
+    var wz  = np.y;  // position profondeur G-code Y
+    // Hauteur pointe outil dans Three.js
+    // Surface brut = lz, G-code Z=0 → pointe à lz, Z=-10 → pointe à lz-10
+    var toolTipY = lz + np.z;
+    if (toolTipY >= lz) return;  // outil au-dessus du brut, rien à couper
+    toolTipY = Math.max(toolTipY, 0); // plancher à 0
+
+    var cutDepth = lz - toolTipY;
+    if (cutDepth <= 0.1) return;
+
+    // Parois intérieures du trou (cylindre BackSide)
+    var wallGeo = new THREE.CylinderGeometry(toolR, toolR, cutDepth, 24, 1, true);
+    var wallMat = new THREE.MeshStandardMaterial({
+      color: 0x0a1825, roughness: 0.95, metalness: 0.05, side: THREE.BackSide
+    });
+    var wall = new THREE.Mesh(wallGeo, wallMat);
+    wall.position.set(wx, toolTipY + cutDepth / 2, wz);
+    cutGrp.add(wall);
+
+    // Fond du trou
+    var fdGeo = new THREE.CircleGeometry(toolR, 24);
+    var fdMat = new THREE.MeshStandardMaterial({color: 0x050e18, roughness: 0.95, side: THREE.DoubleSide});
+    var fd = new THREE.Mesh(fdGeo, fdMat);
+    fd.rotation.x = -Math.PI / 2;
+    fd.position.set(wx, toolTipY + 0.1, wz);
+    cutGrp.add(fd);
+
+    // Ouverture surface (disque sombre au niveau de la surface)
+    var opGeo = new THREE.CircleGeometry(toolR, 24);
+    var opMat = new THREE.MeshStandardMaterial({color: 0x030810, roughness: 1, side: THREE.DoubleSide});
+    var op = new THREE.Mesh(opGeo, opMat);
+    op.rotation.x = -Math.PI / 2;
+    op.position.set(wx, lz + 0.3, wz);
+    cutGrp.add(op);
+
+  } else {
+    // TOURNAGE — construire un segment cylindrique entre prevZ et toolZ
+    var toolX   = np.z;         // G-code Z → Three.js X (longueur)
+    var targetR = np.x / 2;     // G-code X = diamètre → rayon
+    var origR   = BP.diam / 2;
+    var prevX   = lathePrevZ;   // position Z précédente en Three.js X
+
+    // Mettre à jour la position Z précédente
+    lathePrevZ = toolX;
+
+    if (targetR >= origR) return; // pas de matière à enlever
+    targetR = Math.max(0, targetR);
+
+    var segLen = Math.abs(toolX - prevX);
+    var segCx  = (toolX + prevX) / 2;  // centre du segment
+
+    // Si le segment a une longueur, créer un tube cylindrique
+    if (segLen > 0.5) {
+      // Matière enlevée: tube entre origR et targetR, longueur segLen
+      // Visible depuis tous les angles
+      var tubeGeo = new THREE.CylinderGeometry(origR, origR, segLen, 48, 1, true);
+      var tubeMat = new THREE.MeshStandardMaterial({
+        color: 0x040b12, roughness: 0.95, side: THREE.BackSide
+      });
+      var tube = new THREE.Mesh(tubeGeo, tubeMat);
+      tube.rotation.z = Math.PI / 2;
+      tube.position.set(segCx, 0, 0);
+      cutGrp.add(tube);
+
+      // Surface usinée (cylindre intérieur à targetR)
+      var surfGeo = new THREE.CylinderGeometry(targetR, targetR, segLen, 48, 1, false);
+      var surfMat = new THREE.MeshStandardMaterial({
+        color: 0x0d1f2d, roughness: 0.85, metalness: 0.15, side: THREE.FrontSide
+      });
+      var surf = new THREE.Mesh(surfGeo, surfMat);
+      surf.rotation.z = Math.PI / 2;
+      surf.position.set(segCx, 0, 0);
+      cutGrp.add(surf);
+    }
+
+    // Anneau de fond à la position actuelle (section transversale)
+    if (targetR < origR) {
+      var ringGeo = new THREE.RingGeometry(targetR, origR, 48);
+      var ringMat = new THREE.MeshStandardMaterial({
+        color: 0x040b12, roughness: 1, side: THREE.DoubleSide
+      });
+      var ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.rotation.y = Math.PI / 2;
+      ring.position.set(toolX, 0, 0);
+      cutGrp.add(ring);
+    }
+  }
+}
+
+function clearCutsOnly() {
+  while (cutGrp && cutGrp.children.length) {
+    var c = cutGrp.children[0];
+    if (c.geometry) c.geometry.dispose();
+    if (c.material)  c.material.dispose();
+    cutGrp.remove(c);
+  }
+}
+
+function clearCuts() {
+  clearCutsOnly();
+  while (trailGrp.children.length) {
+    var c = trailGrp.children[0];
+    if (c.geometry) c.geometry.dispose();
+    if (c.material)  c.material.dispose();
+    trailGrp.remove(c);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// G-CODE ENGINE
+// ═══════════════════════════════════════════════════════
+var OKG = 'all'; // accepte tous les codes G
+var OKM = 'all'; // accepte tous les codes M
+
+function parseLine(raw) {
+  var l = raw.trim().toUpperCase();
+  if (!l || l[0]===';' || l[0]==='%') return null;
+  var clean = l.replace(/\([^)]*\)/g, '').trim();
+  if (!clean) return null;
+  var b = {}, re = /([A-Z])(-?[\d.]+)/g, m;
+  while ((m = re.exec(clean)) !== null) {
+    var lt = m[1], v = parseFloat(m[2]);
+    if (lt === 'G') {
+      if (OKG !== 'all' && OKG.indexOf(v) < 0) { continue; }
+      b['G'+v] = true;
+      if (v === 0) b.isRapid = true;
+    } else if (lt === 'M') {
+      if (OKM !== 'all' && OKM.indexOf(v) < 0) { continue; }
+      b['M'+v] = true;
+    } else {
+      b[lt] = v;
+    }
+  }
+  return b;
+}
+
+function moveToolTo(np, isRapid) {
+  var tx, ty, tz;
+  if (mode === 'fraise') {
+    // G-code X → Three X  (latéral)
+    // G-code Y → Three Z  (profondeur)
+    // G-code Z → Three Y  (hauteur depuis surface = lz + Z_gcode)
+    tx = np.x;
+    ty = BP.lz + np.z;  // Z=0 → surface, Z=-10 → 10mm dans le brut
+    tz = np.y;
+  } else {
+    // G-code Z → Three X (longueur axe pièce)
+    // G-code X = diamètre → rayon = X/2 → position Y dans Three.js
+    // Le brut est centré sur Y=0, surface extérieure à Y=diam/2
+    tx = np.z;
+    ty = np.x / 2;   // X gcode = diamètre, Three.js = rayon depuis centre
+    tz = 0;
+  }
+  toolMesh.position.set(tx, ty, tz);
+
+  // Trail
+  var from = lastTP.clone();
+  var to   = new THREE.Vector3(tx, ty, tz);
+  if (from.distanceTo(to) > 0.1) {
+    var g = new THREE.BufferGeometry().setFromPoints([from, to]);
+    var m = new THREE.LineBasicMaterial({
+      color:       isRapid ? 0xf59e0b : 0x10b981,
+      transparent: isRapid,
+      opacity:     isRapid ? 0.35 : 1
+    });
+    trailGrp.add(new THREE.Line(g, m));
+  }
+  lastTP.set(tx, ty, tz);
+
+  // Couper matière si en avance travail
+  if (!isRapid) addCut(np);
+}
+
+function resetToolPos() {
+  pos = {x:0, y:0, z:0};
+  lathePrevZ = 0; // reset position Z tournage
+  lastTP.set(0, 0, 0);
+  if (toolMesh) toolMesh.position.set(
+    0,
+    mode==='fraise' ? BP.lz : BP.diam/2,   // fraise: surface Z=lz / tour: surface rayon
+    0
+  );
+}
+
+function setSpindle(on) { spOn = on; document.getElementById('ls').className = 'led ' + (on ? 'led-o' : 'led-off'); }
+function setCoolant(on) { coOn = on; document.getElementById('lc').className = 'led ' + (on ? 'led-g' : 'led-off'); }
+
+function triggerAlarm(msg) {
+  document.getElementById('alarm-ov').classList.add('show');
+  document.getElementById('alm').textContent = msg;
+  document.getElementById('diag').textContent = msg;
+  document.getElementById('dl').className = 'led led-o alm';
+  clog('ALARM', msg, '#ef4444');
+  running = false;
+  if (eTmr) clearTimeout(eTmr);
+}
+
+function clearAlarm() {
+  document.getElementById('alarm-ov').classList.remove('show');
+  document.getElementById('diag').textContent = 'Aucune alarme.';
+  document.getElementById('dl').className = 'led led-off';
+}
+
+function clog(tag, msg, col) {
+  var el = document.getElementById('con');
+  el.innerHTML += '<span style="color:' + col + '">[' + tag + '] ' + msg + '</span>\n';
+  el.scrollTop = el.scrollHeight;
+}
+
+function setProg(p) { document.getElementById('pb').style.width = p + '%'; }
+
+// ═══════════════════════════════════════════════════════
+// CYCLE
+// ═══════════════════════════════════════════════════════
+function runCycle() {
+  if (running) return;
+  buildBillet();       // repart d'un brut propre
+  resetToolPos();
+  clearAlarm();
+  setSpindle(false); setCoolant(false);
+  running = true; paused = false;
+  document.getElementById('el').innerHTML = '';
+  document.getElementById('bpa').textContent = '⏸ Pause';
+  document.getElementById('bpa').style.color = '#94a3b8';
+
+  var lines  = document.getElementById('gc').value.split('\n');
+  var logEl  = document.getElementById('el');
+  var spd    = parseInt(document.getElementById('spd').value) || 5;
+  var base   = Math.round(500 / spd);
+
+  lines.forEach(function(l, i) {
+    var t = l.trim(); if (!t) return;
+    var d = document.createElement('div');
+    d.id = 'el' + i;
+    d.textContent = 'L' + (i+1) + ' ' + t.toUpperCase();
+    d.style.padding = '1px 0';
+    logEl.appendChild(d);
+  });
+
+  clog('CNC', 'Cycle Start ▶', '#f97316');
+  setProg(0);
+
+  function exec(i) {
+    if (!running || i >= lines.length) { running = false; setProg(100); return; }
+    if (paused) { eTmr = setTimeout(function(){ exec(i); }, 200); return; }
+
+    setProg(Math.round((i / lines.length) * 100));
+    var allLines = logEl.querySelectorAll('div');
+    allLines.forEach(function(d){ if (d.style.color === 'var(--or)') d.style.color = '#334155'; });
+    var le = document.getElementById('el' + i);
+    if (le) { le.style.color = 'var(--or)'; le.scrollIntoView({block:'nearest'}); }
+
+    var b = parseLine(lines[i]);
+    if (!b) { eTmr = setTimeout(function(){ exec(i+1); }, 10); return; }
+    if (b.err) {
+      if (le) le.style.color = '#ef4444';
+      triggerAlarm('L' + (i+1) + ': ' + b.err);
+      return;
+    }
+
+    var np = {x: pos.x, y: pos.y, z: pos.z};
+    var moved = false;
+    var isR = !!b.isRapid;
+
+    if (b.X !== undefined) { np.x = b.X; moved = true; }
+    if (b.Y !== undefined) { np.y = b.Y; moved = true; }
+    if (b.Z !== undefined) { np.z = b.Z; moved = true; }
+    if (mode === 'tour') np.y = 0;
+
+    if (moved) {
+      moveToolTo(np, isR);
+      pos.x = np.x; pos.y = np.y; pos.z = np.z;
+      document.getElementById('dx').textContent = pos.x.toFixed(3);
+      document.getElementById('dy').textContent = pos.y.toFixed(3);
+      document.getElementById('dz').textContent = pos.z.toFixed(3);
+    }
+    if (b.S !== undefined) document.getElementById('ss').textContent = b.S;
+    if (b.F !== undefined) document.getElementById('sf').textContent = (typeof b.F==='number') ? b.F.toFixed(2) : b.F;
+    if (b.M3 || b.M4) setSpindle(true);
+    if (b.M5) setSpindle(false);
+    if (b.M8) setCoolant(true);
+    if (b.M9) setCoolant(false);
+    if (b.M30) {
+      running = false; setSpindle(false); setCoolant(false);
+      if (le) le.style.color = '#22c55e';
+      clog('CNC', 'M30 — Programme terminé ✓', '#10b981');
+      setProg(100); return;
+    }
+    if (le) le.style.color = '#22c55e';
+
+    var delay = (moved && !isR) ? base : (moved ? Math.round(base*0.2) : 12);
+    eTmr = setTimeout(function(){ exec(i+1); }, delay);
+  }
+  exec(0);
+}
+
+function togglePause() {
+  paused = !paused;
+  var btn = document.getElementById('bpa');
+  btn.textContent = paused ? '▶ Reprendre' : '⏸ Pause';
+  btn.style.color  = paused ? 'var(--or)' : '#94a3b8';
+}
+
+function doReset() {
+  running = false; paused = false;
+  if (eTmr) clearTimeout(eTmr);
+  clearCuts();
+  resetToolPos();
+  clearAlarm();
+  setSpindle(false); setCoolant(false);
+  pos = {x:0, y:0, z:0};
+  ['dx','dy','dz'].forEach(function(id){ document.getElementById(id).textContent = '0.000'; });
+  document.getElementById('ss').textContent = '0';
+  document.getElementById('sf').textContent = '0';
+  document.getElementById('bpa').textContent = '⏸ Pause';
+  document.getElementById('bpa').style.color = '#94a3b8';
+  document.getElementById('el').innerHTML = '';
+  document.getElementById('con').textContent = '[SYS] Machine réinitialisée.\n';
+  setProg(0);
+  buildBillet();
+}
+
+// ═══════════════════════════════════════════════════════
+// MODE SWITCH
+// ═══════════════════════════════════════════════════════
+function switchMode(m) {
+  mode = m;
+  // Boutons nav
+  document.getElementById('tf').className = 'mtab ' + (m==='fraise' ? 'on' : 'off');
+  document.getElementById('tt').className = 'mtab ' + (m==='tour'   ? 'on' : 'off');
+  // DRO Y seulement en fraisage
+  document.getElementById('dyw').style.display = (m==='fraise') ? 'flex' : 'none';
+  // Panneaux brut
+  document.getElementById('bf').style.display = (m==='fraise') ? 'flex' : 'none';
+  document.getElementById('bt').style.display = (m==='tour')   ? 'flex' : 'none';
+  // Overlay
+  document.getElementById('ovm').textContent = (m==='fraise') ? 'FRAISAGE' : 'TOURNAGE';
+  // Orientation outil selon mode
+  if (toolMesh) {
+    if (m === 'fraise') {
+      toolMesh.rotation.set(Math.PI/2, 0, 0); // fraise verticale, pointe vers bas
+    } else {
+      toolMesh.rotation.set(0, 0, Math.PI/2);  // plaquette tournage, axe X
+    }
+  }
+  // Angle caméra
+  sph.th = (m==='tour') ? Math.PI/2.5 : Math.PI/4;
+  sph.ph = (m==='tour') ? Math.PI/4   : Math.PI/3.5;
+  // Stopper le cycle en cours
+  running = false; paused = false;
+  if (eTmr) clearTimeout(eTmr);
+  // Recharger exemple et reconstruire brut
+  loadEx();
+  buildBillet();
+  resetToolPos();
+  camUpdate();
+}
+
+// ═══════════════════════════════════════════════════════
+// EXEMPLES
+// ═══════════════════════════════════════════════════════
+function loadEx() {
+  var ex = {
+    fraise: "(CROIX + POCHE + TROUS)\nG21 G90 G40 G80\nG54 G00 X0 Y0 Z15\nM03 S2000 M08\n\n(RAINURE H)\nG00 X-45 Y0 Z15\nG01 Z-10 F150\nG01 X45 Y0 F400\nG00 Z15\n\n(RAINURE V)\nG00 X0 Y-45 Z15\nG01 Z-10 F150\nG01 X0 Y45 F400\nG00 Z15\n\n(POCHE)\nG00 X-12 Y-12 Z15\nG01 Z-18 F100\nG01 X12 Y-12 F300\nG01 X12 Y12\nG01 X-12 Y12\nG01 X-12 Y-12\nG00 Z15\n\n(TROUS)\nG00 X-30 Y-30 Z15\nG01 Z-20 F120\nG00 Z15\nG00 X30 Y-30\nG01 Z-20 F120\nG00 Z15\nG00 X30 Y30\nG01 Z-20 F120\nG00 Z15\nG00 X-30 Y30\nG01 Z-20 F120\nG00 Z15\n\nG00 Z20\nM09 M05\nM30",
+    tour:   "(TOURNAGE ETAGE)\nG21 G90\nG50 S3000\nG97 S800 M03 M08\nG00 X55 Z5\nG01 Z0 F0.2\nG01 X0\nG00 X55 Z5\nG96 S180 M03\nG01 X50 Z0 F0.25\nG01 Z-20\nG01 X40\nG01 Z-45\nG01 X30\nG01 Z-70\nG01 X20\nG01 Z-90\nG00 X55 Z5\nM09 M05\nM30"
+  };
+  document.getElementById('gc').value = ex[mode];
+}
+
+// ═══════════════════════════════════════════════════════
+// GIZMO XYZ — mini cube de navigation cliquable
+// ═══════════════════════════════════════════════════════
+var gizmoCtx = null;
+var gizmoHover = null;
+
+function initGizmo() {
+  var gc = document.getElementById('gizmo');
+  if (!gc) return;
+  gizmoCtx = gc.getContext('2d');
+  gc.addEventListener('click', function(e) {
+    var hit = getGizmoHit(e.offsetX, e.offsetY);
+    if (hit) { applyGizmoView(hit); }
+  });
+  gc.addEventListener('mousemove', function(e) {
+    var hit = getGizmoHit(e.offsetX, e.offsetY);
+    if (hit !== gizmoHover) { gizmoHover = hit; }
+    gc.style.cursor = hit ? 'pointer' : 'default';
+  });
+  gc.addEventListener('mouseleave', function() { gizmoHover = null; });
+}
+
+// Project a 3D unit vector to 2D gizmo coords using current camera angles
+function gProj(x, y, z) {
+  var th = sph.th, ph = sph.ph;
+  var cos_th = Math.cos(th), sin_th = Math.sin(th);
+  var cos_ph = Math.cos(ph), sin_ph = Math.sin(ph);
+  // Apply Y rotation (theta), then X rotation (phi)
+  var rx  =  x * cos_th + z * sin_th;
+  var ry  = -x * sin_th * sin_ph + y * cos_ph + z * cos_th * sin_ph;
+  var rz  =  x * sin_th * cos_ph - y * sin_ph + z * cos_th * cos_ph;
+  var cx = 45, cy = 45, sc = 28;
+  return { sx: cx + rx * sc, sy: cy - ry * sc, depth: rz };
+}
+
+function drawGizmo() {
+  if (!gizmoCtx) return;
+  var ctx = gizmoCtx;
+  ctx.clearRect(0, 0, 90, 90);
+
+  var O = gProj(0, 0, 0);
+
+  // Axis definitions: label, direction, color
+  var axes = [
+    { l:'X',  d:[1,0,0],  col:'#e74c3c' },
+    { l:'Y',  d:[0,1,0],  col:'#2ecc71' },
+    { l:'Z',  d:[0,0,1],  col:'#3498db' },
+  ];
+
+  // Gather all items (lines + dots) then depth-sort
+  var items = [];
+  axes.forEach(function(ax) {
+    var P = gProj(ax.d[0], ax.d[1], ax.d[2]);
+    var N = gProj(-ax.d[0], -ax.d[1], -ax.d[2]);
+
+    // Line from O to positive end
+    items.push({ type:'line', x1:O.sx, y1:O.sy, x2:P.sx, y2:P.sy, col:ax.col, depth:(P.depth+O.depth)/2 });
+
+    // Positive dot (larger, labelled)
+    items.push({ type:'dot', x:P.sx, y:P.sy, depth:P.depth, r:11, col:ax.col, label:ax.l, neg:false });
+
+    // Negative dot (smaller, darker)
+    var dc = darken(ax.col);
+    items.push({ type:'dot', x:N.sx, y:N.sy, depth:N.depth, r:7,  col:dc,     label:'-'+ax.l, neg:true });
+  });
+
+  // Draw lines first (unsorted, behind everything)
+  items.filter(function(i){return i.type==='line';}).forEach(function(ln) {
+    ctx.beginPath();
+    ctx.moveTo(ln.x1, ln.y1);
+    ctx.lineTo(ln.x2, ln.y2);
+    ctx.strokeStyle = ln.col;
+    ctx.lineWidth = 2.2;
+    ctx.globalAlpha = 0.75;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+
+  // Sort dots back→front (ascending depth = draw first)
+  var dots = items.filter(function(i){return i.type==='dot';});
+  dots.sort(function(a,b){ return a.depth - b.depth; });
+
+  dots.forEach(function(d) {
+    var hov = (gizmoHover === d.label);
+    var r   = hov ? d.r + 2 : d.r;
+    // Shadow glow on hover
+    ctx.shadowColor = hov ? d.col : 'transparent';
+    ctx.shadowBlur  = hov ? 10 : 0;
+    // Circle
+    ctx.beginPath();
+    ctx.arc(d.x, d.y, r, 0, Math.PI*2);
+    ctx.fillStyle = d.col;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    // Label (always show for positive, only on hover for negative)
+    if (!d.neg || hov) {
+      ctx.fillStyle   = '#ffffff';
+      ctx.font        = 'bold ' + Math.round(r * 1.0) + 'px monospace';
+      ctx.textAlign   = 'center';
+      ctx.textBaseline= 'middle';
+      ctx.fillText(d.label.replace('-',''), d.x, d.y);
+    }
+  });
+
+  // Center dot
+  ctx.beginPath();
+  ctx.arc(O.sx, O.sy, 3, 0, Math.PI*2);
+  ctx.fillStyle = '#94a3b8';
+  ctx.fill();
+}
+
+function darken(hex) {
+  var n = parseInt(hex.replace('#',''), 16);
+  var r = Math.max(0, (n>>16) - 50);
+  var g = Math.max(0, ((n>>8)&0xff) - 50);
+  var b = Math.max(0, (n&0xff) - 50);
+  return '#' + ((r<<16)|(g<<8)|b).toString(16).padStart(6,'0');
+}
+
+function getGizmoHit(mx, my) {
+  var axes = [
+    { l:'X',  d:[1,0,0],  r:11 },
+    { l:'Y',  d:[0,1,0],  r:11 },
+    { l:'Z',  d:[0,0,1],  r:11 },
+    { l:'-X', d:[-1,0,0], r:7  },
+    { l:'-Y', d:[0,-1,0], r:7  },
+    { l:'-Z', d:[0,0,-1], r:7  },
+  ];
+  var best = null, bestD = Infinity;
+  axes.forEach(function(ax) {
+    var p = gProj(ax.d[0], ax.d[1], ax.d[2]);
+    var dist = Math.hypot(mx - p.sx, my - p.sy);
+    if (dist <= ax.r + 2 && dist < bestD) { bestD = dist; best = ax.l; }
+  });
+  return best;
+}
+
+function applyGizmoView(label) {
+  pan.x = 0; pan.y = 0;
+  var r = sph.r;
+  if      (label === 'X')  { sph.ph = Math.PI/2 - 0.01; sph.th =  Math.PI/2; }
+  else if (label === '-X') { sph.ph = Math.PI/2 - 0.01; sph.th = -Math.PI/2; }
+  else if (label === 'Y')  { sph.ph = 0.01;              sph.th = 0; }
+  else if (label === '-Y') { sph.ph = Math.PI/2 - 0.01; sph.th = Math.PI; }
+  else if (label === 'Z')  { sph.ph = Math.PI/2 - 0.01; sph.th = 0; }
+  else if (label === '-Z') { sph.ph = Math.PI/2 - 0.01; sph.th = Math.PI; }
+  sph.r = r;
+  camUpdate();
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('load', function() {
+  initThree();      // crée scene, camera, renderer, toolMesh, trailGrp, cutGrp
+  switchMode('fraise'); // construit brut, charge exemple, met à jour UI
+  resizeR();
+});
+window.addEventListener('resize', resizeR);
+</script>
+</body>
+</html>
