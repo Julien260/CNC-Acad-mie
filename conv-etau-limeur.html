@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Étau-Limeur & Mortaiseuse — CNC Académie</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --or:#f97316;--navy:#0f172a;--navy-mid:#1e293b;
+  --green:#10b981;--green-dark:#059669;
+  --mn:'Space Mono',monospace;--dp:'Barlow Condensed',sans-serif;--bd:'Barlow',sans-serif;
+}
+*{font-family:var(--bd);}
+h1,h2,h3,h4{font-family:var(--dp);}
+body{background:#f1f5f9;color:#0f172a;}
+.logo-text{font-family:var(--dp);font-weight:900;font-size:1.4rem;letter-spacing:-.02em;}
+#mobile-menu{display:none;}#mobile-menu.open{display:block;}
+#dropdown-menu{display:none;}#dropdown-menu.open{display:block;}
+.page-header{background:var(--navy);position:relative;overflow:hidden;padding:3rem 1.5rem;}
+.page-header::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(16,185,129,.06) 39px,rgba(16,185,129,.06) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(16,185,129,.06) 39px,rgba(16,185,129,.06) 40px);pointer-events:none;}
+.page-header::after{content:'⚙';font-size:18rem;font-weight:900;position:absolute;right:-2rem;top:-3rem;color:rgba(16,185,129,.04);pointer-events:none;line-height:1;}
+.page-header-inner{position:relative;z-index:1;}
+.level-badge{font-family:var(--mn);font-size:.65rem;letter-spacing:.15em;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);color:var(--green);padding:.3rem .8rem;border-radius:2px;text-transform:uppercase;display:inline-block;margin-bottom:1rem;}
+.prog-bar{background:#1e293b;border-bottom:1px solid #334155;overflow-x:auto;}
+.prog-step{font-family:var(--mn);font-size:.55rem;color:#475569;letter-spacing:.06em;text-transform:uppercase;padding:.6rem 0;white-space:nowrap;display:flex;align-items:center;gap:.35rem;}
+.prog-step.active{color:var(--green);}
+.prog-step.done{color:#22c55e;}
+.prog-dot{width:7px;height:7px;border-radius:50%;background:#334155;flex-shrink:0;}
+.prog-step.active .prog-dot{background:var(--green);box-shadow:0 0 0 3px rgba(16,185,129,.2);}
+.prog-step.done .prog-dot{background:#22c55e;}
+.prog-line{height:1px;background:#334155;flex:1;}
+.prog-line.done{background:#22c55e;}
+.card{background:white;border-radius:14px;padding:2rem;box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid #e2e8f0;}
+.module-num{font-family:var(--mn);font-size:2rem;font-weight:700;color:rgba(16,185,129,.15);line-height:1;}
+.section-title{font-family:var(--dp);font-weight:900;font-size:1.5rem;text-transform:uppercase;color:#1e293b;}
+.machine-divider{display:flex;align-items:center;gap:1rem;margin:3rem 0 2rem;}
+.machine-divider h2{font-family:var(--dp);font-weight:900;font-size:1.8rem;text-transform:uppercase;white-space:nowrap;color:#1e293b;}
+.machine-divider .line{height:2px;flex:1;background:var(--green);opacity:.3;}
+.def-box{background:#f0fdf4;border:1px solid #bbf7d0;border-left:4px solid var(--green);border-radius:8px;padding:1rem 1.25rem;margin-bottom:.75rem;}
+.def-box p{font-size:.875rem;color:#064e3b;line-height:1.65;}
+.warn-box{background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #f59e0b;border-radius:8px;padding:1rem 1.25rem;margin-bottom:.75rem;}
+.warn-box p{font-size:.875rem;color:#92400e;line-height:1.65;}
+.danger-box{background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #ef4444;border-radius:8px;padding:1rem 1.25rem;margin-bottom:.75rem;}
+.danger-box p{font-size:.875rem;color:#7f1d1d;line-height:1.65;}
+.formula{background:#0f172a;border-radius:8px;padding:1rem 1.25rem;font-family:var(--mn);font-size:.78rem;color:#64748b;border-left:3px solid var(--green);line-height:2;}
+.formula .val{color:#7dd3fc;font-weight:700;}
+.formula .res{color:var(--green);font-weight:700;}
+.formula .cm{color:#475569;font-style:italic;}
+.data-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+.data-table th{background:#f8fafc;font-family:var(--mn);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:#64748b;padding:.6rem .75rem;text-align:left;border-bottom:2px solid #e2e8f0;}
+.data-table td{padding:.6rem .75rem;border-bottom:1px solid #f1f5f9;color:#374151;vertical-align:top;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:#fafafa;}
+.green-cell{color:var(--green);font-weight:600;}
+.part-item{display:flex;align-items:flex-start;gap:.75rem;padding:.65rem 0;border-bottom:1px solid #f8fafc;}
+.part-item:last-child{border-bottom:none;}
+.part-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mn);font-size:.6rem;font-weight:700;flex-shrink:0;margin-top:.1rem;}
+.part-name{font-family:var(--dp);font-weight:700;font-size:.95rem;text-transform:uppercase;display:block;margin-bottom:.15rem;}
+.part-desc{font-size:.78rem;color:#64748b;line-height:1.55;}
+.svg-wrap{background:#030712;border-radius:12px;padding:1rem;display:flex;justify-content:center;align-items:center;}
+.exercise{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);border-radius:14px;padding:1.75rem;color:white;}
+.exercise h4{font-family:var(--dp);font-weight:800;font-size:1.2rem;text-transform:uppercase;color:var(--green);margin-bottom:1rem;}
+.ex-question{background:rgba(255,255,255,.05);border-radius:8px;padding:1rem;margin-bottom:.75rem;border-left:3px solid var(--green);}
+.ex-question p{font-size:.85rem;color:#e2e8f0;line-height:1.6;}
+.ex-answer{background:rgba(16,185,129,.1);border-radius:6px;padding:.75rem 1rem;margin-top:.5rem;display:none;}
+.ex-answer.show{display:block;}
+.ex-answer p{font-family:var(--mn);font-size:.75rem;color:var(--green);line-height:1.7;}
+.btn-answer{font-family:var(--mn);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;padding:.3rem .8rem;border-radius:4px;background:rgba(16,185,129,.2);color:var(--green);border:1px solid rgba(16,185,129,.3);cursor:pointer;margin-top:.5rem;transition:all .15s;}
+.btn-answer:hover{background:rgba(16,185,129,.3);}
+.op-card{background:white;border-radius:10px;padding:1.25rem;border:1px solid #e2e8f0;box-shadow:0 2px 6px rgba(0,0,0,.05);transition:transform .2s;}
+.op-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.1);}
+.op-card h4{font-family:var(--dp);font-weight:700;font-size:1rem;text-transform:uppercase;margin-bottom:.4rem;color:var(--green);}
+.op-card p{font-size:.78rem;color:#64748b;line-height:1.55;}
+/* Clavetage spécial */
+.clavette-card{background:white;border-radius:10px;padding:1rem;border:1px solid #e2e8f0;border-top:3px solid var(--green);}
+.clavette-card h5{font-family:var(--dp);font-weight:700;font-size:.9rem;text-transform:uppercase;color:var(--green);margin-bottom:.4rem;}
+.clavette-card p{font-size:.75rem;color:#64748b;line-height:1.5;}
+.lesson-nav{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-top:3rem;padding-top:2rem;border-top:1px solid #e2e8f0;}
+.btn-green{background:var(--green);color:white;font-family:var(--dp);font-weight:700;font-size:.95rem;letter-spacing:.05em;text-transform:uppercase;padding:.75rem 1.75rem;border-radius:6px;text-decoration:none;transition:background .2s;}
+.btn-green:hover{background:var(--green-dark);}
+.btn-sec{border:2px solid #e2e8f0;color:#64748b;font-family:var(--dp);font-weight:700;text-transform:uppercase;padding:.7rem 1.5rem;border-radius:6px;text-decoration:none;font-size:.85rem;transition:all .2s;}
+.btn-sec:hover{border-color:var(--green);color:var(--green);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp .45s ease both;}
+.delay-1{animation-delay:.1s;}.delay-2{animation-delay:.2s;}.delay-3{animation-delay:.3s;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+  <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+    <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+    <div class="hidden md:flex items-center gap-5">
+      <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+      <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+      <div class="relative" id="dropdown-wrapper">
+        <button onclick="toggleDropdown()" class="flex items-center text-white font-semibold hover:text-green-400 transition uppercase tracking-wide text-xs focus:outline-none">
+          COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="dropdown-menu" class="hidden absolute right-0 mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 overflow-hidden" style="width:22rem;max-height:78vh;overflow-y:auto;">
+          <div class="sticky top-0 px-3 pt-2.5 pb-1.5 bg-orange-50 border-b border-orange-100"><p class="text-[10px] font-bold uppercase tracking-widest text-orange-500" style="font-family:var(--mn)">⚡ G-Code CNC Fanuc</p></div>
+          <div class="px-3 pt-1.5 pb-0.5"><p class="text-[9px] font-bold uppercase tracking-widest text-slate-400" style="font-family:var(--mn)">— Bases —</p></div>
+          <a href="lecon1.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 01</span><span class="text-sm text-slate-700">Les Axes et Mouvements</span></a>
+          <a href="lecon2.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 02</span><span class="text-sm text-slate-700">Le Point Zéro (G54)</span></a>
+          <a href="lecon3.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 03</span><span class="text-sm text-slate-700">Avances et Vitesses</span></a>
+          <a href="lecon4.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 04</span><span class="text-sm text-slate-700">Compensation G41/G42</span></a>
+          <a href="lecon5.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 05</span><span class="text-sm text-slate-700">Cycles de Perçage</span></a>
+          <a href="lecon6.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 06</span><span class="text-sm text-slate-700">Sous-Programmes M98</span></a>
+          <a href="lecon7.html" class="block px-4 py-2 border-b-2 border-slate-200 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 07</span><span class="text-sm text-slate-700">Sécurité &amp; Maintenance</span></a>
+          <div class="sticky top-0 px-3 pt-1.5 pb-1 bg-indigo-50 border-t-2 border-indigo-100"><p class="text-[10px] font-bold uppercase tracking-widest text-indigo-500" style="font-family:var(--mn)">⭐ Expert PRO</p></div>
+          <a href="lecon8.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-indigo-50 no-underline"><span class="block text-[10px] text-indigo-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 08</span><span class="text-sm text-slate-700">G96/G97 <span style="background:#6366f1;color:white;font-size:.5rem;padding:.1rem .35rem;border-radius:3px;font-weight:700">PRO</span></span></a>
+          <a href="lecon9.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-indigo-50 no-underline"><span class="block text-[10px] text-indigo-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 09</span><span class="text-sm text-slate-700">Filetage G76 <span style="background:#6366f1;color:white;font-size:.5rem;padding:.1rem .35rem;border-radius:3px;font-weight:700">PRO</span></span></a>
+          <a href="lecon10.html" class="block px-4 py-2 border-b-2 border-slate-200 hover:bg-indigo-50 no-underline"><span class="block text-[10px] text-indigo-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 10</span><span class="text-sm text-slate-700">Prog. Paramétrée <span style="background:#6366f1;color:white;font-size:.5rem;padding:.1rem .35rem;border-radius:3px;font-weight:700">PRO</span></span></a>
+          <div class="sticky top-0 px-3 pt-1.5 pb-1 bg-emerald-50 border-t-2 border-emerald-100"><p class="text-[10px] font-bold uppercase tracking-widest text-green-600" style="font-family:var(--mn)">⚙ Usinage Conventionnel</p></div>
+          <a href="conv-bases.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mn)">L.1 — Bases</span><span class="text-sm text-slate-700">Les 4 machines</span></a>
+          <a href="conv-fraisage.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mn)">L.2 — Fraisage</span><span class="text-sm text-slate-700">Fraiseuse conventionnelle</span></a>
+          <a href="conv-tournage.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mn)">L.3 — Tour</span><span class="text-sm text-slate-700">Tour parallèle</span></a>
+          <a href="conv-etau-limeur.html" class="block px-4 py-2 bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mn)">← Vous êtes ici</span><span class="text-sm text-green-700 font-bold">Étau-Limeur &amp; Mortaiseuse</span></a>
+        </div>
+      </div>
+      <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+      <a href="feedback.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">FAQ</a>
+      <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+    </div>
+    <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+      <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+    <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm">Accueil</a>
+    <a href="conv-tournage.html" class="block text-green-400 font-semibold py-2 border-b border-slate-700 text-sm">← Tour conv.</a>
+    <a href="index.html#conventionnel" class="block text-slate-300 py-2 text-sm hover:text-green-400">Retour Accueil</a>
+  </div>
+</nav>
+
+<!-- PROGRESS -->
+<div class="prog-bar">
+  <div class="container mx-auto max-w-5xl px-6">
+    <div class="flex items-center gap-2 py-1 overflow-x-auto">
+      <div class="prog-step done"><span class="prog-dot"></span>Bases ✓</div>
+      <div class="prog-line done"></div>
+      <div class="prog-step done"><span class="prog-dot"></span>Fraiseuse ✓</div>
+      <div class="prog-line done"></div>
+      <div class="prog-step done"><span class="prog-dot"></span>Tour ✓</div>
+      <div class="prog-line done"></div>
+      <div class="prog-step active"><span class="prog-dot"></span>Étau-Limeur &amp; Mortaiseuse</div>
+      <div class="prog-line"></div>
+      <div class="prog-step"><span class="prog-dot"></span>Clavetage</div>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="page-header">
+  <div class="container mx-auto max-w-5xl page-header-inner fade-up">
+    <div class="level-badge">Usinage Conventionnel · Leçon 4 · Complet</div>
+    <h2 style="font-family:var(--dp);font-weight:900;font-size:clamp(2rem,5vw,3.5rem);line-height:1;text-transform:uppercase;color:white;">Étau-Limeur<br><span style="color:var(--green)">&amp; Mortaiseuse</span></h2>
+    <p style="color:#94a3b8;font-size:.95rem;margin-top:.75rem;max-width:580px;line-height:1.6;">Deux machines à coupe discontinue et mouvement alternatif. Principes, schémas, réglages, opérations et clavetage — tout ce qu'il faut savoir.</p>
+    <div class="flex flex-wrap gap-4 mt-5">
+      <div class="text-center"><div style="font-family:var(--mn);font-size:1.3rem;font-weight:700;color:var(--green)">2</div><div style="font-family:var(--mn);font-size:.55rem;color:#64748b;text-transform:uppercase">Machines</div></div>
+      <div class="text-center"><div style="font-family:var(--mn);font-size:1.3rem;font-weight:700;color:var(--green)">6</div><div style="font-family:var(--mn);font-size:.55rem;color:#64748b;text-transform:uppercase">Modules</div></div>
+      <div class="text-center"><div style="font-family:var(--mn);font-size:1.3rem;font-weight:700;color:var(--green)">5</div><div style="font-family:var(--mn);font-size:.55rem;color:#64748b;text-transform:uppercase">Exercices</div></div>
+    </div>
+  </div>
+</div>
+
+<main class="container mx-auto max-w-5xl py-12 px-6">
+
+<!-- ══════════════════════════ ÉTAU-LIMEUR ══════════════════════════ -->
+<div class="machine-divider fade-up">
+  <div class="line"></div>
+  <h2>⟷ L'Étau-Limeur</h2>
+  <div class="line"></div>
+</div>
+
+<!-- MODULE 01 — ANATOMIE ÉTAU-LIMEUR -->
+<section class="mb-14 fade-up">
+  <div class="flex items-baseline gap-4 mb-6">
+    <span class="module-num">01.</span>
+    <h3 class="section-title">Anatomie de l'étau-limeur</h3>
+  </div>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="svg-wrap" style="min-height:400px;">
+      <svg viewBox="0 0 400 420" width="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="gel" width="18" height="18" patternUnits="userSpaceOnUse"><path d="M18 0L0 0 0 18" fill="none" stroke="#1e293b" stroke-width=".4"/></pattern>
+          <linearGradient id="mel" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1e293b"/><stop offset="50%" stop-color="#243044"/><stop offset="100%" stop-color="#1e293b"/></linearGradient>
+          <marker id="a-g" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#10b981"/></marker>
+          <marker id="a-go" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f97316"/></marker>
+        </defs>
+        <rect width="400" height="420" fill="#030712"/>
+        <rect width="400" height="420" fill="url(#gel)" opacity=".3"/>
+
+        <!-- BASE -->
+        <rect x="10" y="350" width="380" height="40" rx="4" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+        <rect x="12" y="352" width="376" height="36" rx="3" fill="url(#mel)"/>
+
+        <!-- BÂTI PRINCIPAL -->
+        <rect x="15" y="80" width="110" height="275" rx="5" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+        <rect x="17" y="82" width="106" height="271" rx="4" fill="#243044"/>
+        <!-- détails bâti -->
+        <rect x="25" y="95" width="90" height="15" rx="2" fill="#1e293b"/>
+        <rect x="25" y="118" width="90" height="8" rx="1" fill="#1e3a5f"/>
+
+        <!-- MÉCANISME BIELLE-MANIVELLE -->
+        <!-- Disque manivelle -->
+        <circle cx="70" cy="175" r="42" fill="none" stroke="#334155" stroke-width="2"/>
+        <circle cx="70" cy="175" r="36" fill="#0f172a" stroke="#243044" stroke-width="1"/>
+        <!-- Rayon manivelle -->
+        <line x1="70" y1="175" x2="92" y2="147" stroke="#475569" stroke-width="5" stroke-linecap="round"/>
+        <!-- Axe manivelle (point excentré) -->
+        <circle cx="92" cy="147" r="7" fill="#10b981" stroke="#059669" stroke-width="1.5"/>
+        <!-- Centre -->
+        <circle cx="70" cy="175" r="10" fill="#334155"/>
+        <circle cx="70" cy="175" r="4" fill="#475569"/>
+        <!-- Flèche rotation -->
+        <path d="M70 133 A42 42 0 0 1 112 175" stroke="#10b981" fill="none" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="112,172 117,178 110,179" fill="#10b981"/>
+
+        <!-- COULISSE HORIZONTALE (guide) -->
+        <rect x="125" y="155" width="240" height="18" rx="3" fill="#243044" stroke="#334155" stroke-width="1.5"/>
+
+        <!-- BÉLIER (se déplace) -->
+        <rect x="140" y="143" width="150" height="42" rx="5" fill="#1e3a5f" stroke="#10b981" stroke-width="2"/>
+        <!-- Corps bélier détail -->
+        <rect x="148" y="150" width="134" height="10" rx="2" fill="#243044"/>
+
+        <!-- BIELLE (lien manivelle-bélier) -->
+        <line x1="92" y1="147" x2="145" y2="164" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+
+        <!-- PORTE-OUTIL (en bout du bélier) -->
+        <rect x="285" y="135" width="35" height="60" rx="4" fill="#243044" stroke="#475569" stroke-width="1"/>
+        <!-- Clapet articulation -->
+        <circle cx="302" cy="148" r="5" fill="#334155" stroke="#475569"/>
+        <!-- BURIN -->
+        <rect x="297" y="190" width="10" height="35" rx="2" fill="#f59e0b" stroke="#d97706"/>
+        <polygon points="297,225 307,225 302,240" fill="#ffd700" stroke="#d97706"/>
+
+        <!-- FLÈCHES MOUVEMENT ALTERNATIF -->
+        <path d="M145 120 L285 120" stroke="#10b981" stroke-width="2" stroke-dasharray="7,3"/>
+        <polygon points="285,117 296,120 285,123" fill="#10b981"/>
+        <polygon points="145,117 134,120 145,123" fill="#10b981"/>
+        <text x="215" y="113" fill="#10b981" font-size="8" font-family="Space Mono" text-anchor="middle">ALLER (usinage)</text>
+        <text x="215" y="101" fill="#475569" font-size="7" font-family="Space Mono" text-anchor="middle">RETOUR rapide (à vide)</text>
+
+        <!-- TABLE (avance Y intermittente) -->
+        <rect x="125" y="250" width="240" height="28" rx="4" fill="#243044" stroke="#334155" stroke-width="1.5"/>
+        <!-- PIÈCE sur table -->
+        <rect x="165" y="235" width="130" height="20" rx="2" fill="#b87333" stroke="#a16520" stroke-width="1.5"/>
+        <!-- Surface usinée -->
+        <rect x="165" y="235" width="130" height="5" rx="1" fill="#c89050"/>
+        <!-- copeaux -->
+        <path d="M295 242 Q310 236 305 248" stroke="#b87333" fill="none" stroke-width="1.5" opacity=".8"/>
+        <!-- Étau bridage -->
+        <rect x="155" y="228" width="12" height="30" rx="1" fill="#334155" stroke="#475569"/>
+        <rect x="293" y="228" width="12" height="30" rx="1" fill="#334155" stroke="#475569"/>
+
+        <!-- AVANCE Y (flèche) -->
+        <path d="M370 250 L370 278" stroke="#7dd3fc" stroke-width="2.5"/>
+        <polygon points="367,277 370,286 373,277" fill="#7dd3fc"/>
+        <text x="385" y="262" fill="#7dd3fc" font-size="9" font-family="Space Mono">Y</text>
+        <text x="385" y="274" fill="#7dd3fc" font-size="8" font-family="Space Mono">avance</text>
+        <text x="385" y="285" fill="#7dd3fc" font-size="7" font-family="Space Mono">intermit.</text>
+
+        <!-- BASE PIEDS -->
+        <rect x="15" y="350" width="375" height="5" rx="1" fill="#243044"/>
+
+        <!-- NUMÉROS -->
+        <circle cx="55" cy="88" r="11" fill="#10b981"/><text x="55" y="92" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">1</text>
+        <circle cx="92" cy="140" r="11" fill="#10b981"/><text x="92" y="144" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">2</text>
+        <circle cx="215" cy="170" r="11" fill="#f97316"/><text x="215" y="174" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">3</text>
+        <circle cx="300" cy="138" r="11" fill="#f59e0b"/><text x="300" y="142" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">4</text>
+        <circle cx="230" cy="278" r="11" fill="#7dd3fc"/><text x="230" y="282" fill="#0f172a" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">5</text>
+        <circle cx="302" cy="245" r="11" fill="#b87333"/><text x="302" y="249" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">6</text>
+
+        <text x="200" y="20" fill="#10b981" font-size="11" font-family="Space Mono" font-weight="700" text-anchor="middle" letter-spacing="2">ÉTAU-LIMEUR</text>
+        <text x="200" y="34" fill="#475569" font-size="8" font-family="Space Mono" text-anchor="middle">Vue de côté — principe cinématique</text>
+
+        <!-- Légende vitesse retour -->
+        <text x="200" y="395" fill="#475569" font-size="7" font-family="Space Mono" text-anchor="middle">Vitesse retour ≈ 1.5× à 2× vitesse aller (mécanisme à rapport variable)</text>
+      </svg>
+    </div>
+
+    <div>
+      <h4 class="font-black uppercase text-lg mb-4" style="font-family:var(--dp)">Parties essentielles</h4>
+      <div class="part-item">
+        <span class="part-num" style="background:var(--green);color:white;">1</span>
+        <div><span class="part-name" style="color:var(--green)">Le Bâti</span><span class="part-desc">Fonte massive. Supporte la coulisse horizontale. Les glissières en queue d'aronde absorbent les chocs répétés du mouvement alternatif. Hauteur réglable via la console.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:var(--green);color:white;">2</span>
+        <div><span class="part-name" style="color:var(--green)">Mécanisme Bielle-Manivelle</span><span class="part-desc">Convertit la rotation du moteur en translation alternative. La longueur de course est réglable (via excentrique). La position de départ est également ajustable. Rapport de vitesse aller/retour ≈ 1:1.5.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:var(--or);color:white;">3</span>
+        <div><span class="part-name" style="color:var(--or)">Le Bélier (coulisse mobile)</span><span class="part-desc">Pièce mobile principale portant le porte-outil. Se déplace horizontalement sur les glissières. Course réglable de 20 à 600 mm selon la longueur de la pièce.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:#f59e0b;color:white;">4</span>
+        <div><span class="part-name" style="color:#92400e">Le Porte-Outil à Clapet</span><span class="part-desc">Articulation à clapet permettant à l'outil de se soulever au retour. Évite que l'outil raye la surface usinée au retour. Réglage de l'angle d'attaque possible.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:#7dd3fc;color:#0f172a;">5</span>
+        <div><span class="part-name" style="color:#0369a1">La Table (axe Y)</span><span class="part-desc">Avance automatiquement d'un incrément à chaque retour du bélier. Mécanisme à cliquet (rochet). Avance réglable de 0.05 à 1 mm/course. Peut aussi se déplacer en Z (hauteur).</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:#b87333;color:white;">6</span>
+        <div><span class="part-name" style="color:#92400e">L'Outil (burin)</span><span class="part-desc">Outil monodent à coupe frontale. Coupe UNIQUEMENT à l'aller. Géométrie similaire à un outil de tournage. Fixé dans le porte-outil par vis de serrage.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODULE 02 — RÉGLAGES & OPÉRATIONS -->
+<section class="mb-14 fade-up delay-1">
+  <div class="flex items-baseline gap-4 mb-6">
+    <span class="module-num">02.</span>
+    <h3 class="section-title">Réglages et opérations</h3>
+  </div>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="space-y-4">
+      <div class="card">
+        <h4 class="font-black uppercase text-base mb-3" style="font-family:var(--dp);color:var(--green)">Réglage de la course</h4>
+        <div class="def-box">
+          <p>La course du bélier doit être légèrement supérieure à la longueur de la pièce :<br><br>
+          <strong>Course = L_pièce + 15 mm (approche) + 15 mm (dégagement)</strong><br><br>
+          Trop longue → perte de temps. Trop courte → l'outil n'achève pas le profil. Le départ de course doit être réglé pour que le burin entre progressivement dans la matière.</p>
+        </div>
+        <div class="formula">
+          <span class="cm">/* Vitesse de coupe étau-limeur */</span><br>
+          <span class="res">Vc</span> ≈ (<span class="val">2 × L × n</span>) / <span class="val">1000</span><br>
+          <span class="cm">L = course (mm) | n = coups/min</span><br>
+          <span class="cm">Acier : Vc = 6–12 m/min</span><br>
+          <span class="cm">Fonte : Vc = 5–10 m/min</span><br>
+          <span class="cm">Aluminium : Vc = 20–40 m/min</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h4 class="font-black uppercase text-base mb-3" style="font-family:var(--dp)">Opérations réalisables</h4>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="op-card">
+          <h4>Dressage plan</h4>
+          <p>Surface plane horizontale. Passes successives en avance Y. Planéité obtenue : 0.05 à 0.1 mm/100 mm.</p>
+        </div>
+        <div class="op-card">
+          <h4>Rainure droite</h4>
+          <p>Burin de la largeur exacte de la rainure. Passes successives en profondeur jusqu'à la cote finale.</p>
+        </div>
+        <div class="op-card">
+          <h4>Chanfrein / Biseau</h4>
+          <p>Incliner le porte-outil ou la table. Permet des surfaces à angle : 30°, 45°, 60° selon besoin.</p>
+        </div>
+        <div class="op-card">
+          <h4>Épaulement</h4>
+          <p>Combinaison de passes horizontales et verticales. Outil droit ou à 90°. Utile pour les guidages prismatiques.</p>
+        </div>
+      </div>
+      <div class="warn-box mt-4">
+        <p>⚠ <strong>Avance intermittente :</strong> L'avance Y ne se fait QU'au retour du bélier (à vide). Si l'avance se déclenchait pendant l'aller, l'outil briserait en fin de course. Le mécanisme à rochet garantit cette séquence automatiquement.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ MORTAISEUSE ══════════════════════════ -->
+<div class="machine-divider fade-up delay-1">
+  <div class="line"></div>
+  <h2>↕ La Mortaiseuse</h2>
+  <div class="line"></div>
+</div>
+
+<!-- MODULE 03 — ANATOMIE MORTAISEUSE -->
+<section class="mb-14 fade-up delay-1">
+  <div class="flex items-baseline gap-4 mb-6">
+    <span class="module-num">03.</span>
+    <h3 class="section-title">Anatomie de la mortaiseuse</h3>
+  </div>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="svg-wrap" style="min-height:400px;">
+      <svg viewBox="0 0 400 420" width="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="gm" width="18" height="18" patternUnits="userSpaceOnUse"><path d="M18 0L0 0 0 18" fill="none" stroke="#1e293b" stroke-width=".4"/></pattern>
+          <linearGradient id="mm2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1e293b"/><stop offset="50%" stop-color="#243044"/><stop offset="100%" stop-color="#1e293b"/></linearGradient>
+        </defs>
+        <rect width="400" height="420" fill="#030712"/>
+        <rect width="400" height="420" fill="url(#gm)" opacity=".3"/>
+
+        <!-- BASE -->
+        <rect x="30" y="370" width="340" height="35" rx="4" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+        <rect x="32" y="372" width="336" height="31" rx="3" fill="url(#mm2)"/>
+
+        <!-- COLONNE VERTICALE -->
+        <rect x="35" y="50" width="100" height="325" rx="5" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+        <rect x="37" y="52" width="96" height="321" rx="4" fill="#243044"/>
+        <!-- Glissières verticales -->
+        <rect x="33" y="150" width="6" height="200" rx="2" fill="#10b981" opacity=".7"/>
+        <rect x="133" y="150" width="6" height="200" rx="2" fill="#10b981" opacity=".7"/>
+
+        <!-- MÉCANISME EN HAUT -->
+        <!-- Boîte mécanisme -->
+        <rect x="35" y="50" width="100" height="80" rx="3" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+        <!-- Excentrique -->
+        <circle cx="85" cy="90" r="32" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+        <circle cx="85" cy="90" r="26" fill="#1e293b" stroke="#243044"/>
+        <!-- Manivelle excentrique -->
+        <line x1="85" y1="90" x2="85" y2="64" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="85" cy="64" r="6" fill="#10b981" stroke="#059669"/>
+        <circle cx="85" cy="90" r="8" fill="#334155"/>
+        <!-- Rotation arrow -->
+        <path d="M85 58 A32 32 0 0 1 117 90" stroke="#10b981" fill="none" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="117,87 122,93 115,94" fill="#10b981"/>
+
+        <!-- COULISSE VERTICALE (bélier vertical) -->
+        <rect x="72" y="52" width="26" height="295" rx="3" fill="#243044" stroke="#334155" stroke-width="1"/>
+        <!-- BÉLIER VERTICAL -->
+        <rect x="60" y="120" width="50" height="120" rx="5" fill="#1e3a5f" stroke="#10b981" stroke-width="2"/>
+        <!-- Liaison excentrique-bélier (bielle) -->
+        <line x1="85" y1="64" x2="85" y2="125" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+
+        <!-- FLÈCHES MOUVEMENT VERTICAL -->
+        <path d="M150 115 L150 245" stroke="#10b981" stroke-width="2" stroke-dasharray="6,3"/>
+        <polygon points="147,117 150,108 153,117" fill="#10b981"/>
+        <polygon points="147,243 150,252 153,243" fill="#10b981"/>
+        <text x="168" y="185" fill="#10b981" font-size="8" font-family="Space Mono">↕ course</text>
+        <text x="168" y="197" fill="#10b981" font-size="8" font-family="Space Mono">vertical</text>
+
+        <!-- PORTE-OUTIL (bas du bélier) -->
+        <rect x="67" y="236" width="36" height="35" rx="3" fill="#243044" stroke="#475569" stroke-width="1"/>
+        <!-- Outil mortaisage (ciseau vertical) -->
+        <rect x="78" y="268" width="9" height="45" rx="1" fill="#f59e0b" stroke="#d97706"/>
+        <polygon points="78,313 87,313 82,328" fill="#ffd700" stroke="#d97706"/>
+
+        <!-- TABLE CROISÉE + ROTATIVE -->
+        <!-- Table rotative (cercle) -->
+        <ellipse cx="260" cy="300" rx="85" ry="25" fill="#1e3a5f" stroke="#10b981" stroke-width="2"/>
+        <ellipse cx="260" cy="300" rx="78" ry="20" fill="#243044" stroke="#334155"/>
+        <!-- Graduations angulaires -->
+        <line x1="260" y1="280" x2="260" y2="275" stroke="#10b981" stroke-width="1.5"/>
+        <line x1="338" y1="300" x2="343" y2="300" stroke="#334155" stroke-width="1"/>
+        <line x1="182" y1="300" x2="177" y2="300" stroke="#334155" stroke-width="1"/>
+        <text x="260" y="295" fill="#64748b" font-size="7" font-family="Space Mono" text-anchor="middle">360° / 0.5°</text>
+        <!-- Chariot Y sous table -->
+        <rect x="185" y="318" width="150" height="20" rx="3" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+        <!-- Chariot X -->
+        <rect x="175" y="335" width="170" height="20" rx="3" fill="#243044" stroke="#334155" stroke-width="1"/>
+
+        <!-- PIÈCE sur table (vue de dessus) -->
+        <rect x="220" y="288" width="80" height="22" rx="2" fill="#b87333" stroke="#a16520" stroke-width="1.5"/>
+        <!-- Rainure mortaisée -->
+        <rect x="250" y="288" width="12" height="12" rx="0" fill="#0f172a" stroke="#a16520"/>
+        <!-- Outil dans rainure -->
+        <rect x="79" y="295" width="7" height="6" rx="0" fill="#ffd700" opacity=".8"/>
+
+        <!-- FLÈCHE ROTATION TABLE -->
+        <path d="M345 295 A30 12 0 0 1 345 305" stroke="#7dd3fc" fill="none" stroke-width="2" stroke-dasharray="3,2"/>
+        <polygon points="345,303 350,308 342,308" fill="#7dd3fc"/>
+        <text x="358" y="302" fill="#7dd3fc" font-size="9" font-family="Space Mono">360°</text>
+
+        <!-- VOLANT -->
+        <circle cx="360" cy="250" r="20" fill="none" stroke="#334155" stroke-width="2"/>
+        <circle cx="360" cy="250" r="15" fill="#1e293b" stroke="#475569"/>
+        <line x1="340" y1="250" x2="380" y2="250" stroke="#64748b" stroke-width="2"/>
+        <line x1="360" y1="230" x2="360" y2="270" stroke="#64748b" stroke-width="2"/>
+        <circle cx="360" cy="250" r="4" fill="#10b981"/>
+
+        <!-- NUMÉROS -->
+        <circle cx="52" cy="60" r="11" fill="#10b981"/><text x="52" y="64" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">1</text>
+        <circle cx="115" cy="75" r="11" fill="#10b981"/><text x="115" y="79" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">2</text>
+        <circle cx="85" cy="190" r="11" fill="#f97316"/><text x="85" y="194" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">3</text>
+        <circle cx="82" cy="255" r="11" fill="#f59e0b"/><text x="82" y="259" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">4</text>
+        <circle cx="260" cy="330" r="11" fill="#7dd3fc"/><text x="260" y="334" fill="#0f172a" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">5</text>
+        <circle cx="260" cy="295" r="11" fill="#b87333"/><text x="260" y="299" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">6</text>
+
+        <text x="200" y="22" fill="#10b981" font-size="11" font-family="Space Mono" font-weight="700" text-anchor="middle" letter-spacing="2">MORTAISEUSE</text>
+        <text x="200" y="36" fill="#475569" font-size="8" font-family="Space Mono" text-anchor="middle">Vue de face — schéma détaillé</text>
+      </svg>
+    </div>
+
+    <div>
+      <h4 class="font-black uppercase text-lg mb-4" style="font-family:var(--dp)">Parties essentielles</h4>
+      <div class="part-item">
+        <span class="part-num" style="background:var(--green);color:white;">1</span>
+        <div><span class="part-name" style="color:var(--green)">La Colonne Verticale</span><span class="part-desc">Bâti vertical massif en fonte. Les glissières verticales précises guident le bélier. La rigidité verticale est capitale : les efforts de coupe s'exercent vers le bas (compression).</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:var(--green);color:white;">2</span>
+        <div><span class="part-name" style="color:var(--green)">Mécanisme d'Entraînement</span><span class="part-desc">Excentrique ou bielle-manivelle vertical. Course réglable de 10 à 320 mm. Vitesse : 20 à 200 courses/min. Rapport aller/retour légèrement variable selon position excentrique.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:var(--or);color:white;">3</span>
+        <div><span class="part-name" style="color:var(--or)">Le Bélier Vertical</span><span class="part-desc">Descend (coupe) et remonte (retour à vide). Guidé par les glissières de la colonne. Peut s'incliner de ±10° pour rainures en dépouille ou clavettes coniques.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:#f59e0b;color:white;">4</span>
+        <div><span class="part-name" style="color:#92400e">L'Outil de Mortaisage</span><span class="part-desc">Ciseau vertical à coupe en bout. La section de l'outil = section exacte de la rainure. Matière : ARS ou carbure. Doit être rigoureusement perpendiculaire à la table.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:#7dd3fc;color:#0f172a;">5</span>
+        <div><span class="part-name" style="color:#0369a1">Table Croisée + Rotative</span><span class="part-desc">Déplacements X et Y pour positionnement + rotation 360° avec graduation au 0.5°. La rotation permet d'usiner des clavettes sur un cercle (turbine, pompe). Avance automatique disponible.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:#b87333;color:white;">6</span>
+        <div><span class="part-name" style="color:#92400e">Rainure de Clavette (résultat)</span><span class="part-desc">Application principale. L'outil descend par passes successives de 0.1 à 0.3 mm jusqu'à la profondeur finale (t1 selon DIN 6885). Contrôle avec micromètre de profondeur.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODULE 04 — CLAVETAGE COMPLET -->
+<div class="machine-divider fade-up delay-2">
+  <div class="line"></div>
+  <h2>🔩 Clavetage &amp; Assemblages</h2>
+  <div class="line"></div>
+</div>
+
+<section class="mb-14 fade-up delay-2">
+  <div class="flex items-baseline gap-4 mb-6">
+    <span class="module-num">04.</span>
+    <h3 class="section-title">Clavetage — Théorie complète</h3>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6 mb-6">
+    <div class="card">
+      <h4 class="font-black uppercase text-base mb-3" style="font-family:var(--dp);color:var(--green)">Principe du clavetage</h4>
+      <div class="def-box mb-4">
+        <p>La <strong>clavette</strong> est une pièce mécanique interposée entre un arbre et un moyeu pour transmettre un couple. Elle s'engage simultanément dans une rainure de l'arbre ET une rainure du moyeu.<br><br>
+        Le couple transmis : <strong>T = F × r</strong> où F = force tangentielle sur la clavette, r = rayon de l'arbre.</p>
+      </div>
+
+      <!-- SVG clavette -->
+      <div class="svg-wrap" style="min-height:200px;">
+        <svg viewBox="0 0 360 180" width="100%" xmlns="http://www.w3.org/2000/svg">
+          <rect width="360" height="180" fill="#030712"/>
+          <defs><pattern id="gc2" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0L0 0 0 12" fill="none" stroke="#1e293b" stroke-width=".4"/></pattern></defs>
+          <rect width="360" height="180" fill="url(#gc2)" opacity=".3"/>
+
+          <!-- VUE DE COUPE ARBRE + MOYEU + CLAVETTE -->
+          <!-- Moyeu (anneau) -->
+          <circle cx="130" cy="90" r="60" fill="#1e3a5f" stroke="#10b981" stroke-width="2"/>
+          <circle cx="130" cy="90" r="38" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+          <!-- Rainure moyeu -->
+          <rect x="122" y="30" width="16" height="22" rx="0" fill="#1e3a5f" stroke="#10b981" stroke-width="1"/>
+
+          <!-- Arbre -->
+          <circle cx="130" cy="90" r="35" fill="#b87333" stroke="#a16520" stroke-width="1.5"/>
+          <!-- Rainure arbre -->
+          <rect x="122" y="55" width="16" height="18" rx="0" fill="#0f172a" stroke="#a16520"/>
+
+          <!-- CLAVETTE (insérée) -->
+          <rect x="123" y="38" width="14" height="35" rx="1" fill="#ffd700" stroke="#d97706" stroke-width="1.5"/>
+
+          <!-- Dimensions -->
+          <line x1="118" y1="38" x2="118" y2="73" stroke="#10b981" stroke-width="1"/>
+          <line x1="114" y1="38" x2="122" y2="38" stroke="#10b981" stroke-width="1"/>
+          <line x1="114" y1="73" x2="122" y2="73" stroke="#10b981" stroke-width="1"/>
+          <text x="110" y="60" fill="#10b981" font-size="7" font-family="Space Mono" text-anchor="middle">h</text>
+
+          <line x1="123" y1="80" x2="137" y2="80" stroke="#7dd3fc" stroke-width="1"/>
+          <line x1="123" y1="76" x2="123" y2="84" stroke="#7dd3fc" stroke-width="1"/>
+          <line x1="137" y1="76" x2="137" y2="84" stroke="#7dd3fc" stroke-width="1"/>
+          <text x="130" y="94" fill="#7dd3fc" font-size="7" font-family="Space Mono" text-anchor="middle">b</text>
+
+          <!-- Labels -->
+          <text x="130" y="115" fill="#64748b" font-size="7" font-family="Space Mono" text-anchor="middle">ARBRE</text>
+          <text x="185" y="50" fill="#10b981" font-size="7" font-family="Space Mono">MOYEU</text>
+          <text x="175" y="72" fill="#ffd700" font-size="7" font-family="Space Mono">CLAVETTE</text>
+
+          <!-- VUE DE CÔTÉ clavette parallèle -->
+          <g transform="translate(230,40)">
+            <rect x="0" y="20" width="100" height="20" rx="2" fill="#ffd700" stroke="#d97706" stroke-width="1.5"/>
+            <!-- dimensions -->
+            <line x1="0" y1="15" x2="100" y2="15" stroke="#10b981" stroke-width="1"/>
+            <line x1="0" y1="11" x2="0" y2="19" stroke="#10b981" stroke-width="1"/>
+            <line x1="100" y1="11" x2="100" y2="19" stroke="#10b981" stroke-width="1"/>
+            <text x="50" y="10" fill="#10b981" font-size="7" font-family="Space Mono" text-anchor="middle">L (longueur)</text>
+            <line x1="105" y1="20" x2="105" y2="40" stroke="#7dd3fc" stroke-width="1"/>
+            <text x="112" y="35" fill="#7dd3fc" font-size="7" font-family="Space Mono">h</text>
+            <text x="50" y="60" fill="#ffd700" font-size="8" font-family="Space Mono" text-anchor="middle">Vue de côté</text>
+          </g>
+
+          <text x="180" y="165" fill="#10b981" font-size="9" font-family="Space Mono" font-weight="700" text-anchor="middle">CLAVETTE PARALLÈLE — COUPE &amp; CÔTÉ</text>
+        </svg>
+      </div>
+    </div>
+
+    <div>
+      <h4 class="font-black uppercase text-base mb-4" style="font-family:var(--dp)">Tableau DIN 6885 — Dimensions normalisées</h4>
+      <table class="data-table">
+        <thead><tr><th>Ø arbre (mm)</th><th>b × h (mm)</th><th>t1 arbre (mm)</th><th>t2 moyeu (mm)</th></tr></thead>
+        <tbody>
+          <tr><td>6 à 8</td><td class="green-cell">2 × 2</td><td>1.2</td><td>1.0</td></tr>
+          <tr><td>8 à 10</td><td class="green-cell">3 × 3</td><td>1.8</td><td>1.4</td></tr>
+          <tr><td>10 à 12</td><td class="green-cell">4 × 4</td><td>2.5</td><td>1.8</td></tr>
+          <tr><td>12 à 17</td><td class="green-cell">5 × 5</td><td>3.0</td><td>2.3</td></tr>
+          <tr><td>17 à 22</td><td class="green-cell">6 × 6</td><td>3.5</td><td>2.8</td></tr>
+          <tr><td>22 à 30</td><td class="green-cell">8 × 7</td><td>4.0</td><td>3.3</td></tr>
+          <tr><td>30 à 38</td><td class="green-cell">10 × 8</td><td>5.0</td><td>3.3</td></tr>
+          <tr><td>38 à 44</td><td class="green-cell">12 × 8</td><td>5.0</td><td>3.3</td></tr>
+          <tr><td>44 à 50</td><td class="green-cell">14 × 9</td><td>5.5</td><td>3.8</td></tr>
+          <tr><td>50 à 58</td><td class="green-cell">16 × 10</td><td>6.0</td><td>4.3</td></tr>
+        </tbody>
+      </table>
+      <p style="font-family:var(--mn);font-size:.6rem;color:#94a3b8;margin-top:.5rem;">t1 = profondeur rainure arbre · t2 = profondeur rainure moyeu · b = largeur · h = hauteur</p>
+    </div>
+  </div>
+
+  <!-- Types de clavettes -->
+  <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="clavette-card">
+      <h5>Clavette parallèle</h5>
+      <p>Section rectangulaire constante. La plus courante. DIN 6885. Rainure fraiseuse ou mortaiseuse. Ajustement : glissant (h9/N9) ou fixe (p9).</p>
+    </div>
+    <div class="clavette-card">
+      <h5>Clavette Woodruff</h5>
+      <p>Forme demi-lune. Rainure fraisée avec fraise disque spéciale. Auto-centrage dans la rainure conique. DIN 6888. Petits arbres ≤ 25 mm.</p>
+    </div>
+    <div class="clavette-card">
+      <h5>Cannelures</h5>
+      <p>Multiples clavettes intégrées à l'arbre. Transmission couple élevé. DIN 5461/5480. Boîtes de vitesses, arbres de transmission. Taillage ou brochage.</p>
+    </div>
+    <div class="clavette-card">
+      <h5>Goupilles</h5>
+      <p>Cylindrique (DIN 7) ou conique (DIN 1). Assemblage démontable (cylindrique) ou permanent (conique). Perçage simultané arbre + moyeu en position.</p>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="card">
+      <h4 class="font-black uppercase text-base mb-3" style="font-family:var(--dp);color:var(--green)">Procédure de mortaisage d'une rainure</h4>
+      <ol style="list-style:none;padding:0;" class="space-y-2">
+        <li style="display:flex;gap:.75rem;font-size:.82rem;color:#374151;"><span style="color:var(--green);font-family:var(--mn);font-weight:700;flex-shrink:0;">①</span>Monter la pièce sur la table de la mortaiseuse (bridage ou mandrin)</li>
+        <li style="display:flex;gap:.75rem;font-size:.82rem;color:#374151;"><span style="color:var(--green);font-family:var(--mn);font-weight:700;flex-shrink:0;">②</span>Choisir l'outil de la largeur b exacte (ex: 8 mm pour clavette 8×7)</li>
+        <li style="display:flex;gap:.75rem;font-size:.82rem;color:#374151;"><span style="color:var(--green);font-family:var(--mn);font-weight:700;flex-shrink:0;">③</span>Centrer l'outil sur l'axe de la rainure (comparateur)</li>
+        <li style="display:flex;gap:.75rem;font-size:.82rem;color:#374151;"><span style="color:var(--green);font-family:var(--mn);font-weight:700;flex-shrink:0;">④</span>Régler la course verticale = t1 + 5 mm de dégagement</li>
+        <li style="display:flex;gap:.75rem;font-size:.82rem;color:#374151;"><span style="color:var(--green);font-family:var(--mn);font-weight:700;flex-shrink:0;">⑤</span>Passe d'entrée : ap = 0.2 mm. Avance Y = 0.05 mm/course</li>
+        <li style="display:flex;gap:.75rem;font-size:.82rem;color:#374151;"><span style="color:var(--green);font-family:var(--mn);font-weight:700;flex-shrink:0;">⑥</span>Passes successives jusqu'à t1 - 0.1 mm (avant-finition)</li>
+        <li style="display:flex;gap:.75rem;font-size:.82rem;color:#374151;"><span style="color:var(--green);font-family:var(--mn);font-weight:700;flex-shrink:0;">⑦</span>Passe de finition : ap = 0.05 mm sur toute la longueur</li>
+        <li style="display:flex;gap:.75rem;font-size:.82rem;color:#374151;"><span style="color:var(--green);font-family:var(--mn);font-weight:700;flex-shrink:0;">⑧</span>Contrôle avec micromètre de profondeur et calibre d'ajustement</li>
+      </ol>
+    </div>
+    <div class="space-y-4">
+      <div class="warn-box">
+        <p>⚠ <strong>Ajustement de la clavette :</strong><br>
+        La clavette NE DOIT PAS avoir de jeu latéral (b). Jeu autorisé : 0.01 à 0.02 mm (ajustement glissant h9/N9).<br><br>
+        Par contre, un léger jeu en hauteur (h) est normal et souhaité pour éviter l'effet coin. Le jeu radial total = t1 + t2 - h doit être ≥ 0.</p>
+      </div>
+      <div class="danger-box">
+        <p>🚨 <strong>Erreurs fréquentes :</strong><br>
+        ✗ Rainure trop large → jeu latéral → chocs en inversion<br>
+        ✗ Rainure trop profonde → arbre affaibli → risque de rupture<br>
+        ✗ Outil mal perpendiculaire → rainure oblique<br>
+        ✗ Oublier le chanfrein d'entrée → montage impossible<br>
+        ✗ Clavette trop longue → dépasse du moyeu → frottement</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODULE 05 — EXERCICES CORRIGÉS -->
+<section class="mb-10 fade-up delay-3">
+  <div class="flex items-baseline gap-4 mb-6">
+    <span class="module-num">05.</span>
+    <h3 class="section-title">Exercices corrigés</h3>
+  </div>
+  <div class="exercise">
+    <h4>5 Exercices — Étau-Limeur, Mortaiseuse &amp; Clavetage</h4>
+
+    <div class="ex-question">
+      <p><strong>Ex. 1 — Réglage course :</strong> Vous devez dresser une pièce de 180 mm de long sur l'étau-limeur. Quelle course régler ? Le mécanisme effectue 60 coups/min et la Vc souhaitée est 8 m/min. La course est-elle correcte ?</p>
+      <button class="btn-answer" onclick="toggleAnswer('el1')">Voir la réponse ▼</button>
+      <div class="ex-answer" id="el1">
+        <p>Course à régler = 180 + 15 + 15 = <span style="color:#22c55e;font-weight:700">210 mm</span><br><br>
+Vérification Vc :<br>
+Vc = (2 × L × n) / 1000 = (2 × 210 × 60) / 1000 = 25 200 / 1000 = <span style="color:#22c55e;font-weight:700">25.2 m/min</span><br><br>
+Cette Vc est trop élevée pour l'acier (max 12 m/min) !<br>
+→ Réduire à n = 60 × (8/25.2) ≈ <span style="color:#22c55e;font-weight:700">19 coups/min</span><br>
+Ou réduire la vitesse moteur sur la boîte de vitesses.</p>
+      </div>
+    </div>
+
+    <div class="ex-question">
+      <p><strong>Ex. 2 — Choix clavette :</strong> Un arbre de Ø35 mm doit entraîner une roue dentée. Quelle clavette choisir selon DIN 6885 ? Quelles sont les profondeurs de rainure à usiner sur l'arbre et sur le moyeu ?</p>
+      <button class="btn-answer" onclick="toggleAnswer('el2')">Voir la réponse ▼</button>
+      <div class="ex-answer" id="el2">
+        <p>Ø35 mm → entre 30 et 38 mm<br>
+→ <span style="color:#22c55e;font-weight:700">Clavette 10 × 8 mm</span> (DIN 6885 A)<br><br>
+Profondeur rainure arbre : <span style="color:#22c55e;font-weight:700">t1 = 5.0 mm</span><br>
+Profondeur rainure moyeu : <span style="color:#22c55e;font-weight:700">t2 = 3.3 mm</span><br>
+Vérification : t1 + t2 = 5.0 + 3.3 = 8.3 mm > h = 8 mm ✓ (jeu positif)<br><br>
+Outil à utiliser : ciseau de mortaisage de 10 mm de large</p>
+      </div>
+    </div>
+
+    <div class="ex-question">
+      <p><strong>Ex. 3 — Différence étau-limeur / mortaiseuse :</strong> Pour les 3 cas suivants, indiquez quelle machine utiliser et pourquoi :<br>a) Dresser les 4 faces d'un bloc prismatique 200×150×80 mm<br>b) Réaliser une rainure de clavette dans l'alésage Ø50 d'une roue<br>c) Usiner une rainure en T dans une table de bridage</p>
+      <button class="btn-answer" onclick="toggleAnswer('el3')">Voir la réponse ▼</button>
+      <div class="ex-answer" id="el3">
+        <p>a) <span style="color:#22c55e;font-weight:700">Étau-Limeur</span> — Surfaces externes accessibles horizontalement. Mouvement horizontal idéal pour dressage de faces planes.<br><br>
+b) <span style="color:#22c55e;font-weight:700">Mortaiseuse</span> — Rainure intérieure inaccessible à l'étau-limeur. Outil vertical descendant dans l'alésage. La table rotative permet le centrage précis.<br><br>
+c) <span style="color:#22c55e;font-weight:700">Étau-Limeur avec burin spécial</span> en T — Rainure accessible horizontalement. Profil en T obtenu avec un burin profilé en 2 passes (rainure droite + évasement latéral).</p>
+      </div>
+    </div>
+
+    <div class="ex-question">
+      <p><strong>Ex. 4 — Calcul vérification clavette :</strong> Un arbre Ø25 mm transmet un couple T = 150 N·m. La clavette DIN 6885 choisie est 8×7×50 mm. Calculez la pression de contact sur la clavette. Limite admissible = 100 MPa.</p>
+      <button class="btn-answer" onclick="toggleAnswer('el4')">Voir la réponse ▼</button>
+      <div class="ex-answer" id="el4">
+        <p>Force tangentielle : F = T / r = 150 / 0.0125 = <span style="color:#22c55e;font-weight:700">12 000 N</span><br><br>
+Surface de contact clavette (côté) :<br>
+A = (h/2) × L = (7/2) × 50 = 3.5 × 50 = <span style="color:#22c55e;font-weight:700">175 mm²</span><br>
+(on prend h/2 car la moitié de la hauteur est en contact effectif)<br><br>
+Pression : p = F / A = 12 000 / 175 = <span style="color:#22c55e;font-weight:700">68.6 MPa</span><br><br>
+68.6 MPa &lt; 100 MPa admissibles → <span style="color:#22c55e;font-weight:700">Clavette validée ✓</span></p>
+      </div>
+    </div>
+
+    <div class="ex-question">
+      <p><strong>Ex. 5 — Dépannage mortaiseuse :</strong> Après mortaisage, vous constatez que la rainure est légèrement évasée au fond (plus large en bas qu'en haut). Quelle en est la cause ? Comment corriger ?</p>
+      <button class="btn-answer" onclick="toggleAnswer('el5')">Voir la réponse ▼</button>
+      <div class="ex-answer" id="el5">
+        <p><span style="color:#22c55e;font-weight:700">Cause :</span> L'outil n'est pas parfaitement vertical. Il est légèrement incliné par rapport à l'axe de la broche.<br>
+→ Les flancs de l'outil coupent en dépouille insuffisante au fond.<br><br>
+<span style="color:#22c55e;font-weight:700">Autres causes possibles :</span><br>
+• Jeu dans les glissières verticales de la mortaiseuse<br>
+• Outil mal serré (se penche sous l'effort)<br>
+• Avance trop grande (flexion de l'outil)<br><br>
+<span style="color:#22c55e;font-weight:700">Corrections :</span><br>
+① Vérifier la verticalité de l'outil avec un comparateur<br>
+② Réduire l'avance par course<br>
+③ Utiliser un outil plus rigide (section plus grande)<br>
+④ Régler le rattrapage de jeu des glissières</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LESSON NAV -->
+<div class="lesson-nav">
+  <a href="conv-tournage.html" class="btn-sec">← L.3 Tour Parallèle</a>
+  <div class="text-center">
+    <p style="font-family:var(--mn);font-size:.62rem;color:var(--green);text-transform:uppercase;letter-spacing:.1em;">Leçon 4 / Conv. — Étau-Limeur, Mortaiseuse &amp; Clavetage</p>
+    <p style="font-family:var(--mn);font-size:.55rem;color:#94a3b8;margin-top:.25rem;">Série Usinage Conventionnel Complète ✓</p>
+  </div>
+  <a href="index.html#conventionnel" class="btn-green">Retour Accueil ↩</a>
+</div>
+
+</main>
+
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-12">
+  <p class="text-xs" style="font-family:var(--mn);letter-spacing:.2em;text-transform:uppercase">© 2026 CNC ACADÉMIE — Julien Joos · Formation Usinage · Belgique</p>
+  <p class="text-xs mt-2" style="font-family:var(--mn);color:#334155;"><a href="mentions-legales.html" style="color:#475569;text-decoration:underline;">Mentions légales</a></p>
+</footer>
+
+<script>
+document.getElementById('burger-btn').addEventListener('click',()=>{
+  document.getElementById('mobile-menu').classList.toggle('open');
+  document.getElementById('burger-icon').classList.toggle('hidden');
+  document.getElementById('close-icon').classList.toggle('hidden');
+});
+function toggleDropdown(){document.getElementById('dropdown-menu').classList.toggle('hidden');}
+document.addEventListener('click',e=>{
+  const w=document.getElementById('dropdown-wrapper');
+  if(w&&!w.contains(e.target))document.getElementById('dropdown-menu').classList.add('hidden');
+});
+function toggleAnswer(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('show');
+  const btn=el.previousElementSibling;
+  btn.textContent=el.classList.contains('show')?'Masquer la réponse ▲':'Voir la réponse ▼';
+}
+</script>
+</body>
+</html>

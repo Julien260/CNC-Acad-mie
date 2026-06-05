@@ -3,154 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Académie G-Code Fanuc | Introduction</title>
+    <title>CNC Académie | G-Code Fanuc & Usinage Conventionnel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --orange: #f97316;
-            --orange-dark: #ea6c0a;
-            --navy: #0f172a;
-            --navy-mid: #1e293b;
-            --navy-light: #334155;
-            --mono: 'Space Mono', monospace;
-            --display: 'Barlow Condensed', sans-serif;
-            --body: 'Barlow', sans-serif;
+            --orange:#f97316;--orange-dark:#ea6c0a;
+            --navy:#0f172a;--navy-mid:#1e293b;--navy-light:#334155;
+            --green:#10b981;--green-dark:#059669;
+            --mono:'Space Mono',monospace;--display:'Barlow Condensed',sans-serif;--body:'Barlow',sans-serif;
         }
-
-        * { font-family: var(--body); }
-        h1, h2, h3, h4, .display { font-family: var(--display); }
-        code, .mono { font-family: var(--mono); }
-
-        body { background: #f1f5f9; color: #0f172a; }
-
-        /* ─── NAV ─── */
-        nav { background: var(--navy); }
-        .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
-
-        #mobile-menu { display: none; }
-        #mobile-menu.open { display: block; }
-
-        .dropdown-menu {
-            display: none;
-            position: absolute; right: 0; top: calc(100% + 4px);
-            width: 18rem; background: white; border-radius: 0.75rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0;
-            z-index: 100; overflow: hidden;
-        }
-        .dropdown-trigger:hover .dropdown-menu,
-        .dropdown-trigger:focus-within .dropdown-menu { display: block; }
-
-        .menu-lesson { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; text-decoration: none; }
-        .menu-lesson:hover { background: #fff7ed; }
-        .menu-lesson:last-child { border-bottom: none; }
-        .menu-lesson-num { font-family: var(--mono); font-size: 0.6rem; color: var(--orange); letter-spacing: 0.1em; text-transform: uppercase; display: block; }
-        .menu-lesson-title { font-size: 0.85rem; color: #1e293b; font-weight: 500; }
-        .menu-lesson.pro:hover { background: #eef2ff; }
-        .menu-lesson.pro .menu-lesson-num { color: #6366f1; }
-        .badge-pro { font-size: 0.6rem; background: #6366f1; color: white; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.4rem; }
-
-        /* ─── HERO ─── */
-        .hero { background: var(--navy); position: relative; overflow: hidden; }
-        .hero::before {
-            content: ''; position: absolute; inset: 0;
-            background-image:
-                repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(249,115,22,0.07) 39px, rgba(249,115,22,0.07) 40px),
-                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(249,115,22,0.07) 39px, rgba(249,115,22,0.07) 40px);
-            pointer-events: none;
-        }
-        .hero::after {
-            content: ''; position: absolute; bottom: -60px; left: -60px;
-            width: 400px; height: 400px;
-            background: radial-gradient(circle, rgba(249,115,22,0.18) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .hero-badge {
-            font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em;
-            background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.35);
-            color: var(--orange); padding: 0.3rem 0.8rem; border-radius: 2px;
-            text-transform: uppercase; display: inline-block; margin-bottom: 1.2rem;
-        }
-        .hero-title {
-            font-family: var(--display); font-weight: 900;
-            font-size: clamp(2.8rem, 7vw, 5rem); line-height: 0.95;
-            letter-spacing: -0.01em; text-transform: uppercase;
-        }
-        .hero-title .accent { color: var(--orange); }
-        .hero-sub { font-family: var(--body); font-weight: 400; color: #94a3b8; font-size: 1.05rem; line-height: 1.6; max-width: 480px; }
-
-        .hero-code {
-            font-family: var(--mono); font-size: 0.78rem;
-            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
-            border-left: 3px solid var(--orange); padding: 1rem 1.25rem;
-            border-radius: 4px; color: #64748b; line-height: 1.9;
-        }
-        .hero-code .kw { color: var(--orange); }
-        .hero-code .val { color: #7dd3fc; }
-        .hero-code .cm { color: #475569; font-style: italic; }
-
-        /* ─── BUTTONS ─── */
-        .btn-primary {
-            background: var(--orange); color: white; font-family: var(--display);
-            font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase;
-            padding: 0.9rem 2.2rem; border-radius: 6px;
-            transition: background 0.2s, transform 0.15s; display: inline-block; text-decoration: none;
-        }
-        .btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); }
-
-        /* ─── FEATURE CARDS ─── */
-        .feature-card {
-            background: white; border-radius: 12px; padding: 1.75rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-top: 3px solid var(--orange);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .feature-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-        .feature-card .icon {
-            width: 2.5rem; height: 2.5rem; background: rgba(249,115,22,0.1);
-            border-radius: 8px; display: flex; align-items: center; justify-content: center;
-            color: var(--orange); margin-bottom: 1rem;
-        }
-        .feature-card h3 { font-family: var(--display); font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem; }
-        .feature-card p { font-size: 0.875rem; color: #64748b; line-height: 1.65; }
-
-        /* ─── MACHINE CARDS ─── */
-        .machine-card {
-            background: white; border-radius: 16px; overflow: hidden;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .machine-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.12); }
-        .machine-card-header { padding: 1.75rem; }
-        .machine-card h3 { font-family: var(--display); font-weight: 800; font-size: 1.75rem; text-transform: uppercase; }
-        .machine-card .tag { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; padding: 0.25rem 0.65rem; border-radius: 3px; display: inline-block; margin-bottom: 0.75rem; }
-        .machine-card .quote { font-style: italic; color: #94a3b8; font-size: 0.875rem; margin-bottom: 1rem; }
-        .machine-card ul { list-style: none; padding: 0; margin: 0 0 1.25rem; }
-        .machine-card li { font-size: 0.875rem; color: #475569; padding: 0.3rem 0; display: flex; align-items: center; gap: 0.5rem; }
-        .machine-card .code-block { font-family: var(--mono); font-size: 0.75rem; padding: 0.9rem 1.1rem; border-radius: 8px; }
-
-        /* ─── STATS BAR ─── */
-        .stats-bar { background: var(--navy-mid); }
-        .stat-num { font-family: var(--display); font-weight: 900; font-size: 2.2rem; color: var(--orange); }
-        .stat-label { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em; color: #64748b; text-transform: uppercase; margin-top: 0.2rem; }
-
-        /* ─── CTA ─── */
-        .cta-block {
-            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
-            border-radius: 20px; position: relative; overflow: hidden;
-        }
-        .cta-block::before {
-            content: 'G01'; font-family: var(--display); font-size: 10rem; font-weight: 900;
-            position: absolute; right: -1rem; top: -2rem;
-            color: rgba(255,255,255,0.03); pointer-events: none; line-height: 1;
-        }
-
-        /* ─── ANIMATIONS ─── */
-        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-        .fade-up { animation: fadeUp 0.6s ease both; }
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.22s; }
-        .delay-3 { animation-delay: 0.34s; }
+        *{font-family:var(--body);}
+        h1,h2,h3,h4,.display{font-family:var(--display);}
+        code,.mono{font-family:var(--mono);}
+        body{background:#f1f5f9;color:#0f172a;}
+        nav{background:var(--navy);}
+        .logo-text{font-family:var(--display);font-weight:900;font-size:1.4rem;letter-spacing:-0.02em;}
+        #mobile-menu{display:none;}
+        #mobile-menu.open{display:block;}
+        .dropdown-menu{display:none;position:absolute;right:0;top:calc(100% + 4px);width:22rem;background:white;border-radius:.75rem;box-shadow:0 20px 40px rgba(0,0,0,.18);border:1px solid #e2e8f0;z-index:100;overflow:hidden;max-height:80vh;overflow-y:auto;}
+        .dropdown-trigger:hover .dropdown-menu,.dropdown-trigger:focus-within .dropdown-menu{display:block;}
+        .menu-lesson{display:block;padding:.6rem 1rem;border-bottom:1px solid #f1f5f9;transition:background .15s;text-decoration:none;}
+        .menu-lesson:hover{background:#fff7ed;}
+        .menu-lesson.pro:hover{background:#eef2ff;}
+        .menu-lesson.conv:hover{background:#f0fdf4;}
+        .menu-lesson-num{font-family:var(--mono);font-size:.58rem;color:var(--orange);letter-spacing:.1em;text-transform:uppercase;display:block;}
+        .menu-lesson.pro .menu-lesson-num{color:#6366f1;}
+        .menu-lesson.conv .menu-lesson-num{color:var(--green);}
+        .menu-lesson-title{font-size:.82rem;color:#1e293b;font-weight:500;}
+        .badge-pro{font-size:.55rem;background:#6366f1;color:white;padding:.1rem .35rem;border-radius:3px;font-weight:700;vertical-align:middle;margin-left:.3rem;}
+        .badge-soon{font-size:.55rem;background:#94a3b8;color:white;padding:.1rem .35rem;border-radius:3px;font-weight:700;vertical-align:middle;margin-left:.3rem;}
+        .hero{background:var(--navy);position:relative;overflow:hidden;}
+        .hero::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(249,115,22,.07) 39px,rgba(249,115,22,.07) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(249,115,22,.07) 39px,rgba(249,115,22,.07) 40px);pointer-events:none;}
+        .hero::after{content:'';position:absolute;bottom:-60px;left:-60px;width:400px;height:400px;background:radial-gradient(circle,rgba(249,115,22,.18) 0%,transparent 70%);pointer-events:none;}
+        .hero-badge{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.35);color:var(--orange);padding:.3rem .8rem;border-radius:2px;text-transform:uppercase;display:inline-block;margin-bottom:1.2rem;}
+        .hero-title{font-family:var(--display);font-weight:900;font-size:clamp(2.8rem,7vw,5rem);line-height:.95;letter-spacing:-.01em;text-transform:uppercase;}
+        .hero-title .accent{color:var(--orange);}
+        .hero-sub{font-family:var(--body);font-weight:400;color:#94a3b8;font-size:1.05rem;line-height:1.6;max-width:480px;}
+        .hero-code{font-family:var(--mono);font-size:.78rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-left:3px solid var(--orange);padding:1rem 1.25rem;border-radius:4px;color:#64748b;line-height:1.9;}
+        .hero-code .kw{color:var(--orange);}.hero-code .val{color:#7dd3fc;}.hero-code .cm{color:#475569;font-style:italic;}
+        .btn-primary{background:var(--orange);color:white;font-family:var(--display);font-weight:700;font-size:1rem;letter-spacing:.05em;text-transform:uppercase;padding:.9rem 2.2rem;border-radius:6px;transition:background .2s,transform .15s;display:inline-block;text-decoration:none;}
+        .btn-primary:hover{background:var(--orange-dark);transform:translateY(-1px);}
+        .btn-green{background:var(--green);color:white;font-family:var(--display);font-weight:700;font-size:1rem;letter-spacing:.05em;text-transform:uppercase;padding:.9rem 2.2rem;border-radius:6px;transition:background .2s,transform .15s;display:inline-block;text-decoration:none;}
+        .btn-green:hover{background:var(--green-dark);transform:translateY(-1px);}
+        .feature-card{background:white;border-radius:12px;padding:1.75rem;box-shadow:0 2px 8px rgba(0,0,0,.06);border-top:3px solid var(--orange);transition:transform .2s,box-shadow .2s;}
+        .feature-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1);}
+        .feature-card .icon{width:2.5rem;height:2.5rem;background:rgba(249,115,22,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--orange);margin-bottom:1rem;}
+        .feature-card h3{font-family:var(--display);font-weight:700;font-size:1.2rem;margin-bottom:.5rem;}
+        .feature-card p{font-size:.875rem;color:#64748b;line-height:1.65;}
+        .feature-card.green{border-top-color:var(--green);}
+        .feature-card.green .icon{background:rgba(16,185,129,.1);color:var(--green);}
+        .machine-card{background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08);transition:transform .2s,box-shadow .2s;}
+        .machine-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.12);}
+        .machine-card-header{padding:1.75rem;}
+        .machine-card h3{font-family:var(--display);font-weight:800;font-size:1.75rem;text-transform:uppercase;}
+        .machine-card .tag{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;padding:.25rem .65rem;border-radius:3px;display:inline-block;margin-bottom:.75rem;}
+        .machine-card .quote{font-style:italic;color:#94a3b8;font-size:.875rem;margin-bottom:1rem;}
+        .machine-card ul{list-style:none;padding:0;margin:0 0 1.25rem;}
+        .machine-card li{font-size:.875rem;color:#475569;padding:.3rem 0;display:flex;align-items:center;gap:.5rem;}
+        .machine-card .code-block{font-family:var(--mono);font-size:.75rem;padding:.9rem 1.1rem;border-radius:8px;}
+        .conv-card{background:white;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.07);transition:transform .2s,box-shadow .2s;border-top:4px solid var(--green);}
+        .conv-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.11);}
+        .conv-card-header{padding:1.5rem;}
+        .conv-card h3{font-family:var(--display);font-weight:800;font-size:1.5rem;text-transform:uppercase;color:#1e293b;margin-bottom:.25rem;}
+        .conv-card .subtag{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--green);text-transform:uppercase;display:block;margin-bottom:.6rem;}
+        .conv-card .quote{font-style:italic;color:#94a3b8;font-size:.82rem;margin-bottom:1rem;border-left:2px solid var(--green);padding-left:.6rem;}
+        .conv-card ul{list-style:none;padding:0;margin:0 0 1rem;}
+        .conv-card li{font-size:.82rem;color:#475569;padding:.25rem 0;display:flex;align-items:center;gap:.5rem;}
+        .conv-card .coming-soon{font-family:var(--mono);font-size:.62rem;background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0;padding:.4rem .8rem;border-radius:4px;display:inline-block;}
+        .stats-bar{background:var(--navy-mid);}
+        .stat-num{font-family:var(--display);font-weight:900;font-size:2.2rem;color:var(--orange);}
+        .stat-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;color:#64748b;text-transform:uppercase;margin-top:.2rem;}
+        .cta-block{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%);border-radius:20px;position:relative;overflow:hidden;}
+        .cta-conv{background:linear-gradient(135deg,#064e3b 0%,#065f46 100%);border-radius:20px;position:relative;overflow:hidden;}
+        .intro-conv{background:var(--navy);border-radius:20px;overflow:hidden;position:relative;}
+        .intro-conv::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(16,185,129,.05) 39px,rgba(16,185,129,.05) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(16,185,129,.05) 39px,rgba(16,185,129,.05) 40px);pointer-events:none;}
+        .def-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:1.25rem;}
+        .def-card h4{font-family:var(--display);font-weight:700;font-size:1.1rem;text-transform:uppercase;color:white;margin-bottom:.4rem;}
+        .def-card p{font-size:.82rem;color:#94a3b8;line-height:1.65;}
+        .def-card .def-tag{font-family:var(--mono);font-size:.58rem;color:var(--green);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:.4rem;}
+        .section-divider{display:flex;align-items:center;gap:1rem;margin-bottom:2rem;}
+        .section-divider h2{font-family:var(--display);font-weight:900;font-size:1.75rem;text-transform:uppercase;white-space:nowrap;}
+        .section-divider .line{height:1px;flex:1;background:#e2e8f0;}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+        .fade-up{animation:fadeUp .6s ease both;}
+        .delay-1{animation-delay:.1s;}.delay-2{animation-delay:.22s;}.delay-3{animation-delay:.34s;}.delay-4{animation-delay:.46s;}
     </style>
 </head>
 <body>
@@ -159,7 +97,7 @@
 <nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
     <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
         <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
-        <div class="hidden md:flex items-center gap-6">
+        <div class="hidden md:flex items-center gap-5">
             <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
             <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
             <div class="relative dropdown-trigger">
@@ -167,7 +105,8 @@
                     COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div class="dropdown-menu">
-                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                    <div class="dd-sticky px-3 pt-2.5 pb-1.5 bg-orange-50 border-b border-orange-100"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-orange-500">⚡ G-Code CNC Fanuc</p></div>
+                    <div class="px-3 pt-1.5 pb-0.5"><p style="font-family:var(--mono)" class="text-[9px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
                     <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
                     <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
                     <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
@@ -175,10 +114,15 @@
                     <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
                     <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
                     <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
-                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
-                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
-                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
+                    <div class="dd-sticky px-3 pt-1.5 pb-1 bg-indigo-50 border-t-2 border-indigo-100 mt-0.5"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-500">⭐ Expert PRO</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Filetage G76 <span class="badge-pro">PRO</span></span></a>
                     <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                    <div class="dd-sticky px-3 pt-1.5 pb-1 bg-emerald-50 border-t-2 border-emerald-100 mt-0.5"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-green-600">⚙ Usinage Conventionnel</p></div>
+                    <a href="conv-bases.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.1 — Bases</span><span class="text-sm text-slate-700">Les 4 machines principales</span></a>
+                    <a href="conv-fraisage.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.2 — Fraisage</span><span class="text-sm text-slate-700">Fraiseuse conventionnelle</span></a>
+                    <a href="conv-tournage.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.3 — Tour</span><span class="text-sm text-slate-700">Tour parallèle</span></a>
+                    <a href="conv-etau-limeur.html" class="block px-4 py-2.5 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.4 — Étau-Limeur</span><span class="text-sm text-slate-700">Étau-limeur &amp; Mortaiseuse</span></a>
                 </div>
             </div>
             <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
@@ -195,32 +139,31 @@
         <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
         <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
         <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
-        <div>
-            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
-            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
-            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
-            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
-            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
-            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
-            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
-            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
-        </div>
+        <a href="mentions-legales.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Légal</a>
+        <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-orange-400 pt-3 pb-1">⚡ G-Code CNC</p>
+        <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">L.1 – Les Axes</a>
+        <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">L.7 – Sécurité</a>
+        <a href="lecon10.html" class="block text-slate-300 py-1.5 text-sm hover:text-indigo-400">L.10 – Paramétré</a>
+        <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-green-400 pt-3 pb-1">⚙ Conventionnel</p>
+        <a href="conv-bases.html" class="block text-slate-300 py-1.5 text-sm hover:text-green-400">L.1 – Bases &amp; Machines</a>
+        <a href="conv-fraisage.html" class="block text-slate-300 py-1.5 text-sm hover:text-green-400">L.2 – Fraiseuse</a>
+        <a href="conv-tournage.html" class="block text-slate-300 py-1.5 text-sm hover:text-green-400">L.3 – Tour parallèle</a>
+        <a href="conv-etau-limeur.html" class="block text-slate-300 py-1.5 text-sm hover:text-green-400">L.4 – Étau-Limeur</a>
     </div>
 </nav>
+
 
 <!-- ═══ HERO ═══ -->
 <header class="hero text-white py-20 px-6 relative">
     <div class="container mx-auto max-w-5xl relative z-10">
         <div class="grid md:grid-cols-2 gap-12 items-center">
             <div class="fade-up">
-                <div class="hero-badge">ISO 6983 · Fanuc Series 0i</div>
-                <h2 class="hero-title text-white mb-5">
-                    Maîtrisez<br>le <span class="accent">G-Code</span><br>Fanuc
-                </h2>
-                <p class="hero-sub mb-8">Du débutant au programmateur expert — apprenez le langage qui fait tourner l'industrie mondiale.</p>
+                <div class="hero-badge">ISO 6983 · Fanuc 0i · Usinage Conventionnel</div>
+                <h2 class="hero-title text-white mb-5">Maîtrisez<br>l'<span class="accent">Usinage</span><br>complet</h2>
+                <p class="hero-sub mb-8">Du G-Code Fanuc à la fraiseuse conventionnelle — apprenez le langage et les gestes qui font tourner l'industrie mondiale.</p>
                 <div class="flex flex-wrap gap-3">
-                    <a href="lecon1.html" class="btn-primary">Commencer la Leçon 1 →</a>
-                    <a href="dictionnaire.html" class="inline-block border border-slate-600 text-slate-300 hover:border-orange-500 hover:text-orange-400 transition font-semibold py-3 px-5 rounded-md text-sm uppercase tracking-wide" style="font-family:var(--display)">Codes G/M</a>
+                    <a href="lecon1.html" class="btn-primary">G-Code : Leçon 1 →</a>
+                    <a href="#conventionnel" class="btn-green">Usinage Conv. ↓</a>
                 </div>
             </div>
             <div class="fade-up delay-2 hidden md:block">
@@ -235,7 +178,6 @@
                     <span class="kw">G71 P</span><span class="val">10</span> <span class="kw">Q</span><span class="val">20</span> <span class="kw">F</span><span class="val">0.3</span><br>
                     <span class="kw">N10 G00 X</span><span class="val">30.</span><br>
                     <span class="kw">G01 Z-</span><span class="val">25.</span> <span class="kw">F</span><span class="val">0.15</span><br>
-                    <span class="kw">N20 X</span><span class="val">42.</span><br>
                     <span class="kw">M30</span> <span class="cm">; Fin programme</span>
                 </div>
             </div>
@@ -246,8 +188,9 @@
 <!-- ═══ STATS BAR ═══ -->
 <div class="stats-bar">
     <div class="container mx-auto max-w-5xl">
-        <div class="grid grid-cols-3 divide-x divide-slate-700">
-            <div class="text-center p-5"><div class="stat-num">10</div><div class="stat-label">Leçons</div></div>
+        <div class="grid grid-cols-4 divide-x divide-slate-700">
+            <div class="text-center p-5"><div class="stat-num">10</div><div class="stat-label">Leçons CNC</div></div>
+            <div class="text-center p-5"><div class="stat-num">7</div><div class="stat-label">Machines Conv.</div></div>
             <div class="text-center p-5"><div class="stat-num">90%</div><div class="stat-label">Ateliers couverts</div></div>
             <div class="text-center p-5"><div class="stat-num">100%</div><div class="stat-label">Gratuit</div></div>
         </div>
@@ -257,47 +200,30 @@
 <!-- ═══ MAIN ═══ -->
 <main class="container mx-auto max-w-5xl py-16 px-6">
 
-    <!-- Feature cards -->
+    <!-- Feature cards G-Code -->
     <div class="grid md:grid-cols-3 gap-6 mb-16">
         <div class="feature-card fade-up">
-            <div class="icon">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-            </div>
+            <div class="icon"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
             <h3>Qu'est-ce que la CNC ?</h3>
             <p>La <strong>Commande Numérique par Calculateur</strong> est le cerveau de la machine. Elle interprète des données numériques pour piloter les moteurs avec une précision chirurgicale.</p>
         </div>
         <div class="feature-card fade-up delay-1">
-            <div class="icon">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                </svg>
-            </div>
+            <div class="icon"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>
             <h3>Le Langage G-Code</h3>
-            <p>C'est la liste d'instructions envoyée à la machine. Chaque ligne (bloc) dicte un mouvement ou une action : <strong>G</strong> pour la géométrie, <strong>M</strong> pour la machine.</p>
+            <p>Chaque ligne (bloc) dicte un mouvement ou une action : <strong>G</strong> pour la géométrie, <strong>M</strong> pour la machine. C'est le langage universel de la productique numérique.</p>
         </div>
         <div class="feature-card fade-up delay-2">
-            <div class="icon">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                </svg>
-            </div>
+            <div class="icon"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
             <h3>Le Standard Fanuc</h3>
-            <p>Le système <strong>Fanuc</strong> est la référence absolue en usinage. Apprendre le code ISO Fanuc vous ouvre les portes de 90% des ateliers de mécanique.</p>
+            <p>Le système <strong>Fanuc</strong> est la référence absolue. Apprendre le code ISO Fanuc vous ouvre les portes de 90% des ateliers de mécanique dans le monde.</p>
         </div>
     </div>
 
-    <!-- Divider -->
-    <div class="mb-8 flex items-center gap-4">
-        <div class="h-px flex-1 bg-slate-200"></div>
-        <h2 class="text-2xl font-black uppercase tracking-wide text-slate-700" style="font-family:var(--display)">Deux disciplines, un même langage</h2>
-        <div class="h-px flex-1 bg-slate-200"></div>
-    </div>
+    <!-- Divider CNC -->
+    <div class="section-divider mb-8"><div class="line"></div><h2 class="text-slate-700">G-Code — Deux disciplines CNC</h2><div class="line"></div></div>
 
-    <!-- Machine cards -->
-    <div class="grid md:grid-cols-2 gap-8 mb-16">
-        <!-- Fraisage -->
+    <!-- Machine cards CNC -->
+    <div class="grid md:grid-cols-2 gap-8 mb-8">
         <div class="machine-card">
             <div class="machine-card-header border-t-4 border-blue-500">
                 <span class="tag bg-blue-50 text-blue-600 border border-blue-100" style="font-family:var(--mono)">3 Axes : X · Y · Z</span>
@@ -308,7 +234,7 @@
                     <li><span class="text-blue-500 text-lg">✔</span> Surfaçage, poches et contours</li>
                     <li><span class="text-blue-500 text-lg">✔</span> Perçage, alésage, taraudage</li>
                 </ul>
-                <div class="code-block bg-slate-900 text-slate-400 border border-slate-700" style="border-left:3px solid #3b82f6; font-family:var(--mono); font-size:0.75rem; line-height:1.8">
+                <div class="code-block bg-slate-900 text-slate-400 border border-slate-700" style="border-left:3px solid #3b82f6;font-family:var(--mono);font-size:.75rem;line-height:1.8">
                     <span style="color:#f97316">G00</span> X0. Y0. Z5.<br>
                     <span style="color:#f97316">G01</span> Z-5. <span style="color:#7dd3fc">F100.</span><br>
                     <span style="color:#f97316">G01</span> X100. Y50. <span style="color:#7dd3fc">F200.</span><br>
@@ -316,7 +242,6 @@
                 </div>
             </div>
         </div>
-        <!-- Tournage -->
         <div class="machine-card">
             <div class="machine-card-header border-t-4 border-orange-500">
                 <span class="tag bg-orange-50 text-orange-600 border border-orange-100" style="font-family:var(--mono)">2 Axes : X · Z</span>
@@ -327,7 +252,7 @@
                     <li><span class="text-orange-500 text-lg">✔</span> Dressage, chariotage et filetage</li>
                     <li><span class="text-orange-500 text-lg">✔</span> Cycles d'ébauche G71/G72</li>
                 </ul>
-                <div class="code-block bg-slate-900 text-slate-400 border border-slate-700" style="border-left:3px solid #f97316; font-family:var(--mono); font-size:0.75rem; line-height:1.8">
+                <div class="code-block bg-slate-900 text-slate-400 border border-slate-700" style="border-left:3px solid #f97316;font-family:var(--mono);font-size:.75rem;line-height:1.8">
                     <span style="color:#f97316">G96</span> S180 M03<br>
                     <span style="color:#f97316">G00</span> X42. Z2.<br>
                     <span style="color:#f97316">G01</span> X40. Z-25. <span style="color:#7dd3fc">F0.2</span><br>
@@ -337,34 +262,222 @@
         </div>
     </div>
 
-    <!-- CTA -->
-    <div class="cta-block text-white p-10 flex flex-col md:flex-row items-center justify-between gap-6">
+    <!-- CTA G-Code -->
+    <div class="cta-block text-white p-10 flex flex-col md:flex-row items-center justify-between gap-6 mb-24">
         <div>
             <p class="text-orange-400 text-xs font-bold uppercase tracking-widest mb-1" style="font-family:var(--mono)">// Prêt ?</p>
-            <h4 class="text-3xl font-black uppercase" style="font-family:var(--display)">Entrez dans l'atelier.</h4>
+            <h4 class="text-3xl font-black uppercase" style="font-family:var(--display)">Entrez dans l'atelier CNC.</h4>
             <p class="text-slate-400 mt-1 text-sm">Commencez par comprendre les axes de mouvement.</p>
         </div>
         <div class="flex flex-wrap gap-3">
             <a href="lecon1.html" class="btn-primary">Commencer Leçon 1 →</a>
-            <a href="simulateur.html" class="inline-block border border-slate-600 text-slate-300 hover:border-orange-500 hover:text-orange-400 transition font-bold py-3 px-5 rounded-md text-sm uppercase" style="font-family:var(--display)">Simulateur</a>
+            <a href="simulateur.html" class="inline-block border border-slate-600 text-slate-300 hover:border-orange-500 hover:text-orange-400 transition font-bold py-3 px-5 rounded-md text-sm uppercase" style="font-family:var(--display)">Simulateur 3D</a>
         </div>
     </div>
 
+    <!-- ══════════════════════════════════ -->
+    <!-- USINAGE CONVENTIONNEL            -->
+    <!-- ══════════════════════════════════ -->
+    <div id="conventionnel" class="scroll-mt-20">
+
+        <div class="section-divider mb-8">
+            <div class="line" style="background:#bbf7d0"></div>
+            <h2 style="color:#064e3b; font-size:1.6rem;">⚙ Usinage Conventionnel</h2>
+            <div class="line" style="background:#bbf7d0"></div>
+        </div>
+
+        <!-- Intro block -->
+        <div class="intro-conv text-white p-10 mb-10 fade-up">
+            <div class="relative z-10">
+                <span style="font-family:var(--mono);font-size:.65rem;color:var(--green);text-transform:uppercase;letter-spacing:.15em;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);padding:.3rem .8rem;border-radius:2px;display:inline-block;margin-bottom:1rem;">Fondamentaux du métier</span>
+                <h3 class="text-4xl font-black uppercase mb-4" style="font-family:var(--display)">Avant la CNC, <span style="color:var(--green)">le conventionnel</span></h3>
+                <p class="text-slate-300 text-base leading-relaxed max-w-3xl mb-8">L'usinage conventionnel est la base de tout technicien en mécanique. Avant de programmer une CNC, il faut comprendre comment les copeaux se forment, comment une pièce est maintenue, et comment chaque machine travaille la matière. C'est le socle sur lequel repose toute la productique moderne.</p>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="def-card">
+                        <span class="def-tag">Définition</span>
+                        <h4>L'Usinage</h4>
+                        <p>Procédé de fabrication par enlèvement de copeaux. On retire de la matière d'un brut pour obtenir une pièce aux dimensions et tolérances souhaitées.</p>
+                    </div>
+                    <div class="def-card">
+                        <span class="def-tag">Conventionnel vs CNC</span>
+                        <h4>La Différence</h4>
+                        <p>Sur une machine conventionnelle, c'est l'opérateur qui pilote les axes manuellement. Sur une CNC, c'est le G-Code qui commande les servomoteurs.</p>
+                    </div>
+                    <div class="def-card">
+                        <span class="def-tag">Pourquoi l'apprendre</span>
+                        <h4>L'Essentiel</h4>
+                        <p>Comprendre le conventionnel permet de mieux programmer en CNC : on sait ce que fait réellement l'outil, et comment réagir face à un problème d'usinage.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature cards conventionnel -->
+        <div class="grid md:grid-cols-3 gap-6 mb-10">
+            <div class="feature-card green fade-up">
+                <div class="icon"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+                <h3>Vitesse de Coupe Vc</h3>
+                <p>La <strong>Vc</strong> (m/min) est la vitesse relative entre outil et pièce. Elle dépend du matériau et de l'outil. Trop rapide = outil brûlé. Trop lent = mauvaise coupe et vibrations.</p>
+            </div>
+            <div class="feature-card green fade-up delay-1">
+                <div class="icon"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg></div>
+                <h3>Avance &amp; Passes</h3>
+                <p>L'<strong>avance</strong> (mm/tr ou mm/min) est le déplacement de l'outil. La <strong>profondeur de passe</strong> détermine l'épaisseur du copeau enlevé à chaque passage.</p>
+            </div>
+            <div class="feature-card green fade-up delay-2">
+                <div class="icon"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 20h16a2 2 0 002-2V8a2 2 0 00-2-2h-5L11 3H7a2 2 0 00-2 2v13a2 2 0 002 2z"/></svg></div>
+                <h3>Précision &amp; Tolérances</h3>
+                <p>En conventionnel, la précision dépend du savoir-faire de l'opérateur. Cote <strong>Ø30 h6</strong> = lecture micromètre + passes de finition soigneuses.</p>
+            </div>
+        </div>
+
+        <!-- Machines conventionnelles -->
+        <div class="section-divider mb-6">
+            <div class="line" style="background:#d1fae5"></div>
+            <h3 class="text-lg font-black uppercase text-slate-600 whitespace-nowrap" style="font-family:var(--display)">Les 6 machines à connaître</h3>
+            <div class="line" style="background:#d1fae5"></div>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            <div class="conv-card fade-up">
+                <div class="conv-card-header">
+                    <span class="subtag">Fraisage · 3 axes manuels</span>
+                    <h3>Fraiseuse Universelle</h3>
+                    <p class="quote">"L'outil tourne, la table se déplace en XYZ."</p>
+                    <ul>
+                        <li><span style="color:var(--green)">✔</span> Surfaçage et dressage de faces</li>
+                        <li><span style="color:var(--green)">✔</span> Rainures, poches, épaulements</li>
+                        <li><span style="color:var(--green)">✔</span> Fraisage en bout et en roulant</li>
+                        <li><span style="color:var(--green)">✔</span> Rainures de clavettes</li>
+                    </ul>
+                    <span class="coming-soon">📚 Leçon bientôt disponible</span>
+                </div>
+            </div>
+            <div class="conv-card fade-up delay-1">
+                <div class="conv-card-header">
+                    <span class="subtag">Tournage · 2 axes manuels</span>
+                    <h3>Tour Parallèle</h3>
+                    <p class="quote">"La pièce tourne, l'outil avance."</p>
+                    <ul>
+                        <li><span style="color:var(--green)">✔</span> Chariotage et dressage</li>
+                        <li><span style="color:var(--green)">✔</span> Filetage à la lyre</li>
+                        <li><span style="color:var(--green)">✔</span> Perçage et alésage en bout</li>
+                        <li><span style="color:var(--green)">✔</span> Tronçonnage et gorges</li>
+                    </ul>
+                    <span class="coming-soon">📚 Leçon bientôt disponible</span>
+                </div>
+            </div>
+            <div class="conv-card fade-up delay-2">
+                <div class="conv-card-header">
+                    <span class="subtag">Rabotage · Mouvement alternatif</span>
+                    <h3>Étau-Limeur</h3>
+                    <p class="quote">"L'outil va-et-vient, la table avance pas à pas."</p>
+                    <ul>
+                        <li><span style="color:var(--green)">✔</span> Dressage de surfaces planes</li>
+                        <li><span style="color:var(--green)">✔</span> Chanfreins et biseaux</li>
+                        <li><span style="color:var(--green)">✔</span> Rainures droites simples</li>
+                        <li><span style="color:var(--green)">✔</span> Pièces prismatiques</li>
+                    </ul>
+                    <span class="coming-soon">📚 Leçon bientôt disponible</span>
+                </div>
+            </div>
+            <div class="conv-card fade-up delay-1">
+                <div class="conv-card-header">
+                    <span class="subtag">Mortaisage · Mouvement vertical</span>
+                    <h3>Mortaiseuse</h3>
+                    <p class="quote">"L'outil monte et descend, la pièce pivote."</p>
+                    <ul>
+                        <li><span style="color:var(--green)">✔</span> Rainures de clavettes intérieures</li>
+                        <li><span style="color:var(--green)">✔</span> Profils internes complexes</li>
+                        <li><span style="color:var(--green)">✔</span> Polygones intérieurs</li>
+                        <li><span style="color:var(--green)">✔</span> Clavetage de moyeux</li>
+                    </ul>
+                    <span class="coming-soon">📚 Leçon bientôt disponible</span>
+                </div>
+            </div>
+            <div class="conv-card fade-up delay-2">
+                <div class="conv-card-header">
+                    <span class="subtag">Rectification · Finition de précision</span>
+                    <h3>Rectifieuse Plane</h3>
+                    <p class="quote">"La meule enlève des microns, pas des millimètres."</p>
+                    <ul>
+                        <li><span style="color:var(--green)">✔</span> Finition haute précision (IT5-IT6)</li>
+                        <li><span style="color:var(--green)">✔</span> Rectification de portées</li>
+                        <li><span style="color:var(--green)">✔</span> Travail des aciers trempés</li>
+                        <li><span style="color:var(--green)">✔</span> État de surface Ra &lt; 0.4 µm</li>
+                    </ul>
+                    <span class="coming-soon">📚 Leçon bientôt disponible</span>
+                </div>
+            </div>
+            <div class="conv-card fade-up delay-3">
+                <div class="conv-card-header">
+                    <span class="subtag">Perçage · Opération axiale</span>
+                    <h3>Perceuse à Colonne</h3>
+                    <p class="quote">"Simple mais fondamentale — base de l'assemblage."</p>
+                    <ul>
+                        <li><span style="color:var(--green)">✔</span> Perçage, alésage, fraisage</li>
+                        <li><span style="color:var(--green)">✔</span> Taraudage machine</li>
+                        <li><span style="color:var(--green)">✔</span> Lamage et chambrage</li>
+                        <li><span style="color:var(--green)">✔</span> Centrage et pointage</li>
+                    </ul>
+                    <span class="coming-soon">📚 Leçon bientôt disponible</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clavetage section -->
+        <div class="bg-white rounded-2xl p-8 border border-emerald-100 shadow-sm mb-10" style="border-left:4px solid var(--green)">
+            <div class="flex items-start gap-8 flex-wrap">
+                <div class="flex-1 min-w-64">
+                    <span style="font-family:var(--mono);font-size:.62rem;color:var(--green);text-transform:uppercase;letter-spacing:.1em;">Technique spéciale</span>
+                    <h3 class="text-2xl font-black uppercase mt-1 mb-3" style="font-family:var(--display)">Clavetage &amp; Assemblages</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-5">Le clavetage solidarise un arbre à un moyeu (roue, poulie, engrenage) en transmettant le couple via une clavette. Opération réalisée à la mortaiseuse, à la fraiseuse ou à la broche d'alésage.</p>
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div class="bg-slate-50 rounded-lg p-3"><p class="font-bold text-slate-700 mb-1" style="font-family:var(--display);text-transform:uppercase;font-size:.8rem;">Clavette parallèle</p><p class="text-slate-500">La plus courante. Section rectangulaire. Rainure sur arbre ET moyeu. Norme DIN 6885.</p></div>
+                        <div class="bg-slate-50 rounded-lg p-3"><p class="font-bold text-slate-700 mb-1" style="font-family:var(--display);text-transform:uppercase;font-size:.8rem;">Clavette Woodruff</p><p class="text-slate-500">Forme demi-lune. Rainure fraisée. Utilisée sur petits arbres et arbres coniques.</p></div>
+                        <div class="bg-slate-50 rounded-lg p-3"><p class="font-bold text-slate-700 mb-1" style="font-family:var(--display);text-transform:uppercase;font-size:.8rem;">Cannelures</p><p class="text-slate-500">Multiple clavettes intégrées à l'arbre. Transmission de couple élevé. Arbres de boîtes de vitesse.</p></div>
+                        <div class="bg-slate-50 rounded-lg p-3"><p class="font-bold text-slate-700 mb-1" style="font-family:var(--display);text-transform:uppercase;font-size:.8rem;">Goupilles</p><p class="text-slate-500">Goupille cylindrique ou conique. Assemblage démontable ou permanent selon le type.</p></div>
+                    </div>
+                </div>
+                <div class="bg-slate-900 rounded-xl p-5 text-xs leading-relaxed min-w-52" style="font-family:var(--mono);color:#64748b;">
+                    <p style="color:var(--green);margin-bottom:.5rem">// Calcul rainure clavette</p>
+                    <p>Arbre Ø30 mm → DIN 6885</p>
+                    <p style="color:#7dd3fc">b = 8 mm   (largeur)</p>
+                    <p style="color:#7dd3fc">h = 7 mm   (hauteur)</p>
+                    <p style="color:#7dd3fc">t1 = 4 mm  (prof. arbre)</p>
+                    <p style="color:#7dd3fc">t2 = 3 mm  (prof. moyeu)</p>
+                    <p style="color:var(--green);margin-top:.5rem">→ Fraise disque Ø8 mm</p>
+                    <p style="color:#475569;font-style:italic">ou mortaiseuse</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA conventionnel -->
+        <div class="cta-conv text-white p-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+                <p style="font-family:var(--mono);font-size:.65rem;color:var(--green);text-transform:uppercase;letter-spacing:.15em;" class="mb-1">// En cours de rédaction</p>
+                <h4 class="text-3xl font-black uppercase" style="font-family:var(--display)">Les leçons arrivent.</h4>
+                <p class="text-slate-400 mt-1 text-sm max-w-md">Dites-nous quelle machine vous intéresse en priorité via le feedback — vos votes orienteront la rédaction des prochaines leçons.</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <a href="conv-fraisage.html" class="btn-green">Leçon Fraisage conventionnel →</a>
+                <a href="lecon1.html" class="inline-block border border-slate-600 text-slate-300 hover:border-green-500 hover:text-green-400 transition font-bold py-3 px-5 rounded-md text-sm uppercase" style="font-family:var(--display)">G-Code en attendant</a>
+            </div>
+        </div>
+
+    </div><!-- end conventionnel -->
 </main>
 
-<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800">
-    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Formation G-Code Fanuc Gratuite</p>
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-16">
+    <p class="text-xs" style="font-family:var(--mono);letter-spacing:.2em;text-transform:uppercase">© 2026 CNC ACADÉMIE — Julien Joos · Formation Usinage Gratuite · Belgique</p>
+    <p class="text-xs mt-2" style="font-family:var(--mono);color:#334155;"><a href="mentions-legales.html" style="color:#475569;text-decoration:underline;">Mentions légales</a></p>
 </footer>
 
 <script>
-    const burgerBtn = document.getElementById('burger-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const burgerIcon = document.getElementById('burger-icon');
-    const closeIcon = document.getElementById('close-icon');
-    burgerBtn.addEventListener('click', () => {
-        mobileMenu.classList.toggle('open');
-        burgerIcon.classList.toggle('hidden');
-        closeIcon.classList.toggle('hidden');
+    document.getElementById('burger-btn').addEventListener('click',()=>{
+        document.getElementById('mobile-menu').classList.toggle('open');
+        document.getElementById('burger-icon').classList.toggle('hidden');
+        document.getElementById('close-icon').classList.toggle('hidden');
     });
 </script>
 </body>

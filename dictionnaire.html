@@ -1,6 +1,3 @@
-
-Copier
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -24,17 +21,23 @@ Copier
         h1,h2,h3,h4,.display { font-family: var(--display); }
         code,.mono { font-family: var(--mono); }
         body { background: #f1f5f9; color: #0f172a; }
- 
+
         /* ── NAV ── */
         .logo-text { font-family: var(--display); font-weight: 900; font-size: 1.4rem; letter-spacing: -0.02em; }
         #mobile-menu { display: none; }
         #mobile-menu.open { display: block; }
         .dropdown-menu {
             display: none; position: absolute; right: 0; top: calc(100% + 4px);
-            width: 18rem; background: white; border-radius: 0.75rem;
+            width: 22rem; background: white; border-radius: 0.75rem;
             box-shadow: 0 20px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0;
             z-index: 100; overflow: hidden;
+            max-height: 78vh; overflow-y: auto;
         }
+        /* Custom scrollbar in dropdown */
+        .dropdown-menu::-webkit-scrollbar { width: 5px; }
+        .dropdown-menu::-webkit-scrollbar-track { background: #f8fafc; }
+        .dropdown-menu::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .dropdown-menu::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .dropdown-trigger:hover .dropdown-menu,
         .dropdown-trigger:focus-within .dropdown-menu { display: block; }
         .menu-lesson { display: block; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; text-decoration: none; }
@@ -45,9 +48,14 @@ Copier
         .menu-lesson.pro:hover { background: #eef2ff; }
         .menu-lesson.pro .menu-lesson-num { color: #6366f1; }
         .badge-pro { font-size: 0.6rem; background: #6366f1; color: white; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.4rem; }
+        /* Sticky section labels in dropdown */
+        .dd-sticky { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(4px); }
+        .menu-lesson.conv:hover { background: #f0fdf4; }
+        .menu-lesson.conv .menu-lesson-num { color: #10b981; }
+        .badge-soon { font-size: 0.55rem; background: #94a3b8; color: white; padding: 0.1rem 0.35rem; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 0.3rem; }
         .btn-primary { background: var(--orange); color: white; font-family: var(--display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.6rem 1.4rem; border-radius: 6px; transition: background 0.2s; display: inline-block; text-decoration: none; }
         .btn-primary:hover { background: var(--orange-dark); }
- 
+
         /* ── HERO / HEADER ── */
         .page-header {
             background: var(--navy);
@@ -67,7 +75,7 @@ Copier
         .page-title { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1; text-transform: uppercase; color: white; }
         .page-title .accent { color: var(--orange); }
         .page-sub { color: #94a3b8; font-size: 0.95rem; margin-top: 0.75rem; max-width: 500px; }
- 
+
         /* ── SEARCH ── */
         .search-box {
             background: white;
@@ -81,7 +89,7 @@ Copier
         .search-box:focus-within { border-color: var(--orange); }
         .search-box input { border: none; outline: none; font-family: var(--mono); font-size: 0.85rem; flex: 1; color: #1e293b; }
         .search-box svg { color: #94a3b8; flex-shrink: 0; }
- 
+
         /* ── FILTER TABS ── */
         .filter-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
         .filter-tab { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.35rem 0.9rem; border-radius: 4px; border: 1px solid #e2e8f0; background: white; cursor: pointer; transition: all 0.15s; color: #64748b; }
@@ -92,7 +100,7 @@ Copier
         .filter-tab[data-cat="cycles"].active { background: #7c3aed; border-color: #7c3aed; }
         .filter-tab[data-cat="auxiliaires"].active { background: #2563eb; border-color: #2563eb; }
         .filter-tab[data-cat="tournage"].active { background: #d97706; border-color: #d97706; }
- 
+
         /* ── SECTION TITLES ── */
         .section-heading {
             font-family: var(--display); font-weight: 800; font-size: 1.1rem;
@@ -101,7 +109,7 @@ Copier
             display: flex; align-items: center; gap: 0.6rem;
         }
         .section-heading .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
- 
+
         /* ── TABLES ── */
         .dict-table { background: white; border-radius: 0 0 12px 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
         .dict-table table { width: 100%; border-collapse: collapse; }
@@ -118,7 +126,7 @@ Copier
         .tip-badge { display: inline-block; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.05em; padding: 0.15rem 0.5rem; border-radius: 3px; margin-left: 0.4rem; font-weight: 700; vertical-align: middle; }
         .tip-vital { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
         .tip-note { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
- 
+
         /* ── ILLUSTRATION CARDS ── */
         .illus-card {
             background: var(--navy-mid); border-radius: 12px;
@@ -128,7 +136,7 @@ Copier
         .illus-card .caption { padding: 0.9rem 1rem; }
         .illus-card .caption h4 { font-family: var(--display); font-weight: 700; font-size: 1rem; color: white; text-transform: uppercase; }
         .illus-card .caption p { font-size: 0.75rem; color: #94a3b8; margin-top: 0.2rem; }
- 
+
         /* ── QUICK REF BOX ── */
         .quick-ref {
             background: var(--navy);
@@ -147,7 +155,7 @@ Copier
         .qr-item { background: rgba(255,255,255,0.05); border-radius: 6px; padding: 0.6rem 0.75rem; display: flex; align-items: baseline; gap: 0.5rem; }
         .qr-code { font-family: var(--mono); font-size: 0.75rem; color: var(--orange); font-weight: 700; }
         .qr-label { font-size: 0.75rem; color: #94a3b8; }
- 
+
         /* Animations */
         @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
         .fade-up { animation: fadeUp 0.5s ease both; }
@@ -156,20 +164,21 @@ Copier
     </style>
 </head>
 <body>
- 
-<!-- ═══ NAV (identique index.html) ═══ -->
+
+<!-- ═══ NAV ═══ -->
 <nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
     <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
         <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
-        <div class="hidden md:flex items-center gap-6">
+        <div class="hidden md:flex items-center gap-5">
             <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
-            <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+            <a href="dictionnaire.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">Codes G/M</a>
             <div class="relative dropdown-trigger">
                 <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-orange-400 transition">
                     COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div class="dropdown-menu">
-                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                    <div class="dd-sticky px-3 pt-2.5 pb-1.5 bg-orange-50 border-b border-orange-100"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-orange-500">⚡ G-Code CNC Fanuc</p></div>
+                    <div class="px-3 pt-1.5 pb-0.5"><p style="font-family:var(--mono)" class="text-[9px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
                     <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
                     <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
                     <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
@@ -177,14 +186,19 @@ Copier
                     <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
                     <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
                     <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
-                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
-                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <div class="dd-sticky px-3 pt-1.5 pb-1 bg-indigo-50 border-t-2 border-indigo-100 mt-0.5"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-500">⭐ Expert PRO</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
                     <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
                     <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                    <div class="dd-sticky px-3 pt-1.5 pb-1 bg-emerald-50 border-t-2 border-emerald-100 mt-0.5"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-green-600">⚙ Usinage Conventionnel</p></div>
+                    <a href="conv-bases.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.1 — Bases</span><span class="text-sm text-slate-700">Les 4 machines principales</span></a>
+                    <a href="conv-fraisage.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.2 — Fraisage</span><span class="text-sm text-slate-700">Fraiseuse conventionnelle</span></a>
+                    <a href="conv-tournage.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.3 — Tour</span><span class="text-sm text-slate-700">Tour parallèle</span></a>
+                    <a href="conv-etau-limeur.html" class="block px-4 py-2.5 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.4 — Étau-Limeur</span><span class="text-sm text-slate-700">Étau-limeur &amp; Mortaiseuse</span></a>
                 </div>
             </div>
             <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
-            <a href="feedback.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="feedback.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
             <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
         </div>
         <button id="burger-btn" class="md:hidden text-white focus:outline-none">
@@ -194,22 +208,26 @@ Copier
     </div>
     <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
         <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
-        <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
+        <a href="dictionnaire.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">Codes G/M</a>
         <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
-        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
+        <a href="feedback.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">FAQ &amp; Feedback</a>
+        <a href="mentions-legales.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Légal</a>
         <div>
-            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-orange-400 pt-3 pb-1">⚡ G-Code CNC</p>
             <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
-            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
-            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
-            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
-            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
-            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
             <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+            <a href="lecon10.html" class="block text-slate-300 py-1.5 text-sm hover:text-indigo-400">Leçon 10 – Paramétré</a>
+        </div>
+        <div>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-green-400 pt-3 pb-1">⚙ Conventionnel</p>
+            <a href="conv-bases.html" class="block text-slate-300 py-1.5 text-sm hover:text-green-400">L.1 – Bases &amp; Machines</a>
+            <a href="conv-fraisage.html" class="block text-slate-300 py-1.5 text-sm hover:text-green-400">L.2 – Fraiseuse</a>
+            <a href="conv-tournage.html" class="block text-slate-300 py-1.5 text-sm hover:text-green-400">L.3 – Tour parallèle</a>
+            <a href="conv-etau-limeur.html" class="block text-slate-300 py-1.5 text-sm hover:text-green-400">L.4 – Étau-Limeur</a>
         </div>
     </div>
 </nav>
- 
+
 <!-- ═══ PAGE HEADER ═══ -->
 <div class="page-header">
     <div class="container mx-auto max-w-5xl page-header-inner">
@@ -238,10 +256,10 @@ Copier
         </div>
     </div>
 </div>
- 
+
 <!-- ═══ MAIN ═══ -->
 <main class="container mx-auto max-w-5xl py-10 px-6">
- 
+
     <!-- Search + Filters -->
     <div class="mb-6 fade-up">
         <div class="search-box mb-4 max-w-md">
@@ -258,7 +276,7 @@ Copier
             <button class="filter-tab" data-cat="tournage">🟠 Tournage</button>
         </div>
     </div>
- 
+
     <!-- ── ILLUSTRATION STRIP ── -->
     <div class="grid grid-cols-3 gap-4 mb-10 fade-up">
         <div class="illus-card">
@@ -286,7 +304,7 @@ Copier
             </div>
         </div>
     </div>
- 
+
     <!-- ─────────────────────────────────────────────────────── -->
     <!-- 1. MOUVEMENTS GÉOMÉTRIQUES -->
     <!-- ─────────────────────────────────────────────────────── -->
@@ -334,7 +352,7 @@ Copier
             </table>
         </div>
     </section>
- 
+
     <!-- ─────────────────────────────────────────────────────── -->
     <!-- 2. PLANS & UNITÉS -->
     <!-- ─────────────────────────────────────────────────────── -->
@@ -371,7 +389,7 @@ Copier
             </table>
         </div>
     </section>
- 
+
     <!-- ─────────────────────────────────────────────────────── -->
     <!-- ILLUSTRATION : axes CNC -->
     <!-- ─────────────────────────────────────────────────────── -->
@@ -393,7 +411,7 @@ Copier
                  onerror="this.parentElement.innerHTML='<div class=\'flex items-center justify-center h-40 text-slate-500 text-sm p-6\'>Schéma compensation rayon</div>'">
         </div>
     </div>
- 
+
     <!-- ─────────────────────────────────────────────────────── -->
     <!-- 3. CORRECTIONS -->
     <!-- ─────────────────────────────────────────────────────── -->
@@ -430,7 +448,7 @@ Copier
             </table>
         </div>
     </section>
- 
+
     <!-- ─────────────────────────────────────────────────────── -->
     <!-- 4. CYCLES PERÇAGE -->
     <!-- ─────────────────────────────────────────────────────── -->
@@ -472,7 +490,7 @@ Copier
             </table>
         </div>
     </section>
- 
+
     <!-- ─────────────────────────────────────────────────────── -->
     <!-- 5. FONCTIONS M -->
     <!-- ─────────────────────────────────────────────────────── -->
@@ -524,7 +542,7 @@ Copier
             </table>
         </div>
     </section>
- 
+
     <!-- ─────────────────────────────────────────────────────── -->
     <!-- 6. TOURNAGE -->
     <!-- ─────────────────────────────────────────────────────── -->
@@ -566,7 +584,7 @@ Copier
             </table>
         </div>
     </section>
- 
+
     <!-- CTA Navigation leçons -->
     <div class="mt-12 bg-slate-800 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 fade-up">
         <div>
@@ -579,13 +597,14 @@ Copier
             <a href="simulateur.html" class="inline-block border border-slate-600 text-slate-300 hover:border-orange-500 hover:text-orange-400 transition font-bold py-2.5 px-5 rounded-md text-sm uppercase" style="font-family:var(--display)">Simulateur</a>
         </div>
     </div>
- 
+
 </main>
- 
+
 <footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-8">
-    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Le savoir est une arme</p>
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE — Julien Joos · Le savoir est une arme</p>
+    <p class="text-xs mt-2" style="font-family:var(--mono); color:#334155;"><a href="mentions-legales.html" style="color:#475569; text-decoration:underline;">Mentions légales</a></p>
 </footer>
- 
+
 <script>
     // ── Burger menu ──
     const burgerBtn = document.getElementById('burger-btn');
@@ -597,7 +616,7 @@ Copier
         burgerIcon.classList.toggle('hidden');
         closeIcon.classList.toggle('hidden');
     });
- 
+
     // ── Search ──
     const searchInput = document.getElementById('search-input');
     searchInput.addEventListener('input', () => {
@@ -608,7 +627,7 @@ Copier
             row.style.display = match ? '' : 'none';
         });
     });
- 
+
     // ── Filter tabs ──
     const tabs = document.querySelectorAll('.filter-tab');
     tabs.forEach(tab => {

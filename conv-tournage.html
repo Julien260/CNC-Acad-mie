@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tour Parallèle Conventionnel — CNC Académie</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --or:#f97316;--navy:#0f172a;--navy-mid:#1e293b;
+  --green:#10b981;--green-dark:#059669;
+  --mn:'Space Mono',monospace;--dp:'Barlow Condensed',sans-serif;--bd:'Barlow',sans-serif;
+}
+*{font-family:var(--bd);}
+h1,h2,h3,h4{font-family:var(--dp);}
+body{background:#f1f5f9;color:#0f172a;}
+.logo-text{font-family:var(--dp);font-weight:900;font-size:1.4rem;letter-spacing:-.02em;}
+#mobile-menu{display:none;}#mobile-menu.open{display:block;}
+#dropdown-menu{display:none;}#dropdown-menu.open{display:block;}
+.page-header{background:var(--navy);position:relative;overflow:hidden;padding:3rem 1.5rem;}
+.page-header::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(16,185,129,.06) 39px,rgba(16,185,129,.06) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(16,185,129,.06) 39px,rgba(16,185,129,.06) 40px);pointer-events:none;}
+.page-header::after{content:'⚙';font-size:18rem;font-weight:900;position:absolute;right:-2rem;top:-3rem;color:rgba(16,185,129,.04);pointer-events:none;line-height:1;}
+.page-header-inner{position:relative;z-index:1;}
+.level-badge{font-family:var(--mn);font-size:.65rem;letter-spacing:.15em;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);color:var(--green);padding:.3rem .8rem;border-radius:2px;text-transform:uppercase;display:inline-block;margin-bottom:1rem;}
+.prog-bar{background:#1e293b;border-bottom:1px solid #334155;overflow-x:auto;}
+.prog-step{font-family:var(--mn);font-size:.55rem;color:#475569;letter-spacing:.06em;text-transform:uppercase;padding:.6rem 0;white-space:nowrap;display:flex;align-items:center;gap:.35rem;}
+.prog-step.active{color:var(--green);}
+.prog-step.done{color:#22c55e;}
+.prog-dot{width:7px;height:7px;border-radius:50%;background:#334155;flex-shrink:0;}
+.prog-step.active .prog-dot{background:var(--green);box-shadow:0 0 0 3px rgba(16,185,129,.2);}
+.prog-step.done .prog-dot{background:#22c55e;}
+.prog-line{height:1px;background:#334155;flex:1;}
+.prog-line.done{background:#22c55e;}
+.card{background:white;border-radius:14px;padding:2rem;box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid #e2e8f0;}
+.module-num{font-family:var(--mn);font-size:2rem;font-weight:700;color:rgba(16,185,129,.15);line-height:1;}
+.section-title{font-family:var(--dp);font-weight:900;font-size:1.5rem;text-transform:uppercase;color:#1e293b;}
+.def-box{background:#f0fdf4;border:1px solid #bbf7d0;border-left:4px solid var(--green);border-radius:8px;padding:1rem 1.25rem;margin-bottom:.75rem;}
+.def-box p{font-size:.875rem;color:#064e3b;line-height:1.65;}
+.warn-box{background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #f59e0b;border-radius:8px;padding:1rem 1.25rem;margin-bottom:.75rem;}
+.warn-box p{font-size:.875rem;color:#92400e;line-height:1.65;}
+.danger-box{background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #ef4444;border-radius:8px;padding:1rem 1.25rem;margin-bottom:.75rem;}
+.danger-box p{font-size:.875rem;color:#7f1d1d;line-height:1.65;}
+.formula{background:#0f172a;border-radius:8px;padding:1rem 1.25rem;font-family:var(--mn);font-size:.78rem;color:#64748b;border-left:3px solid var(--green);line-height:2;}
+.formula .val{color:#7dd3fc;font-weight:700;}
+.formula .res{color:var(--green);font-weight:700;}
+.formula .cm{color:#475569;font-style:italic;}
+.data-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+.data-table th{background:#f8fafc;font-family:var(--mn);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:#64748b;padding:.6rem .75rem;text-align:left;border-bottom:2px solid #e2e8f0;}
+.data-table td{padding:.6rem .75rem;border-bottom:1px solid #f1f5f9;color:#374151;vertical-align:top;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:#fafafa;}
+.green-cell{color:var(--green);font-weight:600;}
+.part-item{display:flex;align-items:flex-start;gap:.75rem;padding:.65rem 0;border-bottom:1px solid #f8fafc;}
+.part-item:last-child{border-bottom:none;}
+.part-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mn);font-size:.6rem;font-weight:700;flex-shrink:0;margin-top:.1rem;}
+.part-name{font-family:var(--dp);font-weight:700;font-size:.95rem;text-transform:uppercase;display:block;margin-bottom:.15rem;}
+.part-desc{font-size:.78rem;color:#64748b;line-height:1.55;}
+.op-card{background:white;border-radius:10px;padding:1.25rem;border:1px solid #e2e8f0;box-shadow:0 2px 6px rgba(0,0,0,.05);transition:transform .2s,box-shadow .2s;}
+.op-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.1);}
+.op-card h4{font-family:var(--dp);font-weight:700;font-size:1rem;text-transform:uppercase;margin-bottom:.4rem;color:var(--green);}
+.op-card p{font-size:.78rem;color:#64748b;line-height:1.55;}
+.exercise{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);border-radius:14px;padding:1.75rem;color:white;}
+.exercise h4{font-family:var(--dp);font-weight:800;font-size:1.2rem;text-transform:uppercase;color:var(--green);margin-bottom:1rem;}
+.ex-question{background:rgba(255,255,255,.05);border-radius:8px;padding:1rem;margin-bottom:.75rem;border-left:3px solid var(--green);}
+.ex-question p{font-size:.85rem;color:#e2e8f0;line-height:1.6;}
+.ex-answer{background:rgba(16,185,129,.1);border-radius:6px;padding:.75rem 1rem;margin-top:.5rem;display:none;}
+.ex-answer.show{display:block;}
+.ex-answer p{font-family:var(--mn);font-size:.75rem;color:var(--green);line-height:1.7;}
+.btn-answer{font-family:var(--mn);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;padding:.3rem .8rem;border-radius:4px;background:rgba(16,185,129,.2);color:var(--green);border:1px solid rgba(16,185,129,.3);cursor:pointer;margin-top:.5rem;transition:all .15s;}
+.btn-answer:hover{background:rgba(16,185,129,.3);}
+.svg-wrap{background:#030712;border-radius:12px;padding:1rem;display:flex;justify-content:center;align-items:center;}
+.calc-input{background:#020817;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-family:var(--mn);font-size:.82rem;padding:.5rem .75rem;width:100%;outline:none;transition:border-color .2s;}
+.calc-input:focus{border-color:var(--green);}
+.calc-label{font-family:var(--mn);font-size:.58rem;color:#64748b;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem;}
+.calc-result{font-family:var(--mn);font-size:1.5rem;font-weight:700;color:var(--green);text-shadow:0 0 8px rgba(16,185,129,.3);}
+.lesson-nav{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-top:3rem;padding-top:2rem;border-top:1px solid #e2e8f0;}
+.btn-green{background:var(--green);color:white;font-family:var(--dp);font-weight:700;font-size:.95rem;letter-spacing:.05em;text-transform:uppercase;padding:.75rem 1.75rem;border-radius:6px;text-decoration:none;transition:background .2s;}
+.btn-green:hover{background:var(--green-dark);}
+.btn-sec{border:2px solid #e2e8f0;color:#64748b;font-family:var(--dp);font-weight:700;text-transform:uppercase;padding:.7rem 1.5rem;border-radius:6px;text-decoration:none;font-size:.85rem;transition:all .2s;}
+.btn-sec:hover{border-color:var(--green);color:var(--green);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp .45s ease both;}
+.delay-1{animation-delay:.1s;}.delay-2{animation-delay:.2s;}.delay-3{animation-delay:.3s;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
+  <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+    <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
+    <div class="hidden md:flex items-center gap-5">
+      <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
+      <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
+      <div class="relative" id="dropdown-wrapper">
+        <button onclick="toggleDropdown()" class="flex items-center text-white font-semibold hover:text-green-400 transition uppercase tracking-wide text-xs focus:outline-none">
+          COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="dropdown-menu" class="hidden absolute right-0 mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 overflow-hidden" style="width:22rem;max-height:78vh;overflow-y:auto;">
+          <div class="sticky top-0 px-3 pt-2.5 pb-1.5 bg-orange-50 border-b border-orange-100"><p class="text-[10px] font-bold uppercase tracking-widest text-orange-500" style="font-family:var(--mn)">⚡ G-Code CNC Fanuc</p></div>
+          <div class="px-3 pt-1.5 pb-0.5"><p class="text-[9px] font-bold uppercase tracking-widest text-slate-400" style="font-family:var(--mn)">— Bases —</p></div>
+          <a href="lecon1.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 01</span><span class="text-sm text-slate-700">Les Axes et Mouvements</span></a>
+          <a href="lecon2.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 02</span><span class="text-sm text-slate-700">Le Point Zéro (G54)</span></a>
+          <a href="lecon3.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 03</span><span class="text-sm text-slate-700">Avances et Vitesses</span></a>
+          <a href="lecon4.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 04</span><span class="text-sm text-slate-700">Compensation G41/G42</span></a>
+          <a href="lecon5.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 05</span><span class="text-sm text-slate-700">Cycles de Perçage</span></a>
+          <a href="lecon6.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 06</span><span class="text-sm text-slate-700">Sous-Programmes M98</span></a>
+          <a href="lecon7.html" class="block px-4 py-2 border-b-2 border-slate-200 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 07</span><span class="text-sm text-slate-700">Sécurité &amp; Maintenance</span></a>
+          <div class="sticky top-0 px-3 pt-1.5 pb-1 bg-indigo-50 border-t-2 border-indigo-100"><p class="text-[10px] font-bold uppercase tracking-widest text-indigo-500" style="font-family:var(--mn)">⭐ Expert PRO</p></div>
+          <a href="lecon8.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-indigo-50 no-underline"><span class="block text-[10px] text-indigo-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 08</span><span class="text-sm text-slate-700">G96/G97 <span style="background:#6366f1;color:white;font-size:.5rem;padding:.1rem .35rem;border-radius:3px;font-weight:700">PRO</span></span></a>
+          <a href="lecon9.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-indigo-50 no-underline"><span class="block text-[10px] text-indigo-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 09</span><span class="text-sm text-slate-700">Filetage G76 <span style="background:#6366f1;color:white;font-size:.5rem;padding:.1rem .35rem;border-radius:3px;font-weight:700">PRO</span></span></a>
+          <a href="lecon10.html" class="block px-4 py-2 border-b-2 border-slate-200 hover:bg-indigo-50 no-underline"><span class="block text-[10px] text-indigo-400 font-bold uppercase" style="font-family:var(--mn)">Leçon 10</span><span class="text-sm text-slate-700">Prog. Paramétrée <span style="background:#6366f1;color:white;font-size:.5rem;padding:.1rem .35rem;border-radius:3px;font-weight:700">PRO</span></span></a>
+          <div class="sticky top-0 px-3 pt-1.5 pb-1 bg-emerald-50 border-t-2 border-emerald-100"><p class="text-[10px] font-bold uppercase tracking-widest text-green-600" style="font-family:var(--mn)">⚙ Usinage Conventionnel</p></div>
+          <a href="conv-bases.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mn)">L.1 — Bases</span><span class="text-sm text-slate-700">Les 4 machines principales</span></a>
+          <a href="conv-fraisage.html" class="block px-4 py-2 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mn)">L.2 — Fraisage</span><span class="text-sm text-slate-700">Fraiseuse conventionnelle</span></a>
+          <a href="conv-tournage.html" class="block px-4 py-2 border-b border-slate-100 bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mn)">← Vous êtes ici</span><span class="text-sm text-green-700 font-bold">Tour Parallèle</span></a>
+          <a href="conv-etau-limeur.html" class="block px-4 py-2 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mn)">L.4 — Étau-Limeur</span><span class="text-sm text-slate-700">Surfaces planes &amp; rainures</span></a>
+        </div>
+      </div>
+      <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
+      <a href="feedback.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">FAQ</a>
+      <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+    </div>
+    <button id="burger-btn" class="md:hidden text-white focus:outline-none">
+      <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div id="mobile-menu" class="md:hidden bg-slate-800 border-t border-slate-700 px-4 py-4 space-y-1">
+    <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm">Accueil</a>
+    <a href="conv-fraisage.html" class="block text-green-400 font-semibold py-2 border-b border-slate-700 text-sm">← Fraiseuse conv.</a>
+    <a href="conv-etau-limeur.html" class="block text-slate-300 py-2 text-sm hover:text-green-400">Étau-Limeur →</a>
+  </div>
+</nav>
+
+<!-- PROGRESS -->
+<div class="prog-bar">
+  <div class="container mx-auto max-w-5xl px-6">
+    <div class="flex items-center gap-2 py-1 overflow-x-auto">
+      <div class="prog-step done"><span class="prog-dot"></span>Bases ✓</div>
+      <div class="prog-line done"></div>
+      <div class="prog-step done"><span class="prog-dot"></span>Fraiseuse ✓</div>
+      <div class="prog-line done"></div>
+      <div class="prog-step active"><span class="prog-dot"></span>Tour Parallèle</div>
+      <div class="prog-line"></div>
+      <div class="prog-step"><span class="prog-dot"></span>Étau-Limeur</div>
+      <div class="prog-line"></div>
+      <div class="prog-step"><span class="prog-dot"></span>Mortaiseuse</div>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="page-header">
+  <div class="container mx-auto max-w-5xl page-header-inner fade-up">
+    <div class="level-badge">Usinage Conventionnel · Leçon 3 · Complet</div>
+    <h2 style="font-family:var(--dp);font-weight:900;font-size:clamp(2rem,5vw,3.5rem);line-height:1;text-transform:uppercase;color:white;">Le Tour<br><span style="color:var(--green)">Parallèle</span></h2>
+    <p style="color:#94a3b8;font-size:.95rem;margin-top:.75rem;max-width:580px;line-height:1.6;">Anatomie complète, outils de tournage, calculs de coupe, opérations, filetage à la lyre et exercices corrigés. Tout pour maîtriser le tour parallèle conventionnel.</p>
+    <div class="flex flex-wrap gap-4 mt-5">
+      <div class="text-center"><div style="font-family:var(--mn);font-size:1.3rem;font-weight:700;color:var(--green)">6</div><div style="font-family:var(--mn);font-size:.55rem;color:#64748b;text-transform:uppercase">Modules</div></div>
+      <div class="text-center"><div style="font-family:var(--mn);font-size:1.3rem;font-weight:700;color:var(--green)">5</div><div style="font-family:var(--mn);font-size:.55rem;color:#64748b;text-transform:uppercase">Exercices</div></div>
+      <div class="text-center"><div style="font-family:var(--mn);font-size:1.3rem;font-weight:700;color:var(--green)">2</div><div style="font-family:var(--mn);font-size:.55rem;color:#64748b;text-transform:uppercase">Calculateurs</div></div>
+    </div>
+  </div>
+</div>
+
+<main class="container mx-auto max-w-5xl py-12 px-6">
+
+<!-- MODULE 01 — ANATOMIE -->
+<section class="mb-14 fade-up">
+  <div class="flex items-baseline gap-4 mb-6">
+    <span class="module-num">01.</span>
+    <h3 class="section-title">Anatomie du tour parallèle</h3>
+  </div>
+  <div class="grid md:grid-cols-2 gap-6 mb-6">
+    <div class="svg-wrap" style="min-height:380px;">
+      <svg viewBox="0 0 480 340" width="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="gt" width="18" height="18" patternUnits="userSpaceOnUse"><path d="M18 0L0 0 0 18" fill="none" stroke="#1e293b" stroke-width=".4"/></pattern>
+          <linearGradient id="mett" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#243044"/><stop offset="100%" stop-color="#1e293b"/></linearGradient>
+          <marker id="arr-t" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#10b981"/></marker>
+          <marker id="arr-x" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f97316"/></marker>
+        </defs>
+        <rect width="480" height="340" fill="#030712"/>
+        <rect width="480" height="340" fill="url(#gt)" opacity=".3"/>
+
+        <!-- BAN DU TOUR (base) -->
+        <rect x="10" y="240" width="460" height="35" rx="4" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+        <rect x="12" y="242" width="456" height="31" rx="3" fill="url(#mett)"/>
+        <!-- glissières prismatiques -->
+        <polygon points="10,255 480,255 480,250 10,250" fill="#243044"/>
+        <polygon points="10,268 480,268 480,263 10,263" fill="#243044"/>
+
+        <!-- POUPÉE FIXE -->
+        <rect x="15" y="110" width="120" height="132" rx="5" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+        <rect x="17" y="112" width="116" height="128" rx="4" fill="url(#mett)"/>
+        <!-- boite vitesses détail -->
+        <rect x="25" y="120" width="100" height="30" rx="3" fill="#243044" stroke="#334155"/>
+        <text x="75" y="139" fill="#64748b" font-size="7" font-family="Space Mono" text-anchor="middle">BOÎTE VITESSES</text>
+        <!-- levier vitesses -->
+        <rect x="110" y="115" width="8" height="25" rx="2" fill="#475569"/>
+        <circle cx="114" cy="113" r="5" fill="#64748b"/>
+        <!-- broche axiale -->
+        <rect x="135" y="166" width="225" height="12" rx="3" fill="#64748b" stroke="#475569" stroke-width="1"/>
+        <rect x="15" y="162" width="125" height="20" rx="0" fill="#0f172a" stroke="#334155"/>
+
+        <!-- MANDRIN 3 MORS -->
+        <circle cx="75" cy="172" r="40" fill="#0f172a" stroke="#334155" stroke-width="2"/>
+        <circle cx="75" cy="172" r="34" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+        <!-- mors (3) -->
+        <rect x="70" y="138" width="10" height="16" rx="2" fill="#64748b" stroke="#475569"/>
+        <rect x="70" y="210" width="10" height="16" rx="2" fill="#64748b" stroke="#475569"/>
+        <rect x="44" y="165" width="16" height="10" rx="2" fill="#64748b" stroke="#475569"/>
+        <!-- ergot mandrin -->
+        <circle cx="75" cy="172" r="10" fill="#334155"/>
+        <circle cx="75" cy="172" r="4" fill="#475569"/>
+        <!-- clé mandrin symbolique -->
+        <rect x="101" y="168" width="35" height="8" rx="2" fill="#334155" stroke="#475569" stroke-dasharray="3,2"/>
+
+        <!-- PIÈCE cylindrique -->
+        <rect x="133" y="158" width="170" height="28" rx="3" fill="#b87333" stroke="#a16520" stroke-width="1.5"/>
+        <!-- rotation -->
+        <path d="M150 152 A18 8 0 0 1 178 152" stroke="#10b981" fill="none" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <polygon points="178,149 182,154 176,155" fill="#10b981"/>
+
+        <!-- CONTRE-POINTE -->
+        <rect x="360" y="128" width="100" height="115" rx="4" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+        <rect x="362" y="130" width="96" height="111" rx="3" fill="url(#mett)"/>
+        <!-- pointe -->
+        <polygon points="360,168 373,162 373,178" fill="#64748b" stroke="#475569"/>
+        <!-- vis de serrage -->
+        <rect x="365" y="160" width="28" height="20" rx="3" fill="#334155" stroke="#475569"/>
+        <text x="379" y="174" fill="#64748b" font-size="7" font-family="Space Mono" text-anchor="middle">vis</text>
+        <!-- lunette si longue pièce -->
+        <circle cx="290" cy="172" r="18" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="290" y="205" fill="#334155" font-size="7" font-family="Space Mono" text-anchor="middle">(lunette)</text>
+
+        <!-- CHARIOT + TOURELLE -->
+        <!-- Chariot longitudinal (Z) -->
+        <rect x="240" y="210" width="90" height="32" rx="3" fill="#243044" stroke="#334155" stroke-width="1.5"/>
+        <!-- Chariot transversal (X) -->
+        <rect x="252" y="192" width="66" height="22" rx="3" fill="#1e3a5f" stroke="#10b981" stroke-width="1.5"/>
+        <!-- Tourelle 4 positions -->
+        <rect x="265" y="178" width="40" height="18" rx="3" fill="#334155" stroke="#64748b"/>
+        <text x="285" y="191" fill="#94a3b8" font-size="6" font-family="Space Mono" text-anchor="middle">TOURELLE</text>
+        <!-- Outil chariotage -->
+        <rect x="282" y="162" width="6" height="18" rx="1" fill="#f59e0b" stroke="#d97706"/>
+        <!-- pointe outil -->
+        <polygon points="285,162 290,154 290,162" fill="#ffd700" stroke="#d97706"/>
+        <!-- copeaux -->
+        <path d="M290 168 Q305 162 300 174" stroke="#b87333" fill="none" stroke-width="1.5" opacity=".8"/>
+        <path d="M290 174 Q308 166 302 180" stroke="#b87333" fill="none" stroke-width="1.5" opacity=".5"/>
+
+        <!-- VIS MÈRE -->
+        <line x1="135" y1="258" x2="360" y2="258" stroke="#10b981" stroke-width="2" stroke-dasharray="10,4" opacity=".6"/>
+        <text x="248" y="270" fill="#10b981" font-size="7" font-family="Space Mono" text-anchor="middle" opacity=".7">VIS MÈRE (filetage)</text>
+
+        <!-- VOLANTS -->
+        <!-- Volant Z -->
+        <circle cx="455" cy="200" r="22" fill="none" stroke="#334155" stroke-width="2"/>
+        <circle cx="455" cy="200" r="17" fill="#1e293b" stroke="#475569"/>
+        <line x1="433" y1="200" x2="477" y2="200" stroke="#64748b" stroke-width="2"/>
+        <line x1="455" y1="178" x2="455" y2="222" stroke="#64748b" stroke-width="2"/>
+        <circle cx="455" cy="200" r="5" fill="#10b981"/>
+        <text x="455" y="230" fill="#64748b" font-size="7" font-family="Space Mono" text-anchor="middle">Vol. Z</text>
+        <!-- Volant X -->
+        <circle cx="455" cy="155" r="16" fill="none" stroke="#334155" stroke-width="2"/>
+        <circle cx="455" cy="155" r="12" fill="#1e293b" stroke="#475569"/>
+        <line x1="443" y1="155" x2="467" y2="155" stroke="#64748b" stroke-width="1.5"/>
+        <line x1="455" y1="143" x2="455" y2="167" stroke="#64748b" stroke-width="1.5"/>
+        <circle cx="455" cy="155" r="4" fill="#f97316"/>
+        <text x="455" y="135" fill="#f97316" font-size="7" font-family="Space Mono" text-anchor="middle">Vol. X</text>
+
+        <!-- AXES -->
+        <text x="20" y="310" fill="#10b981" font-size="12" font-family="Space Mono" font-weight="700">Z →</text>
+        <line x1="45" y1="307" x2="440" y2="307" stroke="#10b981" stroke-width=".8" opacity=".3"/>
+        <text x="418" y="305" fill="#f97316" font-size="11" font-family="Space Mono" font-weight="700">X ↕</text>
+
+        <!-- NUMÉROS -->
+        <circle cx="45" cy="115" r="11" fill="#10b981"/><text x="45" y="119" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">1</text>
+        <circle cx="75" cy="172" r="11" fill="#10b981"/><text x="75" y="176" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">2</text>
+        <circle cx="200" cy="145" r="11" fill="#f97316"/><text x="200" y="149" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">3</text>
+        <circle cx="285" cy="215" r="11" fill="#10b981"/><text x="285" y="219" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">4</text>
+        <circle cx="408" cy="140" r="11" fill="#7dd3fc"/><text x="408" y="144" fill="#0f172a" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">5</text>
+        <circle cx="248" cy="258" r="11" fill="#f59e0b"/><text x="248" y="262" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">6</text>
+        <circle cx="285" cy="168" r="11" fill="#b87333"/><text x="285" y="172" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">7</text>
+        <circle cx="290" cy="125" r="11" fill="#334155"/><text x="290" y="129" fill="white" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle">8</text>
+
+        <text x="240" y="20" fill="#10b981" font-size="11" font-family="Space Mono" font-weight="700" text-anchor="middle" letter-spacing="2">TOUR PARALLÈLE</text>
+        <text x="240" y="34" fill="#475569" font-size="8" font-family="Space Mono" text-anchor="middle">Vue de dessus — schéma détaillé</text>
+      </svg>
+    </div>
+
+    <div>
+      <h4 class="font-black uppercase text-lg mb-4" style="font-family:var(--dp)">Parties essentielles</h4>
+      <div class="part-item">
+        <span class="part-num" style="background:var(--green);color:white;">1</span>
+        <div><span class="part-name" style="color:var(--green)">La Poupée Fixe</span><span class="part-desc">Boîtier principal contenant la boîte de vitesses, les roulements de broche et les commandes de filetage (lyre). Ne se déplace jamais. Moteur intégré ou par courroie.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:var(--green);color:white;">2</span>
+        <div><span class="part-name" style="color:var(--green)">Le Mandrin (3 ou 4 mors)</span><span class="part-desc">Mandrin 3 mors : auto-centrant, serrage simultané. Précision ±0.05 mm. Mandrin 4 mors : indépendants, pour pièces excentriques ou carrées. Précision ±0.005 mm après réglage.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:var(--or);color:white;">3</span>
+        <div><span class="part-name" style="color:var(--or)">La Pièce en Rotation</span><span class="part-desc">Tourne à la vitesse N sélectionnée. Axe de rotation = axe Z. Diamètre max admissible au-dessus du banc : 250 à 800 mm selon modèle.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:var(--green);color:white;">4</span>
+        <div><span class="part-name" style="color:var(--green)">Le Chariot &amp; Tourelle</span><span class="part-desc">Chariot longitudinal (axe Z) + chariot transversal (axe X) + chariot supérieur (angles). Tourelle 4 positions pour changement rapide d'outils.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:#7dd3fc;color:#0f172a;">5</span>
+        <div><span class="part-name" style="color:#0369a1">La Contre-Pointe</span><span class="part-desc">Se déplace sur le banc, se bloque à n'importe quelle position. Reçoit une pointe fixe (60°) ou tournante pour pièces longues. Peut aussi recevoir forets et alésoirs.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:#f59e0b;color:white;">6</span>
+        <div><span class="part-name" style="color:#92400e">La Vis Mère</span><span class="part-desc">Filetage de précision (pas connu exact). Reliée à la poupée fixe via la lyre (engrenages). Essentielle pour le filetage : synchronise N et avance Z.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:#b87333;color:white;">7</span>
+        <div><span class="part-name" style="color:#92400e">L'Outil de Tournage</span><span class="part-desc">Outil monodent (plaquette ou ARS forgé). Coupe en continu. Se règle en hauteur (à l'axe de la pièce). Plusieurs géométries selon opération.</span></div>
+      </div>
+      <div class="part-item">
+        <span class="part-num" style="background:#334155;color:white;">8</span>
+        <div><span class="part-name" style="color:#475569">La Lunette (optionnel)</span><span class="part-desc">Appui supplémentaire pour pièces longues (L/D > 8). Lunette fixe : montée sur le banc. Lunette mobile : montée sur le chariot, suit l'outil.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODULE 02 — OUTILS DE TOURNAGE -->
+<section class="mb-14 fade-up delay-1">
+  <div class="flex items-baseline gap-4 mb-6">
+    <span class="module-num">02.</span>
+    <h3 class="section-title">Outils de tournage et géométries</h3>
+  </div>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div>
+      <div class="svg-wrap mb-4" style="min-height:260px;">
+        <svg viewBox="0 0 400 240" width="100%" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="240" fill="#030712"/>
+          <defs><pattern id="gt2" width="15" height="15" patternUnits="userSpaceOnUse"><path d="M15 0L0 0 0 15" fill="none" stroke="#1e293b" stroke-width=".4"/></pattern></defs>
+          <rect width="400" height="240" fill="url(#gt2)" opacity=".3"/>
+
+          <!-- OUTIL CHARIOTAGE -->
+          <g transform="translate(20,20)">
+            <rect x="0" y="20" width="60" height="16" rx="2" fill="#94a3b8" stroke="#64748b"/>
+            <polygon points="50,20 60,20 60,36 50,36 60,20" fill="#ffd700" stroke="#d97706"/>
+            <polygon points="60,20 75,28 60,36" fill="#f59e0b" stroke="#d97706"/>
+            <!-- angle coupe -->
+            <path d="M60,20 L75,20" stroke="#10b981" stroke-width="1" stroke-dasharray="3,2"/>
+            <path d="M60,20 L75,28" stroke="#10b981" stroke-width="1"/>
+            <text x="70" y="18" fill="#10b981" font-size="7" font-family="Space Mono">γ</text>
+            <text x="30" y="52" fill="#10b981" font-size="8" font-family="Space Mono" text-anchor="middle">Chariotage</text>
+            <text x="30" y="63" fill="#64748b" font-size="7" font-family="Space Mono" text-anchor="middle">(extérieur)</text>
+          </g>
+
+          <!-- OUTIL DRESSAGE -->
+          <g transform="translate(130,20)">
+            <rect x="10" y="0" width="16" height="50" rx="2" fill="#94a3b8" stroke="#64748b"/>
+            <polygon points="10,40 26,40 18,55" fill="#ffd700" stroke="#d97706"/>
+            <text x="18" y="72" fill="#10b981" font-size="8" font-family="Space Mono" text-anchor="middle">Dressage</text>
+            <text x="18" y="83" fill="#64748b" font-size="7" font-family="Space Mono" text-anchor="middle">(face)</text>
+          </g>
+
+          <!-- OUTIL TRONÇONNAGE -->
+          <g transform="translate(200,20)">
+            <rect x="0" y="15" width="55" height="12" rx="1" fill="#94a3b8" stroke="#64748b"/>
+            <rect x="42" y="10" width="13" height="22" rx="1" fill="#f59e0b" stroke="#d97706"/>
+            <text x="28" y="52" fill="#10b981" font-size="8" font-family="Space Mono" text-anchor="middle">Tronçonnage</text>
+            <text x="28" y="63" fill="#64748b" font-size="7" font-family="Space Mono" text-anchor="middle">(gorge/coupe)</text>
+          </g>
+
+          <!-- OUTIL ALÉSAGE -->
+          <g transform="translate(310,20)">
+            <rect x="15" y="0" width="10" height="55" rx="2" fill="#94a3b8" stroke="#64748b"/>
+            <polygon points="15,45 25,45 15,60 25,60 20,70" fill="#ffd700" stroke="#d97706"/>
+            <text x="20" y="88" fill="#10b981" font-size="8" font-family="Space Mono" text-anchor="middle">Alésage</text>
+            <text x="20" y="99" fill="#64748b" font-size="7" font-family="Space Mono" text-anchor="middle">(intérieur)</text>
+          </g>
+
+          <!-- GÉOMÉTRIE OUTIL détail -->
+          <g transform="translate(20,130)">
+            <text x="0" y="0" fill="#10b981" font-size="8" font-family="Space Mono" font-weight="700">ANGLES DE COUPE</text>
+            <line x1="0" y1="10" x2="360" y2="10" stroke="#1e293b" stroke-width="1"/>
+            <!-- Schéma angles -->
+            <rect x="0" y="20" width="80" height="20" rx="1" fill="#94a3b8" stroke="#64748b"/>
+            <polygon points="65,20 80,20 80,40 65,40 88,30" fill="#ffd700" stroke="#d97706"/>
+            <!-- angles -->
+            <line x1="88" y1="30" x2="110" y2="30" stroke="#475569" stroke-dasharray="3,2"/>
+            <path d="M88,30 L103,18" stroke="#10b981" stroke-width="1.5"/>
+            <text x="108" y="20" fill="#10b981" font-size="7" font-family="Space Mono">α angle dépouille</text>
+            <path d="M88,30 L100,42" stroke="#7dd3fc" stroke-width="1.5"/>
+            <text x="108" y="45" fill="#7dd3fc" font-size="7" font-family="Space Mono">γ angle coupe</text>
+            <text x="0" y="80" fill="#64748b" font-size="7" font-family="Space Mono">Acier : γ=8° α=6° | Alu : γ=15° α=10°</text>
+            <text x="0" y="93" fill="#64748b" font-size="7" font-family="Space Mono">Inox : γ=5° α=5° | Fonte : γ=5° α=8°</text>
+          </g>
+
+          <text x="200" y="225" fill="#10b981" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle" letter-spacing="1">OUTILS DE TOURNAGE</text>
+        </svg>
+      </div>
+    </div>
+    <div class="space-y-4">
+      <div class="def-box">
+        <p><strong>Plaquette indexable</strong> — Carbure revêtu (TiN, TiAlN, Al₂O₃). S'indexe sur le porte-plaquette : 3 à 8 arêtes utilisables avant remplacement. Formes ISO : C (80°), D (55°), T (triangle), R (ronde).</p>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Outil ARS</th><th>Usage</th><th>Particularité</th></tr></thead>
+        <tbody>
+          <tr><td class="font-semibold">Chariotage ext.</td><td>Usinage cylindrique</td><td class="green-cell">Le plus courant</td></tr>
+          <tr><td class="font-semibold">Dressage</td><td>Face perpendiculaire</td><td class="green-cell">Avance vers centre</td></tr>
+          <tr><td class="font-semibold">Tronçonnage</td><td>Couper/gorge</td><td class="green-cell">Outil étroit &lt; 4 mm</td></tr>
+          <tr><td class="font-semibold">Alésage intér.</td><td>Agrandir un trou</td><td class="green-cell">Barre d'alésage</td></tr>
+          <tr><td class="font-semibold">Filetage</td><td>Profil 60° ou Tr</td><td class="green-cell">Pas lié à la lyre</td></tr>
+        </tbody>
+      </table>
+      <div class="warn-box">
+        <p>⚠ <strong>Réglage en hauteur OBLIGATOIRE :</strong> L'outil doit être exactement à l'axe de la pièce (± 0.1 mm). Trop haut → vibrations + arrachement. Trop bas → outil frotte → bris possible. Utiliser une cale de réglage ou la pointe de centrage.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODULE 03 — CALCULS DE COUPE -->
+<section class="mb-14 fade-up delay-1">
+  <div class="flex items-baseline gap-4 mb-6">
+    <span class="module-num">03.</span>
+    <h3 class="section-title">Calculs de conditions de coupe</h3>
+  </div>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="card">
+      <h4 class="font-black uppercase text-lg mb-4" style="font-family:var(--dp);color:var(--green)">Formules tournage</h4>
+      <div class="formula mb-4">
+        <span class="cm">/* Vitesse de rotation */</span><br>
+        <span class="res">N</span> = (<span class="val">1000 × Vc</span>) / (<span class="val">π × D</span>)<br>
+        <span class="cm">N = tr/min | D = diamètre usiné (mm)</span><br><br>
+        <span class="cm">/* Avance par tour → avance table */</span><br>
+        <span class="res">f</span> = avance/tour (mm/tr)<br>
+        <span class="res">Vf</span> = <span class="val">N × f</span> (mm/min)<br><br>
+        <span class="cm">/* Temps de chariotage */</span><br>
+        <span class="res">Tc</span> = <span class="val">L</span> / (<span class="val">N × f</span>) = <span class="val">L / Vf</span><br>
+        <span class="cm">L = longueur à usiner (mm)</span>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Matière</th><th>Vc ARS (m/min)</th><th>Vc Carbure</th></tr></thead>
+        <tbody>
+          <tr><td>Acier doux</td><td class="green-cell">25 – 40</td><td class="green-cell">100 – 200</td></tr>
+          <tr><td>Acier inox</td><td class="green-cell">12 – 20</td><td class="green-cell">50 – 100</td></tr>
+          <tr><td>Aluminium</td><td class="green-cell">100 – 300</td><td class="green-cell">400 – 1000</td></tr>
+          <tr><td>Fonte GG</td><td class="green-cell">15 – 30</td><td class="green-cell">80 – 150</td></tr>
+          <tr><td>Cuivre/laiton</td><td class="green-cell">60 – 150</td><td class="green-cell">200 – 400</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Calculateur tournage -->
+    <div class="card" style="background:#0f172a;border-color:#1e293b;">
+      <h4 class="font-black uppercase text-lg mb-4" style="font-family:var(--dp);color:var(--green)">🧮 Calculateur tournage</h4>
+      <div class="space-y-3 mb-4">
+        <div>
+          <span class="calc-label">Diamètre pièce D (mm)</span>
+          <input type="number" id="t-d" class="calc-input" value="50" min="1" max="500">
+        </div>
+        <div>
+          <span class="calc-label">Vitesse de coupe Vc (m/min)</span>
+          <input type="number" id="t-vc" class="calc-input" value="60" min="1" max="2000">
+        </div>
+        <div>
+          <span class="calc-label">Avance par tour f (mm/tr)</span>
+          <input type="number" id="t-f" class="calc-input" value="0.2" min="0.01" max="5" step="0.01">
+        </div>
+        <div>
+          <span class="calc-label">Longueur à usiner L (mm)</span>
+          <input type="number" id="t-l" class="calc-input" value="100" min="1" max="5000">
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-2">
+        <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:.75rem;text-align:center;">
+          <p style="font-family:var(--mn);font-size:.5rem;color:#64748b;text-transform:uppercase;margin-bottom:.25rem">N (tr/min)</p>
+          <p class="calc-result" id="t-res-n" style="font-size:1.2rem;">382</p>
+        </div>
+        <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:.75rem;text-align:center;">
+          <p style="font-family:var(--mn);font-size:.5rem;color:#64748b;text-transform:uppercase;margin-bottom:.25rem">Vf (mm/min)</p>
+          <p class="calc-result" id="t-res-vf" style="font-size:1.2rem;">76</p>
+        </div>
+        <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:.75rem;text-align:center;">
+          <p style="font-family:var(--mn);font-size:.5rem;color:#64748b;text-transform:uppercase;margin-bottom:.25rem">Tc (min)</p>
+          <p class="calc-result" id="t-res-tc" style="font-size:1.2rem;">1.31</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODULE 04 — OPÉRATIONS -->
+<section class="mb-14 fade-up delay-2">
+  <div class="flex items-baseline gap-4 mb-6">
+    <span class="module-num">04.</span>
+    <h3 class="section-title">Opérations de tournage</h3>
+  </div>
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
+    <div class="op-card">
+      <h4>Chariotage</h4>
+      <p>Usinage cylindrique extérieur. Avance longitudinale (axe Z). Outil à 90° ou 75°. L'opération de base du tournage.</p>
+    </div>
+    <div class="op-card">
+      <h4>Dressage</h4>
+      <p>Usinage d'une face perpendiculaire à l'axe. Avance transversale (axe X) de l'extérieur vers le centre. Crée une face plane et perpendiculaire.</p>
+    </div>
+    <div class="op-card">
+      <h4>Filetage à la lyre</h4>
+      <p>Liaison mécanique poupée-vis mère via engrenages. Le pas du filet dépend du rapport des roues de la lyre. Un tour pièce = un avancement = 1 pas.</p>
+    </div>
+    <div class="op-card">
+      <h4>Tronçonnage</h4>
+      <p>Couper une pièce ou réaliser une gorge. Outil très étroit (2 à 4 mm). Vitesse réduite de 30%. Avance lente et régulière vers l'axe.</p>
+    </div>
+    <div class="op-card">
+      <h4>Perçage / Alésage</h4>
+      <p>Foret en contre-pointe : perçage axial. Barre d'alésage sur tourelle : agrandit et rectifie un alésage intérieur à la cote exacte.</p>
+    </div>
+    <div class="op-card">
+      <h4>Conicité (cône)</h4>
+      <p>Usinage d'une surface conique. 3 méthodes : rotation chariot supérieur, décalage contre-pointe, ou utilisation du combiné taper.</p>
+    </div>
+  </div>
+
+  <!-- SVG tournage opérations -->
+  <div class="svg-wrap" style="min-height:170px;">
+    <svg viewBox="0 0 500 160" width="100%" xmlns="http://www.w3.org/2000/svg">
+      <rect width="500" height="160" fill="#030712"/>
+      <defs><pattern id="gt3" width="15" height="15" patternUnits="userSpaceOnUse"><path d="M15 0L0 0 0 15" fill="none" stroke="#1e293b" stroke-width=".4"/></pattern></defs>
+      <rect width="500" height="160" fill="url(#gt3)" opacity=".3"/>
+
+      <!-- CHARIOTAGE -->
+      <g transform="translate(20,20)">
+        <rect x="0" y="20" width="80" height="30" rx="2" fill="#b87333" stroke="#a16520"/>
+        <rect x="0" y="20" width="5" height="30" rx="1" fill="#c89050"/>
+        <!-- outil -->
+        <rect x="74" y="15" width="6" height="15" rx="1" fill="#f59e0b" stroke="#d97706"/>
+        <polygon points="80,15 86,22 80,28" fill="#ffd700" stroke="#d97706"/>
+        <!-- flèche avance Z -->
+        <path d="M86 22 L10 22" stroke="#f97316" stroke-width="1.5" marker-end="url(#arr-t)"/>
+        <!-- rotation -->
+        <path d="M35 15 A12 6 0 0 1 55 15" stroke="#10b981" fill="none" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <polygon points="55,12 59,16 54,17" fill="#10b981"/>
+        <text x="40" y="140" fill="#10b981" font-size="9" font-family="Space Mono" text-anchor="middle">CHARIOTAGE</text>
+      </g>
+
+      <!-- DRESSAGE -->
+      <g transform="translate(135,20)">
+        <rect x="0" y="0" width="80" height="70" rx="2" fill="#b87333" stroke="#a16520"/>
+        <rect x="0" y="0" width="80" height="8" rx="1" fill="#c89050"/>
+        <!-- outil dressage -->
+        <rect x="38" y="-12" width="14" height="16" rx="1" fill="#f59e0b" stroke="#d97706"/>
+        <polygon points="38,4 52,4 45,12" fill="#ffd700" stroke="#d97706"/>
+        <!-- flèche X -->
+        <path d="M45 12 L45 40" stroke="#f97316" stroke-width="1.5" marker-end="url(#arr-t)"/>
+        <text x="40" y="140" fill="#10b981" font-size="9" font-family="Space Mono" text-anchor="middle">DRESSAGE</text>
+      </g>
+
+      <!-- FILETAGE -->
+      <g transform="translate(250,20)">
+        <rect x="0" y="20" width="90" height="30" rx="2" fill="#b87333" stroke="#a16520"/>
+        <!-- profil filet -->
+        <path d="M0,20 L8,10 L16,20 L24,10 L32,20 L40,10 L48,20 L56,10 L64,20 L72,10 L80,20" stroke="#c89050" fill="none" stroke-width="2"/>
+        <!-- outil filetage -->
+        <polygon points="85,15 95,28 85,35" fill="#ffd700" stroke="#d97706"/>
+        <!-- flèche synchronisée -->
+        <path d="M95 28 L10 28" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="5" y="10" fill="#10b981" font-size="7" font-family="Space Mono">sync. lyre</text>
+        <text x="45" y="140" fill="#10b981" font-size="9" font-family="Space Mono" text-anchor="middle">FILETAGE</text>
+      </g>
+
+      <!-- TRONÇONNAGE -->
+      <g transform="translate(370,20)">
+        <rect x="0" y="15" width="90" height="40" rx="2" fill="#b87333" stroke="#a16520"/>
+        <!-- gorge -->
+        <rect x="38" y="15" width="14" height="30" rx="0" fill="#0f172a" stroke="#a16520"/>
+        <!-- outil tronçonnage -->
+        <rect x="41" y="2" width="8" height="16" rx="1" fill="#f59e0b" stroke="#d97706"/>
+        <!-- flèche -->
+        <path d="M45 2 L45 14" stroke="#f97316" stroke-width="1.5" marker-end="url(#arr-t)"/>
+        <text x="45" y="140" fill="#10b981" font-size="9" font-family="Space Mono" text-anchor="middle">GORGE</text>
+      </g>
+
+      <text x="250" y="12" fill="#10b981" font-size="10" font-family="Space Mono" font-weight="700" text-anchor="middle" letter-spacing="1">OPÉRATIONS DE TOURNAGE</text>
+    </svg>
+  </div>
+</section>
+
+<!-- MODULE 05 — FILETAGE À LA LYRE -->
+<section class="mb-14 fade-up delay-2">
+  <div class="flex items-baseline gap-4 mb-6">
+    <span class="module-num">05.</span>
+    <h3 class="section-title">Le filetage à la lyre</h3>
+  </div>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="card">
+      <h4 class="font-black uppercase text-base mb-3" style="font-family:var(--dp);color:var(--green)">Principe du filetage</h4>
+      <div class="def-box mb-4">
+        <p>La <strong>lyre</strong> (ou boîte de filetage) est un ensemble d'engrenages interchangeables reliant la broche à la vis mère. Quand la pièce fait 1 tour, l'outil avance exactement d'1 pas de filet.<br><br>
+        <strong>Pas obtenu</strong> = Pas de la vis mère × (rapport d'engrenages lyre)</p>
+      </div>
+      <div class="formula">
+        <span class="cm">/* Calcul rapport lyre simplifié */</span><br>
+        <span class="res">i</span> = <span class="val">P_souhaité</span> / <span class="val">P_vis_mère</span><br>
+        <span class="cm">Exemple : filet M20×2.5, vis mère pas=6</span><br>
+        <span class="res">i</span> = <span class="val">2.5</span> / <span class="val">6</span> = <span class="val">5/12</span><br>
+        <span class="cm">→ Roue motrice 20 dents + menée 48 dents</span><br><br>
+        <span class="cm">/* Nombre de passes filetage */</span><br>
+        <span class="res">ap_total</span> ≈ <span class="val">0.65 × P</span> (profil 60°)<br>
+        <span class="cm">Reparti en 5-8 passes décroissantes</span>
+      </div>
+    </div>
+    <div class="space-y-4">
+      <div class="warn-box">
+        <p>⚠ <strong>Procédure filetage conventionnel :</strong><br>
+        ① Régler la lyre selon le tableau de la machine<br>
+        ② Enclencher l'écrou de la vis mère en début de passe<br>
+        ③ À la fin de la passe : dégager l'outil (X rapide) puis désenclencher l'écrou<br>
+        ④ Reculer en Z (retour manuel ou désengagement)<br>
+        ⑤ Rengager à la même position (utiliser le cadran diviseur)<br>
+        ⑥ Augmenter ap et recommencer</p>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Filet ISO</th><th>Pas (mm)</th><th>Profondeur totale</th></tr></thead>
+        <tbody>
+          <tr><td>M8</td><td>1.25</td><td class="green-cell">0.81 mm</td></tr>
+          <tr><td>M10</td><td>1.50</td><td class="green-cell">0.97 mm</td></tr>
+          <tr><td>M12</td><td>1.75</td><td class="green-cell">1.14 mm</td></tr>
+          <tr><td>M16</td><td>2.00</td><td class="green-cell">1.30 mm</td></tr>
+          <tr><td>M20</td><td>2.50</td><td class="green-cell">1.62 mm</td></tr>
+          <tr><td>M24</td><td>3.00</td><td class="green-cell">1.95 mm</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- MODULE 06 — EXERCICES -->
+<section class="mb-10 fade-up delay-3">
+  <div class="flex items-baseline gap-4 mb-6">
+    <span class="module-num">06.</span>
+    <h3 class="section-title">Exercices corrigés</h3>
+  </div>
+  <div class="exercise">
+    <h4>5 Exercices — Cliquez sur "Voir la réponse"</h4>
+
+    <div class="ex-question">
+      <p><strong>Ex. 1 — Calcul N :</strong> Vous charioter un acier S235 de Ø60 mm avec un outil carbure. Vc recommandée = 120 m/min. Calculez N et l'avance Vf si f = 0.25 mm/tr.</p>
+      <button class="btn-answer" onclick="toggleAnswer('ta1')">Voir la réponse ▼</button>
+      <div class="ex-answer" id="ta1">
+        <p>N = (1000 × 120) / (π × 60) = 120 000 / 188.5 = <span style="color:#22c55e;font-weight:700">637 tr/min → choisir 630 tr/min</span><br><br>
+Vf = N × f = 630 × 0.25 = <span style="color:#22c55e;font-weight:700">157.5 mm/min ≈ 160 mm/min</span></p>
+      </div>
+    </div>
+
+    <div class="ex-question">
+      <p><strong>Ex. 2 — Filetage :</strong> Vous devez réaliser un filet M16 (pas 2 mm) sur un tour dont la vis mère a un pas de 4 mm. Quel rapport de lyre utiliser ? Quelle profondeur totale ?</p>
+      <button class="btn-answer" onclick="toggleAnswer('ta2')">Voir la réponse ▼</button>
+      <div class="ex-answer" id="ta2">
+        <p>Rapport lyre : i = P_souhaité / P_vis_mère = 2 / 4 = <span style="color:#22c55e;font-weight:700">1/2</span><br>
+→ Roue motrice 20 dents + roue menée 40 dents (ou 25/50, 30/60...)<br><br>
+Profondeur totale = 0.65 × P = 0.65 × 2 = <span style="color:#22c55e;font-weight:700">1.30 mm</span><br>
+Répartir en 6 passes : 0.35 + 0.25 + 0.20 + 0.20 + 0.15 + 0.15 = 1.30 mm</p>
+      </div>
+    </div>
+
+    <div class="ex-question">
+      <p><strong>Ex. 3 — Tronçonnage :</strong> Vous tronçonnez une barre Ø40 mm en acier. Votre vitesse de chariotage normale est N = 500 tr/min. Quelle vitesse adopter pour le tronçonnage ? Pourquoi ?</p>
+      <button class="btn-answer" onclick="toggleAnswer('ta3')">Voir la réponse ▼</button>
+      <div class="ex-answer" id="ta3">
+        <p>Vitesse tronçonnage = 30 à 50% de la vitesse normale<br>
+N_tronçonnage = 500 × 0.35 = <span style="color:#22c55e;font-weight:700">175 tr/min → choisir 160 tr/min</span><br><br>
+Pourquoi réduire ?<br>
+• L'outil tronçon est étroit (fragile aux vibrations)<br>
+• Le diamètre effectif diminue en cours d'opération → Vc augmente naturellement<br>
+• Risque de bris outil si les vibrations s'amplifient (résonance)</p>
+      </div>
+    </div>
+
+    <div class="ex-question">
+      <p><strong>Ex. 4 — Temps :</strong> Vous charioter une barre de L = 150 mm sur Ø50 mm. N = 500 tr/min, f = 0.3 mm/tr. Calculez le temps de passe. Combien de temps pour 3 passes d'ébauche + 1 passe de finition (f = 0.1 mm/tr) ?</p>
+      <button class="btn-answer" onclick="toggleAnswer('ta4')">Voir la réponse ▼</button>
+      <div class="ex-answer" id="ta4">
+        <p>Vf ébauche = 500 × 0.3 = 150 mm/min<br>
+Tc ébauche = 150 / 150 = <span style="color:#22c55e;font-weight:700">1.00 min par passe</span><br>
+3 passes ébauche = 3.0 min<br><br>
+Vf finition = 500 × 0.1 = 50 mm/min<br>
+Tc finition = 150 / 50 = <span style="color:#22c55e;font-weight:700">3.0 min</span><br><br>
+Total usinage = 3.0 + 3.0 = <span style="color:#22c55e;font-weight:700">6.0 min</span><br>
++ retours + mesures ≈ 10 min au total</p>
+      </div>
+    </div>
+
+    <div class="ex-question">
+      <p><strong>Ex. 5 — Dépannage :</strong> En cours de chariotage, la pièce laisse une surface rugueuse avec des stries hélicoïdales régulières. Quelles sont les causes ? Comment corriger ?</p>
+      <button class="btn-answer" onclick="toggleAnswer('ta5')">Voir la réponse ▼</button>
+      <div class="ex-answer" id="ta5">
+        <p><span style="color:#22c55e;font-weight:700">Cause principale :</span> Avance f trop élevée → le pas hélicoïdal est visible.<br>
+Formule Ra théorique = f² / (8 × r_bec) où r_bec = rayon de bec de l'outil<br><br>
+<span style="color:#22c55e;font-weight:700">Solutions :</span><br>
+① Réduire l'avance f (passer de 0.3 à 0.1 mm/tr en finition)<br>
+② Utiliser un outil avec rayon de bec plus grand (r = 0.8 ou 1.2 mm)<br>
+③ Augmenter la Vc (surface lisse avec vitesse plus élevée)<br>
+④ Vérifier que l'outil est bien à l'axe (ni trop haut, ni trop bas)<br>
+⑤ Éliminer tout jeu dans le chariot (serrer les vis de rattrapage de jeu)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LESSON NAV -->
+<div class="lesson-nav">
+  <a href="conv-fraisage.html" class="btn-sec">← L.2 Fraiseuse Conv.</a>
+  <div class="text-center">
+    <p style="font-family:var(--mn);font-size:.62rem;color:var(--green);text-transform:uppercase;letter-spacing:.1em;">Leçon 3 / Conv. — Tour Parallèle Complet</p>
+  </div>
+  <a href="conv-etau-limeur.html" class="btn-green">L.4 Étau-Limeur →</a>
+</div>
+
+</main>
+
+<footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-12">
+  <p class="text-xs" style="font-family:var(--mn);letter-spacing:.2em;text-transform:uppercase">© 2026 CNC ACADÉMIE — Julien Joos · Formation Usinage · Belgique</p>
+  <p class="text-xs mt-2" style="font-family:var(--mn);color:#334155;"><a href="mentions-legales.html" style="color:#475569;text-decoration:underline;">Mentions légales</a></p>
+</footer>
+
+<script>
+document.getElementById('burger-btn').addEventListener('click',()=>{
+  document.getElementById('mobile-menu').classList.toggle('open');
+  document.getElementById('burger-icon').classList.toggle('hidden');
+  document.getElementById('close-icon').classList.toggle('hidden');
+});
+function toggleDropdown(){document.getElementById('dropdown-menu').classList.toggle('hidden');}
+document.addEventListener('click',e=>{
+  const w=document.getElementById('dropdown-wrapper');
+  if(w&&!w.contains(e.target))document.getElementById('dropdown-menu').classList.add('hidden');
+});
+function calcT(){
+  const D=parseFloat(document.getElementById('t-d').value)||50;
+  const Vc=parseFloat(document.getElementById('t-vc').value)||60;
+  const f=parseFloat(document.getElementById('t-f').value)||0.2;
+  const L=parseFloat(document.getElementById('t-l').value)||100;
+  const N=Math.round((1000*Vc)/(Math.PI*D));
+  const Vf=Math.round(N*f);
+  const Tc=(Vf>0)?(L/Vf).toFixed(2):'∞';
+  document.getElementById('t-res-n').textContent=N.toLocaleString('fr');
+  document.getElementById('t-res-vf').textContent=Vf.toLocaleString('fr');
+  document.getElementById('t-res-tc').textContent=Tc;
+}
+['t-d','t-vc','t-f','t-l'].forEach(id=>document.getElementById(id).addEventListener('input',calcT));
+calcT();
+function toggleAnswer(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('show');
+  const btn=el.previousElementSibling;
+  btn.textContent=el.classList.contains('show')?'Masquer la réponse ▲':'Voir la réponse ▼';
+}
+</script>
+</body>
+</html>

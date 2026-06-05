@@ -108,15 +108,16 @@
 <nav class="bg-slate-900 sticky top-0 z-50 shadow-xl">
     <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
         <a href="index.html" class="logo-text text-white">CNC<span class="text-orange-500">ACADÉMIE</span></a>
-        <div class="hidden md:flex items-center gap-6">
+        <div class="hidden md:flex items-center gap-5">
             <a href="index.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Accueil</a>
             <a href="dictionnaire.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Codes G/M</a>
             <div class="relative dropdown-trigger">
-                <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-orange-400 transition">
+                <button class="flex items-center text-white font-semibold uppercase tracking-wide text-xs focus:outline-none hover:text-indigo-400 transition">
                     COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
-                <div class="dropdown-menu">
-                    <div class="px-3 pt-2 pb-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
+                <div class="dropdown-menu" style="width:22rem;max-height:78vh;overflow-y:auto;">
+                    <div class="dd-sticky px-3 pt-2.5 pb-1.5 bg-orange-50 border-b border-orange-100"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-orange-500">⚡ G-Code CNC Fanuc</p></div>
+                    <div class="px-3 pt-1.5 pb-0.5"><p style="font-family:var(--mono)" class="text-[9px] font-bold uppercase tracking-widest text-slate-400">— Bases —</p></div>
                     <a href="lecon1.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 01</span><span class="menu-lesson-title">Les Axes et Mouvements</span></a>
                     <a href="lecon2.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 02</span><span class="menu-lesson-title">Le Point Zéro (G54)</span></a>
                     <a href="lecon3.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 03</span><span class="menu-lesson-title">Avances et Vitesses (F/S)</span></a>
@@ -124,14 +125,19 @@
                     <a href="lecon5.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 05</span><span class="menu-lesson-title">Cycles de Perçage</span></a>
                     <a href="lecon6.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 06</span><span class="menu-lesson-title">Sous-Programmes (M98)</span></a>
                     <a href="lecon7.html" class="menu-lesson"><span class="menu-lesson-num">Leçon 07</span><span class="menu-lesson-title">Sécurité &amp; Maintenance</span></a>
-                    <div class="px-3 pt-2 pb-1 border-t border-slate-100 mt-1"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">— Expert PRO —</p></div>
-                    <a href="lecon8.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 08</span><span class="menu-lesson-title">Tournage : G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
-                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Cycles de Filetage G76 <span class="badge-pro">PRO</span></span></a>
+                    <div class="dd-sticky px-3 pt-1.5 pb-1 bg-indigo-50 border-t-2 border-indigo-100 mt-0.5"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-500">⭐ Expert PRO</p></div>
+                    <a href="lecon8.html" class="menu-lesson pro active"><span class="menu-lesson-num">Leçon 08 ←</span><span class="menu-lesson-title">Tournage G96 &amp; G97 <span class="badge-pro">PRO</span></span></a>
+                    <a href="lecon9.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 09</span><span class="menu-lesson-title">Filetage G76 <span class="badge-pro">PRO</span></span></a>
                     <a href="lecon10.html" class="menu-lesson pro"><span class="menu-lesson-num">Leçon 10</span><span class="menu-lesson-title">Programmation Paramétrée <span class="badge-pro">PRO</span></span></a>
+                    <div class="dd-sticky px-3 pt-1.5 pb-1 bg-emerald-50 border-t-2 border-emerald-100 mt-0.5"><p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-green-600">⚙ Usinage Conventionnel</p></div>
+                    <a href="conv-bases.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.1 — Bases</span><span class="text-sm text-slate-700">Les 4 machines principales</span></a>
+                    <a href="conv-fraisage.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.2 — Fraisage</span><span class="text-sm text-slate-700">Fraiseuse conventionnelle</span></a>
+                    <a href="conv-tournage.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.3 — Tour</span><span class="text-sm text-slate-700">Tour parallèle</span></a>
+                    <a href="conv-etau-limeur.html" class="block px-4 py-2.5 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.4 — Étau-Limeur</span><span class="text-sm text-slate-700">Étau-limeur &amp; Mortaiseuse</span></a>
                 </div>
             </div>
             <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
-            <a href="feedback.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
+            <a href="feedback.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
             <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
         </div>
         <button id="burger-btn" class="md:hidden text-white focus:outline-none">
@@ -143,19 +149,24 @@
         <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
         <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
         <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
-        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">FAQ &amp; Feedback</a>
+        <a href="feedback.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">FAQ &amp; Feedback</a>
+        <a href="mentions-legales.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Légal</a>
         <div>
-            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-3 pb-1">— Cours —</p>
-            <a href="lecon1.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 1 – Les Axes</a>
-            <a href="lecon2.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 2 – G54</a>
-            <a href="lecon3.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 3 – F/S</a>
-            <a href="lecon4.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 4 – G41/G42</a>
-            <a href="lecon5.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 5 – Perçage</a>
-            <a href="lecon6.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 6 – M98</a>
-            <a href="lecon7.html" class="block text-slate-300 py-1.5 text-sm hover:text-orange-400">Leçon 7 – Sécurité</a>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400 pt-3 pb-1">⭐ Expert PRO</p>
+            <a href="lecon8.html" class="block text-indigo-400 font-bold py-1.5 text-sm">→ Leçon 8 – G96/G97</a>
+            <a href="lecon9.html" class="block text-slate-300 py-1.5 text-sm hover:text-indigo-400">Leçon 9 – Filetage G76</a>
+            <a href="lecon10.html" class="block text-slate-300 py-1.5 text-sm hover:text-indigo-400">Leçon 10 – Paramétré</a>
+        </div>
+        <div>
+            <p style="font-family:var(--mono)" class="text-[10px] font-bold uppercase tracking-widest text-green-400 pt-3 pb-1">⚙ Conventionnel</p>
+            <a href="conv-bases.html" class="block text-slate-300 py-1.5 text-sm hover:text-green-400">L.1 – Bases &amp; Machines</a>
+            <a href="conv-fraisage.html" class="block text-slate-300 py-1.5 text-sm hover:text-green-400">L.2 – Fraiseuse</a>
+            <a href="conv-tournage.html" class="block text-slate-300 py-1.5 text-sm hover:text-green-400">L.3 – Tour parallèle</a>
+            <a href="conv-etau-limeur.html" class="block text-slate-300 py-1.5 text-sm hover:text-green-400">L.4 – Étau-Limeur</a>
         </div>
     </div>
 </nav>
+
 
 <!-- ═══ PROGRESS PRO ═══ -->
 <div class="progress-bar">
@@ -415,7 +426,8 @@
 </main>
 
 <footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800 mt-8">
-    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Le Savoir est votre Force</p>
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE — Julien Joos · Le Savoir est votre Force</p>
+    <p class="text-xs mt-2" style="font-family:var(--mono); color:#334155;"><a href="mentions-legales.html" style="color:#475569; text-decoration:underline;">Mentions légales</a></p>
 </footer>
 
 <script>

@@ -79,17 +79,21 @@
                 <button onclick="toggleDropdown()" class="flex items-center text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs focus:outline-none">
                     COURS <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
-                <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 overflow-hidden">
-                    <div class="px-3 pt-2 pb-1"><p class="text-[10px] font-bold uppercase tracking-widest text-slate-400" style="font-family:var(--mono)">— Bases —</p></div>
+                <div id="dropdown-menu" class="hidden absolute right-0 mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 overflow-hidden" style="width:22rem;max-height:78vh;overflow-y:auto;">
+                    <div class="sticky top-0 px-3 pt-2.5 pb-1.5 bg-orange-50 border-b border-orange-100"><p class="text-[10px] font-bold uppercase tracking-widest text-orange-500" style="font-family:var(--mono)">⚡ G-Code CNC Fanuc</p></div>
+                    <div class="px-3 pt-1.5 pb-0.5"><p class="text-[9px] font-bold uppercase tracking-widest text-slate-400" style="font-family:var(--mono)">— Bases —</p></div>
                     <a href="lecon1.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 01</span><span class="text-sm text-slate-700">Les Axes et Mouvements</span></a>
                     <a href="lecon7.html" class="block px-4 py-2.5 border-b-2 border-slate-200 hover:bg-orange-50 no-underline"><span class="block text-[10px] text-orange-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 07</span><span class="text-sm text-slate-700">Sécurité &amp; Maintenance</span></a>
-                    <div class="px-3 pt-2 pb-1"><p class="text-[10px] font-bold uppercase tracking-widest text-indigo-400" style="font-family:var(--mono)">— Expert PRO —</p></div>
-                    <a href="lecon10.html" class="block px-4 py-2.5 hover:bg-indigo-50 no-underline"><span class="block text-[10px] text-indigo-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 10</span><span class="text-sm text-slate-700">Prog. Paramétrée</span></a>
+                    <div class="sticky top-0 px-3 pt-1.5 pb-1 bg-indigo-50 border-t-2 border-indigo-100"><p class="text-[10px] font-bold uppercase tracking-widest text-indigo-500" style="font-family:var(--mono)">⭐ Expert PRO</p></div>
+                    <a href="lecon10.html" class="block px-4 py-2.5 border-b-2 border-slate-200 hover:bg-indigo-50 no-underline"><span class="block text-[10px] text-indigo-400 font-bold uppercase" style="font-family:var(--mono)">Leçon 10</span><span class="text-sm text-slate-700">Programmation Paramétrée</span></a>
+                    <div class="sticky top-0 px-3 pt-1.5 pb-1 bg-emerald-50 border-t-2 border-emerald-100"><p class="text-[10px] font-bold uppercase tracking-widest text-green-600" style="font-family:var(--mono)">⚙ Usinage Conventionnel</p></div>
+                    <a href="conv-bases.html" class="block px-4 py-2.5 border-b border-slate-100 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.1 — Bases</span><span class="text-sm text-slate-700">Les 4 machines</span></a>
+                    <a href="conv-etau-limeur.html" class="block px-4 py-2.5 hover:bg-green-50 no-underline"><span class="block text-[10px] text-green-500 font-bold uppercase" style="font-family:var(--mono)">L.4 — Étau-Limeur</span><span class="text-sm text-slate-700">Étau-limeur &amp; Mortaiseuse</span></a>
                 </div>
             </div>
             <a href="simulateur.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Simulateur</a>
             <a href="feedback.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">FAQ &amp; Feedback</a>
-            <a href="mentions-legales.html" class="text-white font-semibold hover:text-orange-400 transition uppercase tracking-wide text-xs">Légal</a>
+            <a href="mentions-legales.html" class="text-orange-400 font-semibold underline underline-offset-4 uppercase tracking-wide text-xs">Légal</a>
         </div>
         <button id="burger-btn" class="md:hidden text-white focus:outline-none">
             <svg id="burger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -100,9 +104,11 @@
         <a href="index.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Accueil</a>
         <a href="dictionnaire.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Codes G/M</a>
         <a href="simulateur.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">Simulateur</a>
-        <a href="feedback.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm">FAQ &amp; Feedback</a>
+        <a href="feedback.html" class="block text-white font-semibold py-2 border-b border-slate-700 text-sm hover:text-orange-400">FAQ &amp; Feedback</a>
+        <a href="mentions-legales.html" class="block text-orange-400 font-semibold py-2 border-b border-slate-700 text-sm underline">Légal</a>
     </div>
 </nav>
+
 
 <!-- ═══ HEADER ═══ -->
 <div class="page-header">
@@ -152,7 +158,7 @@
             </div>
             <div class="info-row">
                 <span class="info-label">Éditeur responsable</span>
-                <span class="info-val">[Votre Nom Complet] — à compléter</span>
+                <span class="info-val">Julien Joos</span>
             </div>
             <div class="info-row">
                 <span class="info-label">Adresse</span>
@@ -170,9 +176,13 @@
                 <span class="info-label">Statut</span>
                 <span class="info-val">Particulier — site éducatif sans activité commerciale ni publicité</span>
             </div>
+            <div class="info-row">
+                <span class="info-label">URL du site</span>
+                <span class="info-val">À compléter avec votre domaine OVH</span>
+            </div>
         </div>
         <div class="warn-box mt-4">
-            <p>⚠️ <strong>À compléter :</strong> Remplacez les champs entre crochets par vos informations réelles. Si vous exercez une activité professionnelle ou associative, ajoutez votre numéro d'entreprise (BCE/KBO) le cas échéant.</p>
+            <p>⚠️ <strong>À compléter :</strong> Ajoutez votre adresse postale, votre e-mail de contact, et votre nom de domaine OVH une fois celui-ci activé.</p>
         </div>
     </div>
 
@@ -183,9 +193,11 @@
             Hébergement
         </div>
         <div class="legal-text mb-3">
-            <p>Ce site est hébergé par la plateforme GitHub Pages, service fourni par :</p>
+            <p>Ce site utilise une infrastructure en deux couches : les fichiers sont hébergés sur <strong>GitHub Pages</strong> et le nom de domaine est géré par <strong>OVHcloud</strong>.</p>
         </div>
-        <div>
+
+        <p class="legal-text mb-3"><strong>Hébergeur des fichiers :</strong></p>
+        <div class="mb-4">
             <div class="info-row">
                 <span class="info-label">Hébergeur</span>
                 <span class="info-val font-bold">GitHub, Inc.</span>
@@ -207,8 +219,33 @@
                 <span class="info-val">GitHub Pages — hébergement statique gratuit</span>
             </div>
         </div>
+
+        <p class="legal-text mb-3"><strong>Gestionnaire du nom de domaine :</strong></p>
+        <div class="mb-4">
+            <div class="info-row">
+                <span class="info-label">Registrar</span>
+                <span class="info-val font-bold">OVHcloud (OVH SAS)</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Adresse</span>
+                <span class="info-val">2 rue Kellermann, 59100 Roubaix, France</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Site web</span>
+                <span class="info-val"><a href="https://www.ovhcloud.com/fr/" target="_blank" rel="noopener">ovhcloud.com</a></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Politique de confidentialité</span>
+                <span class="info-val"><a href="https://www.ovhcloud.com/fr/personal-data-protection/" target="_blank" rel="noopener">Protection des données OVHcloud</a></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Nom de domaine</span>
+                <span class="info-val" id="domain-val">À compléter (ex : cnc-academie.be)</span>
+            </div>
+        </div>
+
         <div class="legal-text mt-3">
-            <p>GitHub Pages peut collecter certaines données techniques (adresses IP, logs de serveur) conformément à sa propre politique de confidentialité. L'éditeur de CNC Académie n'a pas accès à ces données.</p>
+            <p>GitHub Pages peut collecter certaines données techniques (adresses IP, logs de serveur) conformément à sa propre politique de confidentialité. OVHcloud gère uniquement la résolution DNS du nom de domaine. L'éditeur de CNC Académie n'a pas accès aux logs serveur de GitHub.</p>
         </div>
     </div>
 
@@ -445,7 +482,7 @@
 </main>
 
 <footer class="bg-slate-900 text-gray-500 py-10 text-center border-t border-gray-800">
-    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE · Tous droits réservés · Belgique</p>
+    <p class="text-xs" style="font-family:var(--mono); letter-spacing:0.2em; text-transform:uppercase">© 2026 CNC ACADÉMIE — Julien Joos · Tous droits réservés · Belgique</p>
     <p class="text-xs mt-2" style="font-family:var(--mono); color:#334155;">
         <a href="mentions-legales.html" style="color:#475569; text-decoration:underline;">Mentions légales</a>
     </p>
